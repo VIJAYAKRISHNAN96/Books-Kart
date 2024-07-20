@@ -134,9 +134,13 @@
 
 const express = require("express");
 const userRouter = express.Router();
+const passport = require('passport'); // Add this line
+
 const userController = require("../controllers/userController");
 const orderManagement = require("../controllers/orderManagement");
 const auth = require("../middlewares/userAuth");
+const googleAuthController = require('../controllers/googleAuthController');
+
 
 // Define routes and link them to controller methods
 userRouter.get("/", userController.homePage);
@@ -171,5 +175,11 @@ userRouter.get('/viewOrder', orderManagement.loadOrderView);
 userRouter.get('/checkout', auth.isLogin, userController.loadCheckout);
 
 userRouter.get('/otpVerify', auth.isLogOut, userController.loadOTP);
+
+userRouter.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+userRouter.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  googleAuthController.googleAuthCallback
+);
 
 module.exports = userRouter;

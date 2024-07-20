@@ -3,6 +3,7 @@ mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+const passport = require("passport");
 
 const User= require("../model/userModel");
 const Product = require("../model/productModel");
@@ -838,7 +839,9 @@ loadCheckout : async (req, res) => {
   } catch (error) {
       console.log(error.message);
   }
-}
+},
+
+
 
 
 }

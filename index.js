@@ -4,6 +4,12 @@ const bodyparser = require('body-parser');
 require("dotenv").config();
 const mongoose = require("mongoose");
 const PORT = process.env.PORT || 4000
+const passport=require("passport");
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const User = require('./model/userModel'); // Make sure to import your User model
+const bcrypt = require('bcrypt');
+
+
 
 
 //    const adminController = require("./controllers/adminController");
@@ -43,7 +49,47 @@ app.use(express.urlencoded({extended:true}));
  );
  app.use(express.json());
  
+// Passport Configuration
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: 'http://localhost:3000/auth/google/callback'
+},
+async (accessToken, refreshToken, profile, done) => {
+  try {
+    const existingUser = await User.findOne({ googleId: profile.id });
+    if (existingUser) {
+      return done(null, existingUser);
+    }
+    const newUser = new User({
+      googleId: profile.id,
+      name: profile.displayName,
+      email: profile.emails[0].value,
+      password: await bcrypt.hash('google_signin_password', 10)       
+      
+    });
+    await newUser.save();
+    done(null, newUser);
+  } catch (error) {
+    done(error, null);
+  }
+}));
 
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
+});
+
+app.use(passport.initialize());
+app.use(passport.session());
 
  app.use((req, res, next) => {
   console.log('Session on every request:', req.session);
