@@ -79,28 +79,97 @@
 // // Load OTP verification page
 // userRouter.get('/otpVerify', userController.loadOTP);
 
+// // module.exports = userRouter;
+// const express = require("express");
+// const userRouter = express.Router();
+// const userController = require("../controllers/userController");
+// const orderManagement = require("../controllers/orderManagement");
+// const auth=require("../middlewares/userAuth");
+// const orderManagement = require("../controllers/orderManagement");
+
+
+// // Define routes and link them to controller methods
+// userRouter.get("/", userController.homePage);
+// userRouter.get("/signup",auth.isLogOut, userController.loadSignup);
+// userRouter.post("/signup", userController.processSignup);
+// // userRouter.get("/productDetails",userController.productDetails);
+// // userRouter.get("/product", userController.loadProductDetail);
+// userRouter.get("/product", userController.loadProductDetails);
+// // userRouter.get("/product",userController.loadProductDetails);
+// // userRouter.get("/productDetails",userController.loadProductDetails);
+
+
+// userRouter.get("/login",auth.isLogOut, userController.loadLogin);
+// userRouter.post("/login", userController.processLogin);
+// userRouter.get('/logout',auth.isLogin,userController.userLogout);
+// userRouter.get("/otp", userController.loadOTP);
+// userRouter.get("/userAccount",auth.isLogin, userController.loadUser);
+// userRouter.post("/editdetails",userController.editDetails);
+// userRouter.post("/resetpassword",userController.resetPassword);
+// userRouter.post("/addAddress",userController.addAddress);
+// userRouter.post("/editAddress",userController.editAddress);
+// userRouter.post("/deletAddress",userController.deleteAddress);
+
+// userRouter.get("/shop", userController.loadShop);
+// // userRouter.get('/shop/filter', userController.loadShopByCategory);
+// userRouter.post("/verifyOTP", userController.verifyOTP);
+// userRouter.post("/resendOTP", userController.resendOTP);
+// userRouter.get('/cart',auth.isLogin,userController.loadCart);
+// userRouter.post("/addToCart",auth.isLogin,userController.addToCart);
+// userRouter.post("/updateCart",auth.isLogin,userController.updateCart);
+// userRouter.post("/deleteCart",auth.isLogin,userController.deleteCart);
+
+// userRouter.post('/placeOrder', orderManagement.placeOrder);
+// userRouter.post('/cancelOrder', orderManagement.cancelOrder);
+// userRouter.get('/viewOrder', orderManagement.loadOrderView);
+
+
+
+// userRouter.get('/checkout',auth.isLogin, userController.loadCheckout);
+
+// userRouter.get('/otpVerify',auth.isLogOut, userController.loadOTP);
+
 // module.exports = userRouter;
+
+
 const express = require("express");
 const userRouter = express.Router();
 const userController = require("../controllers/userController");
-const auth=require("../middlewares/userAuth");
+const orderManagement = require("../controllers/orderManagement");
+const auth = require("../middlewares/userAuth");
 
 // Define routes and link them to controller methods
 userRouter.get("/", userController.homePage);
-userRouter.get("/signup",auth.isLogOut, userController.loadSignup);
+userRouter.get("/signup", auth.isLogOut, userController.loadSignup);
 userRouter.post("/signup", userController.processSignup);
+
+userRouter.get("/login", auth.isLogOut, userController.loadLogin);
+userRouter.post("/login", userController.processLogin);
+userRouter.get('/logout', auth.isLogin, userController.userLogout);
+userRouter.get("/otp", userController.loadOTP);
+userRouter.get("/userAccount", auth.isLogin, userController.loadUser);
+userRouter.post("/editdetails", userController.editDetails);
+userRouter.post("/resetpassword", userController.resetPassword);
+userRouter.post("/addAddress", userController.addAddress);
+userRouter.post("/editAddress", userController.editAddress);
+userRouter.post("/deleteAddress", userController.deleteAddress);
+
+userRouter.get("/shop", userController.loadShop);
 userRouter.get("/product", userController.loadProductDetails);
 
-userRouter.get("/login",auth.isLogOut, userController.loadLogin);
-userRouter.post("/login", userController.processLogin);
-userRouter.get('/logout',auth.isLogin,userController.userLogout);
-userRouter.get("/otp", userController.loadOTP);
-userRouter.get("/userAccount",auth.isLogin, userController.loadUser);
-userRouter.get("/shop", userController.loadShop);
-// userRouter.get('/shop/filter', userController.loadShopByCategory);
 userRouter.post("/verifyOTP", userController.verifyOTP);
 userRouter.post("/resendOTP", userController.resendOTP);
+userRouter.get('/cart', auth.isLogin, userController.loadCart);
+userRouter.post("/addToCart", auth.isLogin, userController.addToCart);
+userRouter.post("/updateCart", auth.isLogin, userController.updateCart);
+userRouter.post("/deleteCart", auth.isLogin, userController.deleteCart);
 
-userRouter.get('/otpVerify',auth.isLogOut, userController.loadOTP);
+userRouter.post('/placeOrder', orderManagement.placeOrder);
+userRouter.post('/cancelOrder', orderManagement.cancelOrder);
+userRouter.get('/viewOrder', orderManagement.loadOrderView);
+
+userRouter.get('/checkout', auth.isLogin, userController.loadCheckout);
+
+userRouter.get('/otpVerify', auth.isLogOut, userController.loadOTP);
 
 module.exports = userRouter;

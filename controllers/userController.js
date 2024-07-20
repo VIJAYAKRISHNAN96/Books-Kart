@@ -1,11 +1,14 @@
 
-
+mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 const User= require("../model/userModel");
 const Product = require("../model/productModel");
+const Cart = require("../model/cartModel")
+const Order= require("../model/orderModel");
+
 
 const transport = nodemailer.createTransport({
   service: "gmail",
@@ -94,7 +97,7 @@ const userController = {
       }
 
       req.session.user = {
-        id: user._id,
+        id: user._id.toString(),
         name: user.name,
         email: user.email,
         
@@ -245,9 +248,204 @@ const userController = {
     }
   },
 
-  loadUser: async(req, res) => {
-    res.render('userAccount');
+  // loadUser: async(req, res) => {
+  //   res.render('userAccount');
+  // },
+
+  // loadUser : async (req, res) => {
+  //   try {
+  //     const userId = req.session.user;
+  //     const user = await User.findById(userId);
+  //     // const order = await Order.find({ user: userId });
+  
+  //     // Calculate cart count
+  //     const cart = await Cart.findOne({ userId });
+  //     let cartCount = 0;
+  //     if (cart) {
+  //       cartCount = cart.product.length;
+  //     }
+  
+  //     res.render("userAccount", { user, order, cartCount });
+  //   } catch (error) {
+  //     console.error(error.message);
+  //     res.status(500).send("Internal Server Error");
+  //   }
+  // },
+  loadUser : async (req, res) => {
+    try {
+      const userId = req.session.user.id;
+      const user = await User.findById(userId);
+      
+      // Uncomment and use the following line to retrieve user orders
+      const order = await Order.find({ user: userId });
+  
+      // Calculate cart count
+      const cart = await Cart.findOne({ userId });
+      let cartCount = 0;
+      if (cart) {
+        cartCount = cart.product.length;
+      }
+  
+      res.render("userAccount", { user, order, cartCount });
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Internal Server Error");
+    }
   },
+  
+
+  editDetails : async (req, res) => {
+    try {
+      const userId = req.session.user.id; // Assuming session user contains the user ID
+      const { name, email } = req.body;
+  
+      // Update user details
+      const user = await User.findByIdAndUpdate(userId, { name, email }, { new: true });
+  
+      if (!user) {
+        return res.status(404).json({ success: false, error: 'User not found' });
+      }
+  
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+  },
+  
+   addAddress : async (req, res) => {
+    try {
+      const userId = req.session.user.id; // Assuming session user contains the user ID
+      const { houseName, street, city, state, country, postalCode, phoneNo, addressType } = req.body;
+  
+      // Create address object
+      const address = {
+        houseName,
+        street,
+        city,
+        state,
+        country,
+        postalCode,
+        phoneNumber: phoneNo,
+        type: addressType
+      };
+  
+      // Find user by ID and update the address array
+      const updatedUser = await User.findByIdAndUpdate(userId, {
+        $push: { address: address }
+      }, { new: true });
+  
+      if (!updatedUser) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+      }
+  
+      res.status(200).json({ success: true, message: 'Address added successfully', address: address });
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+  },
+
+  editAddress : async (req, res) => {
+    try {
+      const userId = req.session.user.id; // Extract user ID from session object
+      const { id, houseName, street, city, state, country, postalCode, phoneNumber, addressType } = req.body;
+  
+      // Find user by ID
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+      }
+  
+      // Find address by ID
+      const addressIndex = user.address.findIndex(addr => addr._id.toString() === id);
+      if (addressIndex !== -1) {
+        // Update address fields
+        user.address[addressIndex].houseName = houseName;
+        user.address[addressIndex].street = street;
+        user.address[addressIndex].city = city;
+        user.address[addressIndex].state = state;
+        user.address[addressIndex].country = country;
+        user.address[addressIndex].postalCode = postalCode;
+        user.address[addressIndex].phoneNumber = phoneNumber;
+        user.address[addressIndex].type = addressType;
+  
+        // Save the updated user document
+        await user.save();
+  
+        res.json({ success: true, message: 'Address updated successfully' });
+      } else {
+        // Address not found
+        res.status(404).json({ success: false, message: 'Address not found' });
+      }
+    } catch (error) {
+      console.log(error.message);
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+  },
+  
+  
+   deleteAddress : async (req, res) => {
+    try {
+      const userId = req.session.user.id; // Assuming session user contains the user ID
+      const addressId = req.query.id;
+  
+      // Find user by ID
+      const user = await User.findById(userId);
+  
+      // Find the index of the address to delete
+      const addressIndex = user.address.findIndex(addr => addr._id.toString() === addressId);
+  
+      if (addressIndex !== -1) {
+        user.address.splice(addressIndex, 1); // Remove address from array
+        await user.save(); // Save the updated user document
+        res.json({ success: true, message: 'Address deleted successfully' });
+      } else {
+        // Address not found
+        res.status(404).json({ success: false, message: 'Address not found' });
+      }
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+  },
+
+  resetPassword :async(req,res)=>{
+    try{
+      const user= await User.findById(req.session.user);
+      const {currentPassword,newPassword}=req.body;
+    
+      const validPassword=await bcrypt.compare(currentPassword,user.password)
+      if(!validPassword){
+        return res.json({ notMatch:true, message: 'Current password is incorrect' });
+      }
+      
+      const spassword=await securePassword(newPassword);
+      user.password=spassword;
+      await user.save();
+  
+      return res.status(200).json({ success: true, message: 'Password reset successful' });
+  
+  
+  
+    }catch(error){
+      console.log(error.message);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+  },
+  
+
+ 
+  
+  
+
+
+
+
+
+
+
+
   loadShop: async (req, res) => {
     try {
       const page = parseInt(req.query.page) || 1;
@@ -288,43 +486,360 @@ const userController = {
       res.status(500).send('Internal Server Error');
     }
   },
-  // loadproductDetails: async (req, res) => {
+  
+  // loadProductDetail : async (req, res) => {
   //   try {
-  //     const productId= req.query.id;
-
+  //     const productId = req.params.productId;
   //     const product = await Product.findById(productId);
-  //     if(!product) {
+  
+  //     if (!product) {
   //       return res.status(404).send('Product not found');
   //     }
-  //     res.render('productDetails', { product });
+  
+  //     res.render('productDetails', {
+  //       product: product,
+  //     });
   //   } catch (error) {
-  //     console.log(error.message);
-  //     res.status(500).send('Internal Server Error');
+  //     console.error(error);
+  //     res.status(500).send('Internal server error');
   //   }
-  // }
-  loadProductDetails : async (req, res) => {
-    try {
-      const productId = req.query.id;
-      if (!productId) {
-        return res.status(400).send('Product ID is required');
-      }
+  // },
   
-      const product = await Product.findById(productId);
-      if (!product) {
-        return res.status(404).send('Product not found');
-      }
+  // 
+//   loadProductDetails: async (req, res) => {
+//     try {
+//         const userId = req.session.user ? req.session.user.id : null; // Safely access user ID
+//         const productId = req.params.productId; // Get product ID from request params
 
-      const relatedProducts = await Product.find({ category: product.category, _id: { $ne: productId } }).limit(4);
+//         const product = await Product.findById(productId); // Fetch the product from the database
+//         if (!product) {
+//             return res.status(404).send('Product not found');
+//         }
 
-        res.render('productDetails', { product, relProduct: relatedProducts });
+//         res.render('productDetails', { product, user: { id: userId } }); // Pass user ID to EJS
+//     } catch (error) {
+//         console.error('Error loading product details:', error);
+//         res.status(500).send('Internal Server Error');
+//     }
+// },
+// loadProductDetails: async (req, res) => {
+//   try {
+//       const productId = req.params.productId;
+//       const product = await Product.findById(productId);
+
+//       if (!product) {
+//           return res.status(404).render('user/errorPage', { message: 'Product not found' });
+//       }
+
+//       res.render('user/productDetails', { product });
+//   } catch (error) {
+//       console.error('Error loading product details:', error);
+//       res.status(500).render('user/errorPage', { message: 'Internal Server Error' });
   
-      // res.render('productDetails', { product });
-    } catch (error) {
-      console.log(error.message);
-      res.status(500).send('Internal Server Error');
+//     }
+// },
+
+
+
+loadProductDetails : async (req, res) => {
+  try {
+    const productId = req.query.id;
+    if (!productId) {
+      return res.status(400).send('Product ID is required');
     }
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).send('Product not found');
+    }
+
+    const relatedProducts = await Product.find({ category: product.category, _id: { $ne: productId } }).limit(4);
+
+      res.render('productDetails', { product, relProduct: relatedProducts });
+
+    // res.render('productDetails', { product });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send('Internal Server Error');
   }
-  
+},
+ 
+
+
+addToCart : async (req, res) => {
+  try {
+    console.log("Received request body:", req.body);
+
+    if (!req.session?.user?.id) {
+      console.log("User not authenticated");
+      return res.status(401).json({ success: false, error: 'User not authenticated' });
+    }
+
+    const userId = req.session.user.id;
+    const { productId, quantity = 1 } = req.body;
+
+    console.log(`Adding product ${productId} with quantity ${quantity} for user ${userId}`);
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      console.log("Product not found");
+      return res.status(404).json({ success: false, error: 'Product not found' });
+    }
+
+    let cart = await Cart.findOne({ userId });
+    if (!cart) {
+      console.log("Cart not found, creating new cart");
+      cart = new Cart({ userId, products: [] });
+    } else {
+      console.log("Existing cart found:", cart);
+    }
+
+    const existingProductIndex = cart.product.findIndex(p => p.productId.toString() === productId);
+    
+    if (existingProductIndex > -1) {
+      console.log("Product exists in cart, updating quantity");
+      cart.product[existingProductIndex].quantity += parseInt(quantity);
+    } else {
+      console.log("Product does not exist in cart, adding new product");
+      cart.product.push({ productId, quantity: parseInt(quantity) });
+    }
+
+    console.log("Updated cart:", JSON.stringify(cart, null, 2));
+
+    await cart.save();
+
+    console.log("Cart saved successfully");
+
+    res.json({ 
+      success: true, 
+      message: 'Product added to cart successfully',
+      cartItemCount: cart.product.length,
+      productName: product.name
+    });
+  } catch (error) {
+    console.error("Error in addToCart:", error);
+    res.status(500).json({ success: false, error: 'Internal Server Error', details: error.message });
+  }
+},
+
+
+
+
+// working one
+
+ loadCart : async (req, res) => {
+  try {
+    console.log("Session object:", req.session);
+
+    const userId = req.session.user ? req.session.user.id : null;
+    if (!userId) {
+      return res.render('cart', { cart: { products: [], totalPrice: 0 } });
+    }
+
+    const cart = await Cart.findOne({ userId }).populate('product.productId');
+    console.log("Cart object after fetching and populating:", JSON.stringify(cart, null, 2));
+
+    if (!cart || !cart.product || cart.product.length === 0) {
+      return res.render('cart', { cart: { products: [], totalPrice: 0 } });
+    }
+
+    cart.totalPrice = cart.product.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
+    console.log("Cart object after calculating totalPrice:", JSON.stringify(cart, null, 2));
+
+    res.render('cart', { cart });
+  } catch (error) {
+    console.log('Error Occurred: ', error);
+    res.status(500).send('Internal Server Error');
+  }
+},
+
+
+// new working
+// loadCart: async (req, res) => {
+//   try {
+//     console.log("Session object:", req.session);
+
+//     const userId = req.session.user ? req.session.user.id : null;
+//     if (!userId) {
+//       return res.render('cart', { cart: { products: [], totalPrice: 0, currentPage: 1, totalPages: 0 } });
+//     }
+
+//     const page = parseInt(req.query.page) || 1;
+//     const limit = 5;
+//     const skip = (page - 1) * limit;
+
+//     const cart = await Cart.findOne({ userId }).populate('product.productId').lean();
+//     console.log("Cart object after fetching and populating:", JSON.stringify(cart, null, 2));
+
+//     if (!cart || !cart.product || cart.product.length === 0) {
+//       return res.render('cart', { cart: { products: [], totalPrice: 0, currentPage: 1, totalPages: 0 } });
+//     }
+
+//     const totalProducts = cart.product.length;
+//     const totalPages = Math.ceil(totalProducts / limit);
+
+//     const paginatedProducts = cart.product.slice(skip, skip + limit);
+
+//     cart.totalPrice = cart.product.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
+//     console.log("Cart object after calculating totalPrice:", JSON.stringify(cart, null, 2));
+
+//     res.render('cart', {
+//       cart: {
+//         products: paginatedProducts,
+//         totalPrice: cart.totalPrice,
+//         currentPage: page,
+//         totalPages: totalPages
+//       }
+//     });
+//   } catch (error) {
+//     console.log('Error Occurred: ', error);
+//     res.status(500).send('Internal Server Error');
+//   }
+// },
+
+// loadCart: async (req, res) => {
+//   try {
+//     console.log("Session object:", req.session);
+
+//     const userId = req.session.user ? req.session.user.id : null;
+//     if (!userId) {
+//       return res.render('cart', { cart: { products: [], totalPrice: 0, currentPage: 1, totalPages: 0 } });
+//     }
+
+//     const page = parseInt(req.query.page) || 1;
+//     const limit = 5;
+//     const skip = (page - 1) * limit;
+
+//     const cart = await Cart.findOne({ userId }).populate('product.productId').lean();
+//     console.log("Cart object after fetching and populating:", JSON.stringify(cart, null, 2));
+
+//     if (!cart || !cart.product || cart.product.length === 0) {
+//       return res.render('cart', { cart: { products: [], totalPrice: 0, currentPage: 1, totalPages: 0 } });
+//     }
+
+//     const totalProducts = cart.product.length;
+//     const totalPages = Math.ceil(totalProducts / limit);
+
+//     const paginatedProducts = cart.product.slice(skip, skip + limit);
+
+//     cart.totalPrice = cart.product.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
+//     console.log("Cart object after calculating totalPrice:", JSON.stringify(cart, null, 2));
+
+//     res.render('cart', {
+//       cart: {
+//         products: paginatedProducts,
+//         totalPrice: cart.totalPrice,
+//         currentPage: page,
+//         totalPages: totalPages
+//       }
+//     });
+//   } catch (error) {
+//     console.log('Error Occurred: ', error);
+//     res.status(500).send('Internal Server Error');
+//   }
+// },
+
+
+ updateCart : async (req, res) => {
+  try {
+    const { updates } = req.body;
+    const userId = req.session.user.id;
+
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+      return res.status(400).json({ success: false, message: 'Cart not found' });
+    }
+
+    updates.forEach(update => {
+      const product = cart.product.find(p => p.productId.toString() === update.productId);
+      if (product) {
+        product.quantity = update.quantity;
+      }
+    });
+
+    await cart.save();
+
+    res.json({ success: true, message: 'Cart updated successfully' });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+},
+
+
+
+
+deleteCart : async (req, res) => {
+  try {
+    const userId = req.session.user.id; // Assuming you have the user ID in session
+    const productId = req.body.productId; // Assuming productId is sent in the request body
+
+    // Delete the product from the user's cart
+    const cart = await Cart.findOneAndUpdate(
+      { userId },
+      { $pull: { product: { productId } } },
+      { new: true }
+    );
+
+    if (!cart) {
+      return res.status(404).json({ success: false, message: 'Cart not found or product not in cart' });
+    }
+
+    res.json({ success: true, message: 'Product removed from cart successfully' });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+},
+
+
+
+
+
+
+
+// loadCheckout :async(req,res)=>{
+//   try{
+//       const userId=req.session.user;
+//       const user=await User.findById(userId);
+//       const cart=await Cart.findOne({userId:userId}).populate("product.productId");
+//       // const coupon=await Coupon.find({status:"active"});
+//       // const wallet= await Wallet.findOne({user:userId});
+      
+//       let cartCount=0;
+//       if(cart){
+//          cartCount=cart.product.length;
+//       }
+//       res.render("checkout",{user,cart,cartCount})
+
+//   }catch(error){
+//       console.log(error.message);
+//   }
+// }
+
+loadCheckout : async (req, res) => {
+  try {
+      const userId = req.session.user.id;
+      const user = await User.findById(userId);
+      const cart = await Cart.findOne({ userId: userId }).populate("product.productId");
+      // const coupon = await Coupon.find({ status: "active" });
+
+      let cartCount = 0;
+      if (cart) {
+          cartCount = cart.product.length;
+      }
+
+      // Ensure user.address is defined and is an array
+      user.address = user.address || [];
+
+      res.render("checkout", { user, cart, cartCount, });
+
+  } catch (error) {
+      console.log(error.message);
+  }
+}
+
 
 }
 
@@ -332,80 +847,3 @@ const userController = {
 module.exports = userController;
 
 
-// module.exports = {
-//     insertUser,
-//     loadOTP,
-//     verifyOTP,
-//     resendOTP
-// }
-
-
-
-// const loadSignup = (req,res) => {
-//     res.render("signup");
-// }
-
-
-// const homePage = (req,res) => {
-//     res.render("home");
-
-// }
-
-// const loadLogin = (req,res) => {
-//     res.render("login");
-// }
-
-// // const loadOTP = (req,res) => {
-// //     res.render("otp");
-// // }
-
-// const loadUser = (req,res) => {
-//     res.render("userAccount");
-// }
-
-// const loadShop = (req,res) => {
-//     res.render("shop");
-// }
-
-// module.exports={
-//     loadSignup,
-//     homePage,
-//     loadLogin,
-//     // loadOTP,
-//     loadUser,
-//     loadShop ,
-//     // loadOTP
-// } 
-
-// const userController = {
-//     homePage: (req, res) => {
-//       res.render('home');
-//     },
-//     loadSignup: (req, res) => {
-//       res.render('signup');
-//     },
-//     processSignup: (req, res) => {
-//       // Logic for processing signup
-//     },
-//     loadLogin: (req, res) => {
-//       res.render('login');
-//     },
-//     loadOTP: (req, res) => {
-//       res.render('otp');
-//     },
-//     loadUser: (req, res) => {
-//       res.render('user');
-//     },
-//     loadShop: (req, res) => {
-//       res.render('shop');
-//     },
-//     verifyOTP: (req, res) => {
-//       // Logic for verifying OTP
-//     },
-//     resendOTP: (req, res) => {
-//       // Logic for resending OTP
-//     }
-//   };
-  
-//   module.exports = userController;
-  

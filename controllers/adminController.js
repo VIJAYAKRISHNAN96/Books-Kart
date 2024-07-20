@@ -1,6 +1,7 @@
 const categoryModel = require("../model/categoryModel");
 const userModel = require("../model/userModel");
 const productModel = require("../model/productModel");
+const Order = require("../model/orderModel");
 const sharp = require("sharp");
 const fs = require("fs");
 const path = require('path');
@@ -299,6 +300,12 @@ editProduct: async (req, res) => {
     // res.render("category");
 
   },
+
+  // loadOrder: async (req, res) => {
+  //   res.render("order");
+  // },
+
+ 
   
   //   addCategory : async (req, res) => {
   //     const { name, description,discount } = req.body;

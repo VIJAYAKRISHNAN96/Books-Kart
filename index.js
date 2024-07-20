@@ -13,6 +13,8 @@ const session = require("express-session");
 
 const app= express();
 
+// app.use('/userAssets', express.static(path.join(__dirname, 'userAssets')));
+
  app.set("view engine","ejs")
 
  mongoose.connect(process.env.MONGO_URL).then(() => console.log('MongoDB connected successfully'))
@@ -28,17 +30,23 @@ app.use(express.urlencoded({extended:true}));
  ])
  app.use(express.static(path.join(__dirname,"public")));
 
-  
+//  app.use('/userAssets', express.static(path.join(__dirname, 'userAssets')));
+
   app.use(
    session({
      secret: 'secret',
      resave: false,
      saveUninitialized: true,
-     cookie: { secure: false },
+    //  store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
+     cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 },
    })
  );
+ app.use(express.json());
+ 
+
 
  app.use((req, res, next) => {
+  console.log('Session on every request:', req.session);
    res.locals.user = req.session.user || null;
    next();
  });

@@ -37,6 +37,7 @@
 }
 
 </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
 <body>
     <!-- Quick view -->
@@ -245,7 +246,7 @@
                                         <div class="clearfix product-price-cover">
                                             <div class="product-price primary-color float-left">
                                                 <ins><span class="text-brand">$<%= product.discountPrice.toFixed(2) %></span></ins>
-                                                <ins><span class="old-price font-md ml-15">$<%= product.price.toFixed(2) %></span></ins>
+                                                <ins><span class="old-price font-md ml-15">$<%= product.price %></span></ins>
                                                 <% if (product.price > product.discountPrice) { %>
                                                   <span class="save-price font-md color3 ml-15"><%= Math.floor(((product.price - product.discountPrice) / product.price) * 100) %>% Off</span>
                                                 <% } %>
@@ -269,19 +270,99 @@
                                         </div>
                                         <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                                         <div class="detail-extralink">
-                                            <div class="detail-qty border radius">
+                                            <!-- <div class="detail-qty border radius">
                                                 <a href="#" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
                                                 <span class="qty-val">1</span>
                                                 <a href="#" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
+                                            </div> -->
+                                            <div class="detail-extralink">
+                                                <div class="detail-qty border radius">
+                                                    <a href="#" class="qty-down" onclick="updateQuantity(-1); return false;"><i class="fi-rs-angle-small-down"></i></a>
+                                                    <span class="qty-val" id="quantity-value">1</span>
+                                                    <a href="#" class="qty-up" onclick="updateQuantity(1); return false;"><i class="fi-rs-angle-small-up"></i></a>
+                                                </div>
+                                                <div class="product-extra-link2">
+                                                    <button onclick="addToCart('<%= product._id %>', '<%= product.name %>')">Add to Cart</button>
+                                                </div>
                                             </div>
-                                            <div class="product-extra-link2">
+
+                                            <!-- <div class="product-extra-link2">
                                                 <form id="add-to-cart-form" data-product-id="<%= product._id %>">
                                                     <input type="hidden" name="productId" value="<%= product._id %>">
                                                     <button type="submit" class="button button-add-to-cart">Add to cart</button>
                                                 </form>
+                                            </div> -->
+                                            <!-- <div class="product-extra-link2">
+                                                <button onclick="addToCart('<%= product._id %>')">Add to Cart</button>                                                
+                                              </div> -->
+                                            
+
+                                            
+                                            
+                                            
+
+                                            <!-- <div class="product-extra-link2">
+                                                <button class="button button-add-to-cart" id="add-to-cart-btn" data-product-id="<%= product._id %> , ">
+                                                    Add to cart
+                                                </button>
+                                            </div> -->
+                                            <!-- <div class="product-extra-link2">
+
+                                                 <form id="add-to-cart-form" data-product-id="<%= product._id %>">
+                                                    <input type="hidden" name="productId" value="<%= product._id %>">
+                                                    <button type="submit" class="button button-add-to-cart">Add to cart</button>
+                                                </form> -->
+                                                <!-- <button class="button button-add-to-cart" id="add-to-cart-btn" data-product-id="<%= product._id %>">
+                                                    Add to cart
+                                                </button>
+                                                 -->
+                                                
+
+                                                <!-- <form id="add-to-cart-form" data-product-id="<%= product._id %>">
+                                                    <input type="hidden" name="productId" value="<%= product._id %>">
+                                                    <button type="submit" class="button button-add-to-cart">Add to cart</button>
+                                                </form> -->
                                                 <!-- <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
                                                 <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a> -->
-                                            </div>
+                                            <!-- </div>  -->
+                                            <!-- <div class="product-extra-link2">
+
+                                                <% if (user) { %>
+                                                    <button type="submit" class="button button-add-to-cart" onclick="addToCart('<%=user.id%>','<%=product._id %>')">Add to cart</button>
+                                                <% } else { %>
+                                                    <% } %>
+                                                <- <form id="add-to-cart-form" data-product-id="<%= product._id %>">
+                                                    <input type="hidden" name="productId" value="<%= product._id %>">
+                                                    <button type="submit" class="button button-add-to-cart">Add to cart</button>
+                                                </form> -->
+                                               
+                                            <!-- </div>  -->
+
+
+                                           
+                                            <!-- <div class="product-extra-link2">
+                                                <button type="submit" class="button button-add-to-cart" onclick="addToCart(','<%=product._id %>')">Add to cart</button> -->
+                                                    
+                                                <!-- <input type="hidden" name="productId" value="<%= product.id %>">
+                                                    <button type="submit">Add to Cart</button> -->
+                                              
+                                                
+                                                <!-- <form id="add-to-cart-form" data-product-id="<%= product._id %>">
+                                                    <input type="hidden" name="productId" value="<%= product._id %>">
+                                                    <button type="button" class="button button-add-to-cart" onclick="addToCart()">Add to cart</button>
+                                                </form> -->
+                                            <!-- </div> -->
+                                            
+                                            <!-- <div class="product-extra-link2">
+                                                <% if (user) { %>
+                                                    <form id="add-to-cart-form" data-product-id="<%= product._id %>">
+                                                        <input type="hidden" name="productId" value="<%= product._id %>">
+                                                        <button type="button" class="button button-add-to-cart" onclick="addToCart()">Add to cart</button>
+                                                    </form>
+                                                <% } else { %>
+                                                    <p>Please log in to add items to your cart.</p>
+                                                <% } %>
+                                            </div> -->
                                         </div>
                                         <ul class="product-meta font-xs color-grey mt-50">
                                             <!-- <li class="mb-5">SKU: <a href="#">FWM15VKT</a></li> -->
@@ -620,46 +701,103 @@
             
         </section>
     </main>
-    
-    <!-- External JavaScript for image zoom effect -->
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+      
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        
     <script>
-//         document.addEventListener("DOMContentLoaded", function () {
-//     const mainImage = document.getElementById('main-product-image');
-//     const thumbnailImages = document.querySelectorAll('.thumbnail-image');
-
-//     thumbnailImages.forEach(function(thumbnail) {
-//         thumbnail.addEventListener('click', function() {
-//             const imageUrl = this.getAttribute('src');
-//             console.log("Selected Image URL:", imageUrl); // Debug log
-//             mainImage.setAttribute('src', imageUrl);
-//         });
-//     });
-// });
-
-
-
-        // Wait for the document to fully load before running the script
-        document.addEventListener("DOMContentLoaded", function () {
-            const mainImage = document.getElementById('main-product-image');
-            const thumbnailImages = document.querySelectorAll('.thumbnail-image');
-    
-            // Add event listeners to each thumbnail image
-            thumbnailImages.forEach(function(thumbnail) {
-                thumbnail.addEventListener('mouseover', function() {
-                    const imageUrl = thumbnail.getAttribute('src');
-                    mainImage.setAttribute('src', imageUrl);
-
-            //   thumbnail.addEventListener('click', function() {
-            // const imageUrl = thumbnail.getAttribute('src');
-            // mainImage.setAttribute('src', imageUrl);
-
-
-                });
-            });
+  
+    // Wait for the document to fully load before running the script
+    document.addEventListener("DOMContentLoaded", function () {
+      const mainImage = document.getElementById('main-product-image');
+      const thumbnailImages = document.querySelectorAll('.thumbnail-image');
+  
+      // Add event listeners to each thumbnail image
+      thumbnailImages.forEach(function(thumbnail) {
+        thumbnail.addEventListener('mouseover', function() {
+          const imageUrl = thumbnail.getAttribute('src');
+          mainImage.setAttribute('src', imageUrl);
         });
+  
+        thumbnail.addEventListener('click', function() {
+          const imageUrl = thumbnail.getAttribute('src');
+          mainImage.setAttribute('src', imageUrl);
+        });
+      });
+    });
+  </script>
+<!-- new -->
+<script>
+    let quantity = 1;
 
-    </script>
-    
+function updateQuantity(change) {
+    quantity += change;
+    if (quantity < 1) quantity = 1;
+    document.getElementById('quantity-value').textContent = quantity;
+}
+
+function addToCart(productId, productName) {
+    fetch('/addToCart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ productId, quantity }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                title: 'Added to Cart!',
+                text: `${quantity} ${quantity > 1 ? 'items' : 'item'} of ${productName} ${quantity > 1 ? 'have' : 'has'} been added to your cart.`,
+                icon: 'success',
+                confirmButtonText: 'Continue Shopping'
+            });
+            // Optional: Update mini cart or cart icon if you have one
+            // updateMiniCart(data.cartItemCount, data.totalPrice);
+        } else {
+            Swal.fire({
+                title: 'Error!',
+                text: data.error || 'Failed to add product to cart',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'An unexpected error occurred',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    });
+}
+
+// Optional: Implement this function if you have a mini cart or cart icon to update
+// function updateMiniCart(itemCount, totalPrice) {
+//     const cartCountElement = document.getElementById('cart-count');
+//     const cartTotalElement = document.getElementById('cart-total');
+//     if (cartCountElement) cartCountElement.textContent = itemCount;
+//     if (cartTotalElement) cartTotalElement.textContent = `$${totalPrice.toFixed(2)}`;
+// }
+</script>
+
+
+
+
     <%- include("../partials/footer.ejs") %>
     
     
@@ -702,6 +840,8 @@
     <script src="userAssets/js/plugins/jquery.vticker-min.js"></script>
     <script src="userAssets/js/plugins/jquery.theia.sticky.js"></script>
     <script src="userAssets/js/plugins/jquery.elevatezoom.js"></script>
+    
+
     <!-- Template  JS -->
     <script src="./userAssets/js/main.js?v=3.4"></script>
     <script src="./userAssets/js/shop.js?v=3.4"></script>
