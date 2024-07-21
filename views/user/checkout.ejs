@@ -1,4 +1,10 @@
-<%-include("../partials/header.ejs")%>
+<%-include("../partials/header.ejs")%>    
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+
+
+
 
 <div class="mobile-header-active mobile-header-wrapper-style">
     <div class="mobile-header-wrapper-inner">
@@ -13,6 +19,7 @@
                 </button>
             </div>
         </div>
+        
         <div class="mobile-header-content-area">
             <div class="mobile-search search-style-3 mobile-header-border">
                 <form action="#">
@@ -159,7 +166,78 @@
             </div>
         </div>
     </div>
+
+
+
+</div><div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAddressModalLabel">Add Address</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addAddressForm">
+                    <div class="mb-3">
+                        <label for="houseName" class="form-label">House Name:</label>
+                        <input type="text" class="form-control" id="houseName" required>
+                        <div id="houseNameError" class="error-message text-danger"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="street" class="form-label">Street:</label>
+                        <input type="text" class="form-control" id="street" required>
+                        <div id="streetError" class="error-message text-danger"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="city" class="form-label">City:</label>
+                        <input type="text" class="form-control" id="city" required>
+                        <div id="cityError" class="error-message text-danger"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="state" class="form-label">State:</label>
+                        <input type="text" class="form-control" id="state" required>
+                        <div id="stateError" class="error-message text-danger"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="country" class="form-label">Country:</label>
+                        <input type="text" class="form-control" id="country" required>
+                        <div id="countryError" class="error-message text-danger"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="postalCode" class="form-label">Postal Code:</label>
+                        <input type="text" class="form-control" id="postalCode" required>
+                        <div id="postalCodeError" class="error-message text-danger"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phoneNo" class="form-label">Phone No:</label>
+                        <input type="text" class="form-control" id="phoneNo" required>
+                        <div id="phoneNoError" class="error-message text-danger"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="addressType" class="form-label">Address Type:</label><br>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="addressType" id="office" value="office">
+                            <label class="form-check-label" for="office">Office</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="addressType" id="home" value="home">
+                            <label class="form-check-label" for="home">Home</label>
+                        </div>
+                        <div id="addressTypeError" class="error-message text-danger"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="closeModalBtn">Close</button>
+                <button type="button" class="btn btn-primary" onclick="validateAddress()">Save Address</button>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+
+
 <main class="main">
     <div class="page-header breadcrumb-wrap">
         <div class="container">
@@ -289,6 +367,17 @@
                     <div class="mb-25">
                         <h4>Billing Details</h4>
                     </div>
+
+                    <!-- <button id="openAddressModalButton" class="btn btn-primary">Add Address</button> -->
+
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                        Add Address
+                    </button>
+
+
+                    <!-- <div class="text-end mb-3">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal" style="background-color: #FF6B6B; border-color:  #FF6B6B;">Add Address</button>
+                    </div> -->
                     <div class="row">
                         <% if (user.address && Array.isArray(user.address)) { %>
                             <% user.address.forEach(function(add, index) { %>
@@ -405,121 +494,7 @@
                 </div>
             </div>
         </div>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
-
-<!-- SweetAlert JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-
-
-        <!-- <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                document.getElementById('placeOrderBtn').addEventListener('click', function(event) {
-                    event.preventDefault(); // Prevent default action of anchor tag
-                    confirmQuantity();
-                });
-        
-                calculateSubtotal();
-            });
-        
-            function calculateSubtotal() {
-                const itemPrices = document.querySelectorAll('.item-price');
-                let subtotal = 0;
-                itemPrices.forEach(item => {
-                    subtotal += parseFloat(item.innerText);
-                });
-                document.getElementById('subtotal').innerText = subtotal.toFixed(2);
-                document.getElementById('total').innerText = subtotal.toFixed(2);
-            }
-        
-            function confirmQuantity() {
-                const selectedAddressIndex = document.querySelector('input[name="selectedAddress"]:checked'); 
-                if (!selectedAddressIndex) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Order Placement Failed',
-                        text: "Select an appropriate address for shipment",
-                    });
-                    return;
-                }
-                fetch('/confirmQuantity', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const selectedAddressIndex = document.querySelector('input[name="selectedAddress"]:checked').value;
-                        const selectedPaymentMethod = "Cash On Delivery"; // Directly use COD as the payment method
-                        const totalAmount = document.getElementById("total").innerText;
-                        const subtotal = document.getElementById("subtotal").innerText;
-        
-                        fetch('/placeOrder', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                addressIndex: selectedAddressIndex,
-                                paymentMethod: selectedPaymentMethod,
-                                totalAmount: totalAmount,
-                                subtotal: subtotal
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire({
-                                    icon: "success",
-                                    title: data.message,
-                                    text: "View My orders",
-                                    confirmButtonText: "OK"
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        window.location.href = "/account";
-                                    }
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: 'Order Placement Failed',
-                                    text: data.message
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error placing order:', error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Order Placement Failed',
-                                text: 'There was an error confirming your order. Please try again.'
-                            });
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Order Placement Failed',
-                            text: data.message,
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error confirming order:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Order Placement Failed',
-                        text: 'There was an error confirming your order. Please try again.'
-                    });
-                });
-            }
-        </script> -->
-        
-
+    </div>
 
     </section>
 </main>
@@ -530,7 +505,161 @@
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
     <script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    var myModal = new bootstrap.Modal(document.getElementById('addAddressModal'));
+    
+    document.querySelector('[data-bs-toggle="modal"][data-bs-target="#addAddressModal"]').addEventListener('click', function() {
+        myModal.show();
+    });
+    document.getElementById('closeModalBtn').addEventListener('click', function() {
+        myModal.hide();
+    });
+
+});
+
+
+
+    function validateAddress() {
+        // Reset previous error messages
+        document.querySelectorAll('.error-message').forEach(elem => elem.textContent = '');
+
+        // Get input values
+        const houseName = document.getElementById('houseName').value.trim();
+        const street = document.getElementById('street').value.trim();
+        const city = document.getElementById('city').value.trim();
+        const state = document.getElementById('state').value.trim();
+        const country = document.getElementById('country').value.trim();
+        const postalCode = document.getElementById('postalCode').value.trim();
+        const phoneNo = document.getElementById('phoneNo').value.trim();
+        const addressType = document.querySelector('input[name="addressType"]:checked');
+
+        let isValid = true;
+
+        // Validation for empty fields
+        if (houseName === '') {
+            document.getElementById('houseNameError').textContent = 'House Name is required';
+            isValid = false;
+        }
+
+        if (street === '') {
+            document.getElementById('streetError').textContent = 'Street is required';
+            isValid = false;
+        }
+
+        if (city === '') {
+            document.getElementById('cityError').textContent = 'City is required';
+            isValid = false;
+        }
+        if (state === '') {
+            document.getElementById('stateError').textContent = 'State is required';
+            isValid = false;
+        }
+
+        if (country === '') {
+            document.getElementById('countryError').textContent = 'Country is required';
+            isValid = false;
+        }
+
+        // Validation for postal code (should be exactly 6 digits)
+        if (!/^\d{6}$/.test(postalCode)) {
+            document.getElementById('postalCodeError').textContent = 'Postal Code should contain 6 digits';
+            isValid = false;
+        }
+
+        // Validation for phone number (should be exactly 10 digits)
+        if (!/^\d{10}$/.test(phoneNo)) {
+            document.getElementById('phoneNoError').textContent = 'Phone No should contain 10 digits';
+            isValid = false;
+        }
+
+        // Validation for address type
+        if (!addressType) {
+            document.getElementById('addressTypeError').textContent = 'Please select Address Type';
+            isValid = false;
+        }
+        if (isValid) {
+            // Data to be sent in the request body
+            const data = {
+                houseName: houseName,
+                street: street,
+                city: city,
+                state: state,
+                country: country,
+                postalCode: postalCode,
+                phoneNo: phoneNo,
+                addressType: addressType.value
+            };
+
+            // Perform fetch operation
+            fetch('/addAddress', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // Parse response body as JSON
+            })
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Address Added Successfully',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        // Hide the modal after the SweetAlert
+                        $('#addAddressModal').modal('hide');
+                        
+                        
+                        document.getElementById('addAddressForm').reset();
+                        location.reload();
+                    });
+                } else {
+                    // Handle other response errors here
+                    // For example, if there's an error message in the response
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Adding Address Failed',
+                        text: data.message || 'Unknown error occurred'
+                    }).then(() => {
+                    var myModalEl = document.getElementById('addAddressModal');
+                    var modal = bootstrap.Modal.getInstance(myModalEl);
+                    modal.hide();
+                        // Hide the modal after the SweetAlert
+                        $('#addAddressModal').modal('hide');
+                        document.getElementById('addAddressForm').reset();
+                        location.reload();
+                    });
+                }
+            })
+            .catch(error => {
+                // Handle error
+                console.error('There was a problem with the fetch operation:', error);
+                // Optionally, show an alert for failure
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Address Addition Failed',
+                    text: error.message
+                });
+            });
+        }
+    }
+
+
+
+
     document.addEventListener('DOMContentLoaded', function () {
         // Event listener for the Place Order button
         document.getElementById('placeOrderBtn').addEventListener('click', function(event) {
@@ -595,6 +724,143 @@
             });
         });
     }
-</script>
+
+
 
 </script>
+
+
+
+
+<!-- <script>
+    function validateAddress() {
+    // Reset previous error messages
+    document.querySelectorAll('.error-message').forEach(elem => elem.textContent = '');
+
+    // Get input values
+    const houseName = document.getElementById('houseName').value.trim();
+    const street = document.getElementById('street').value.trim();
+    const city = document.getElementById('city').value.trim();
+    const state = document.getElementById('state').value.trim();
+    const country = document.getElementById('country').value.trim();
+    const postalCode = document.getElementById('postalCode').value.trim();
+    const phoneNo = document.getElementById('phoneNo').value.trim();
+    const addressType = document.querySelector('input[name="addressType"]:checked');
+
+    let isValid = true;
+
+    // Validation for empty fields
+    if (houseName === '') {
+        document.getElementById('houseNameError').textContent = 'House Name is required';
+        isValid = false;
+    }
+
+    if (street === '') {
+        document.getElementById('streetError').textContent = 'Street is required';
+        isValid = false;
+    }
+
+    if (city === '') {
+        document.getElementById('cityError').textContent = 'City is required';
+        isValid = false;
+    }
+    if (state === '') {
+        document.getElementById('stateError').textContent = 'State is required';
+        isValid = false;
+    }
+
+    if (country === '') {
+        document.getElementById('countryError').textContent = 'Country is required';
+        isValid = false;
+    }
+
+    // Validation for postal code (should be exactly 6 digits)
+    if (!/^\d{6}$/.test(postalCode)) {
+        document.getElementById('postalCodeError').textContent = 'Postal Code should contain 6 digits';
+        isValid = false;
+    }
+
+    // Validation for phone number (should be exactly 10 digits)
+    if (!/^\d{10}$/.test(phoneNo)) {
+        document.getElementById('phoneNoError').textContent = 'Phone No should contain 10 digits';
+        isValid = false;
+    }
+
+    // Validation for address type
+    if (!addressType) {
+        document.getElementById('addressTypeError').textContent = 'Please select Address Type';
+        isValid = false;
+    }
+
+    if (isValid) {
+        // Data to be sent in the request body
+        const data = {
+            houseName: houseName,
+            street: street,
+            city: city,
+            state: state,
+            country: country,
+            postalCode: postalCode,
+            phoneNo: phoneNo,
+            addressType: addressType.value
+        };
+
+        // Perform fetch operation
+        fetch('/addAddress', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); // Parse response body as JSON
+        })
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Address Added Successfully',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    // Hide the modal after the SweetAlert
+                    $('#addAddressModal').modal('hide');
+                    document.getElementById('addAddressForm').reset();
+                    location.reload();
+                });
+            } else {
+                // Handle other response errors here
+                // For example, if there's an error message in the response
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Adding Address Failed',
+                    text: data.message || 'Unknown error occurred'
+                }).then(() => {
+                    // Hide the modal after the SweetAlert
+                    $('#addAddressModal').modal('hide');
+                    document.getElementById('addAddressForm').reset();
+                    location.reload();
+                });
+            }
+        })
+        .catch(error => {
+            // Handle error
+            console.error('There was a problem with the fetch operation:', error);
+            // Optionally, show an alert for failure
+            Swal.fire({
+                icon: 'error',
+                title: 'Address Addition Failed',
+                text: error.message
+            });
+        });
+    }
+}
+
+</script> -->
+
+
+
