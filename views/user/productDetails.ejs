@@ -806,15 +806,35 @@ function addToCart(productId, productName) {
             });
         }
     })
+    // .catch((error) => {
+    //     console.error('Error:', error);
+    //     Swal.fire({
+    //         title: 'Error!',
+    //         text: 'An unexpected error occurred',
+    //         icon: 'error',
+    //         confirmButtonText: 'OK'
+    //     });
+    // });
+
     .catch((error) => {
-        console.error('Error:', error);
-        Swal.fire({
-            title: 'Error!',
-            text: 'An unexpected error occurred',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
+    console.error('Error:', error);
+    Swal.fire({
+        title: 'You must log in to add to cart',
+        text: 'Please log in to continue.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Login',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Redirect to the login page
+            window.location.href = '/login';
+        }
     });
+});
+
+
+
 }
 
 // Optional: Implement this function if you have a mini cart or cart icon to update

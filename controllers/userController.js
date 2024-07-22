@@ -32,9 +32,29 @@ const securePassword = async (password) => {
 
 // User controller object
 const userController = {
-  homePage: (req, res) => {
-    res.render('home');
+  // homePage: (req, res) => {
+  //   res.render('home');
+  // },
+
+
+  homePage: async (req, res) => {
+    try {
+      // Fetch products from the database
+      const products = await Product.find({}).limit(8); // Adjust the limit as needed
+
+      // Render the home page and pass the products
+      res.render('home', { products: products });
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      res.status(500).render('error', { message: 'Error loading products' });
+    }
   },
+
+
+
+
+
+
   loadSignup: (req, res) => {
     res.render('signup');
   },
