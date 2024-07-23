@@ -51,10 +51,6 @@ const userController = {
   },
 
 
-
-
-
-
   loadSignup: (req, res) => {
     res.render('signup');
   },
@@ -456,15 +452,6 @@ const userController = {
   },
   
 
- 
-  
-  
-
-
-
-
-
-
 
 
   loadShop: async (req, res) => {
@@ -508,57 +495,6 @@ const userController = {
     }
   },
   
-  // loadProductDetail : async (req, res) => {
-  //   try {
-  //     const productId = req.params.productId;
-  //     const product = await Product.findById(productId);
-  
-  //     if (!product) {
-  //       return res.status(404).send('Product not found');
-  //     }
-  
-  //     res.render('productDetails', {
-  //       product: product,
-  //     });
-  //   } catch (error) {
-  //     console.error(error);
-  //     res.status(500).send('Internal server error');
-  //   }
-  // },
-  
-  // 
-//   loadProductDetails: async (req, res) => {
-//     try {
-//         const userId = req.session.user ? req.session.user.id : null; // Safely access user ID
-//         const productId = req.params.productId; // Get product ID from request params
-
-//         const product = await Product.findById(productId); // Fetch the product from the database
-//         if (!product) {
-//             return res.status(404).send('Product not found');
-//         }
-
-//         res.render('productDetails', { product, user: { id: userId } }); // Pass user ID to EJS
-//     } catch (error) {
-//         console.error('Error loading product details:', error);
-//         res.status(500).send('Internal Server Error');
-//     }
-// },
-// loadProductDetails: async (req, res) => {
-//   try {
-//       const productId = req.params.productId;
-//       const product = await Product.findById(productId);
-
-//       if (!product) {
-//           return res.status(404).render('user/errorPage', { message: 'Product not found' });
-//       }
-
-//       res.render('user/productDetails', { product });
-//   } catch (error) {
-//       console.error('Error loading product details:', error);
-//       res.status(500).render('user/errorPage', { message: 'Internal Server Error' });
-  
-//     }
-// },
 
 
 
@@ -646,8 +582,6 @@ addToCart : async (req, res) => {
 
 
 
-// working one
-
  loadCart : async (req, res) => {
   try {
     console.log("Session object:", req.session);
@@ -675,90 +609,7 @@ addToCart : async (req, res) => {
 },
 
 
-// new working
-// loadCart: async (req, res) => {
-//   try {
-//     console.log("Session object:", req.session);
 
-//     const userId = req.session.user ? req.session.user.id : null;
-//     if (!userId) {
-//       return res.render('cart', { cart: { products: [], totalPrice: 0, currentPage: 1, totalPages: 0 } });
-//     }
-
-//     const page = parseInt(req.query.page) || 1;
-//     const limit = 5;
-//     const skip = (page - 1) * limit;
-
-//     const cart = await Cart.findOne({ userId }).populate('product.productId').lean();
-//     console.log("Cart object after fetching and populating:", JSON.stringify(cart, null, 2));
-
-//     if (!cart || !cart.product || cart.product.length === 0) {
-//       return res.render('cart', { cart: { products: [], totalPrice: 0, currentPage: 1, totalPages: 0 } });
-//     }
-
-//     const totalProducts = cart.product.length;
-//     const totalPages = Math.ceil(totalProducts / limit);
-
-//     const paginatedProducts = cart.product.slice(skip, skip + limit);
-
-//     cart.totalPrice = cart.product.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
-//     console.log("Cart object after calculating totalPrice:", JSON.stringify(cart, null, 2));
-
-//     res.render('cart', {
-//       cart: {
-//         products: paginatedProducts,
-//         totalPrice: cart.totalPrice,
-//         currentPage: page,
-//         totalPages: totalPages
-//       }
-//     });
-//   } catch (error) {
-//     console.log('Error Occurred: ', error);
-//     res.status(500).send('Internal Server Error');
-//   }
-// },
-
-// loadCart: async (req, res) => {
-//   try {
-//     console.log("Session object:", req.session);
-
-//     const userId = req.session.user ? req.session.user.id : null;
-//     if (!userId) {
-//       return res.render('cart', { cart: { products: [], totalPrice: 0, currentPage: 1, totalPages: 0 } });
-//     }
-
-//     const page = parseInt(req.query.page) || 1;
-//     const limit = 5;
-//     const skip = (page - 1) * limit;
-
-//     const cart = await Cart.findOne({ userId }).populate('product.productId').lean();
-//     console.log("Cart object after fetching and populating:", JSON.stringify(cart, null, 2));
-
-//     if (!cart || !cart.product || cart.product.length === 0) {
-//       return res.render('cart', { cart: { products: [], totalPrice: 0, currentPage: 1, totalPages: 0 } });
-//     }
-
-//     const totalProducts = cart.product.length;
-//     const totalPages = Math.ceil(totalProducts / limit);
-
-//     const paginatedProducts = cart.product.slice(skip, skip + limit);
-
-//     cart.totalPrice = cart.product.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
-//     console.log("Cart object after calculating totalPrice:", JSON.stringify(cart, null, 2));
-
-//     res.render('cart', {
-//       cart: {
-//         products: paginatedProducts,
-//         totalPrice: cart.totalPrice,
-//         currentPage: page,
-//         totalPages: totalPages
-//       }
-//     });
-//   } catch (error) {
-//     console.log('Error Occurred: ', error);
-//     res.status(500).send('Internal Server Error');
-//   }
-// },
 
 
  updateCart : async (req, res) => {
@@ -860,7 +711,6 @@ loadCheckout : async (req, res) => {
       console.log(error.message);
   }
 },
-
 
 
 
