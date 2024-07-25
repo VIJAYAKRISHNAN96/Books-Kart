@@ -2,7 +2,7 @@ const express = require("express");
 const adminRouter = express.Router();
 const path = require('path');
 const adminController = require("../controllers/adminController");
-// const orderManagement = require("../controllers/orderManagement");
+const couponManagement= require("../controllers/couponManagement");
 
 const auth=require("../middlewares/adminAuth");
 
@@ -66,9 +66,12 @@ adminRouter.post('/category/create', adminController.addCategory);
 adminRouter.get("/order", auth.isLogin,orderManagement.loadOrder);
 adminRouter.put("/changeOrderStatus", auth.isLogin,orderManagement.changeOrderStatus);
 adminRouter.get("/orderDetails", auth.isLogin,orderManagement.loadOrderDetails);
-// adminRouter.get("/order", auth.isLogin, orderManagement.loadOrder);
-// adminRouter.put("/changeOrderStatus", auth.isLogin, orderManagement.changeOrderStatus);
-// adminRouter.get("/orderDetails", auth.isLogin, orderManagement.loadOrderDetails); // Ensure this is correct
+
+
+adminRouter.get('/coupon', couponManagement.loadCouponList);
+adminRouter.post('/addCoupon', couponManagement.addCoupon);
+adminRouter.put('/couponStatus', couponManagement.changeCouponStatus);
+adminRouter.delete('/deleteCoupon', couponManagement.deleteCoupon);
 
 module.exports = adminRouter;
 // module.exports= orderManagement

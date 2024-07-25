@@ -170,6 +170,7 @@ userRouter.post("/deleteCart", auth.isLogin, userController.deleteCart);
 
 userRouter.get("/wishList",auth.isLogin,userController.loadWishList);
 userRouter.post("/addToWishList",auth.isLogin,userController.addToWishList);
+userRouter.post("/addToCartFromWishlist",auth.isLogin,userController.addToCartFromWishlist);
 
 
 userRouter.delete("/deleteWishList",auth.isLogin,userController.deleteWishList);

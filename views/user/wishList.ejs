@@ -125,6 +125,7 @@
 
 </style> -->
 
+
 <style>
     /* General button styles */
 .btn {
@@ -405,7 +406,7 @@
                                                 </td>
                                                 <td class="text-right" data-title="Cart">
                                                     <% if (product.stock > 0) { %>
-                                                        <button class="btn btn-sm add-to-cart-btn" onclick="addToCart('<%= user.id %>', '<%= product._id %>')">
+                                                        <button class="btn btn-sm add-to-cart-btn" onclick="addToCartFromWishlist('<%= product._id %>',this)">
                                                             <i class="fi-rs-shopping-bag mr-2"></i>Add To Cart</button>
                                                     <% } else { %>
                                                         <button class="btn btn-sm btn-secondary"><i class="fi-rs-headset mr-3"></i>Contact Us</button>
@@ -483,282 +484,128 @@
     }
 </script>
 
-
-<script>
-    function addToCart(userId, productId) {
-        fetch(`/addToCart?userId=${userId}&productId=${productId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Handle success response
-            if(data.success){
-                window.location.href="/cart";
-                console.log('Added to cart:', data);
-            }else{
-              Swal.fire({
-                        title: "Oops",
-                        text: data.message,
-                        icon: "warning",
-                        showCloseButton: true, // Show close button
-                        confirmButtonText: 'Close' // Button text
-                    });  
-
-            }
-
-            
-            
-            // Optionally, you can redirect the user to the cart page or show a success message
-        })
-        .catch(error => {
-            // Handle error
-            console.error('There was a problem with your fetch operation:', error);
-        });
-    }
-
-    
-</script>
-
-
-
-
-
 <!-- <script>
-   function confirmDelete(event, productId) {
-    event.preventDefault(); // Prevent the form from submitting immediately
-
-    console.log('Product ID:', productId); // Debugging line
-
-    Swal.fire({
-      title: 'Are you sure?',
-      text: "Do you really want to remove this product from your wishlist?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Submit the form if confirmed
-        const form = document.getElementById(`deleteWishlistForm-${productId}`);
-        console.log('Form ID:', `deleteWishlistForm-${productId}`); // Debugging line
-        form.submit();
-      }
-    });
-
-    return false; // Ensure the form doesn't submit immediately
-}
-</script> -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
-
-  
-
-
-
-
-
-
-
-
-
-<script>
-function removeProduct(productId) {
-    fetch(`/removeProduct?productId=${productId}`, {
+    function addToCart(productId, productName, quantity = 1) {
+    fetch('/addToCart', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            Swal.fire({
-                title: "Removed",
-                text: data.message,
-                icon: "success",
-                showCloseButton: true,
-                confirmButtonText: 'Close'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    location.reload();
-                }
-            });
-        } else {
-            Swal.fire({
-                title: "Oops",
-                text: data.message,
-                icon: "warning",
-                showCloseButton: true,
-                confirmButtonText: 'Close'
-            });
-        }
-    })
-    .catch(error => {
-        console.error('There was a problem with your fetch operation:', error);
-        Swal.fire({
-            title: "Error",
-            text: "An error occurred while removing the product.",
-            icon: "error",
-            showCloseButton: true,
-            confirmButtonText: 'Close'
-        });
-    });
-}   
-</script>
-
-
-<!-- wrked -->
-<!-- <script>
-    function removeProduct(productId) {
-    console.log('Removing product:', productId);
-    fetch(`/removeProduct?productId=${productId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ productId, quantity }),
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Server response:', data);
         if (data.success) {
             Swal.fire({
-                title: "Removed",
-                text: data.message,
-                icon: "success",
-                showCloseButton: true,
-                confirmButtonText: 'Close'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    location.reload();
-                }
+                title: 'Added to Cart!',
+                text: `${quantity} ${quantity > 1 ? 'items' : 'item'} of ${productName} ${quantity > 1 ? 'have' : 'has'} been added to your cart.`,
+                icon: 'success',
+                confirmButtonText: 'Continue Shopping'
             });
+            // Optional: Update mini cart or cart icon if you have one
+            // updateMiniCart(data.cartItemCount, data.totalPrice);
         } else {
             Swal.fire({
-                title: "Oops",
-                text: data.message,
-                icon: "warning",
-                showCloseButton: true,
-                confirmButtonText: 'Close'
+                title: 'Error!',
+                text: data.error || 'Failed to add product to cart',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'An unexpected error occurred',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    });
+}
+
+
+</script> -->
+
+
+<!-- <script>
+  function addToCart(userId, productId) {
+    // Send an AJAX request to your server
+    fetch('addToCart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: userId, productId: productId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Product successfully added to cart
+            alert('Product added to cart!');
+            // Optionally, update the cart count or refresh the page
+            // updateCartCount();
+        } else {
+            // Handle error
+            alert('Failed to add product to cart. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+}
+</script> -->
+
+
+
+<!-- wrking -->
+
+<script>
+    function addToCartFromWishlist(productId, quantity = 1) {
+    fetch('/addToCartFromWishlist', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ productId: productId, quantity: quantity })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Added to Cart',
+                text: `${data.productName} has been added to your cart.`,
+                showConfirmButton: false,
+                timer: 1500
+            });
+            updateCartCount(data.cartItemCount);
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Failed to add product to cart. Please try again.',
             });
         }
     })
     .catch(error => {
         console.error('Error:', error);
         Swal.fire({
-            title: "Error",
-            text: "An error occurred while removing the product.",
-            icon: "error",
-            showCloseButton: true,
-            confirmButtonText: 'Close'
+            icon: 'error',
+            title: 'Oops...',
+            text: 'An error occurred. Please try again.',
         });
     });
 }
-</script> -->
 
-<!-- <script>
-    function removeProduct(productId) {
-        fetch(`/removeProduct?productId=${productId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    title: "Removed",
-                    text: data.message,
-                    icon: "success",
-                    showCloseButton: true,
-                    confirmButtonText: 'Close'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        location.reload();
-                    }
-                });
-            } else {
-                Swal.fire({
-                    title: "Oops",
-                    text: data.message,
-                    icon: "warning",
-                    showCloseButton: true,
-                    confirmButtonText: 'Close'
-                });
-            }
-        })
-        .catch(error => {
-            console.error('There was a problem with your fetch operation:', error);
-        });
+
+function updateCartCount(count) {
+    const cartCountElement = document.getElementById('cart-count');
+    if (cartCountElement) {
+        cartCountElement.textContent = count;
     }
-</script> -->
-
-<!-- <script>
-    
-
-    function removeProduct(productId) {
-        fetch('/removeProduct', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ productId: productId }) // Send productId in the request body
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    title: "Removed",
-                    text: data.message,
-                    icon: "success",
-                    showCloseButton: true,
-                    confirmButtonText: 'Close'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        location.reload();
-                    }
-                });
-            } else {
-                Swal.fire({
-                    title: "Oops",
-                    text: data.message,
-                    icon: "warning",
-                    showCloseButton: true,
-                    confirmButtonText: 'Close'
-                });
-            }
-        })
-        .catch(error => {
-            console.error('There was a problem with your fetch operation:', error);
-        });
-    }
+}
+</script>
 
 
-
-
-</script> -->
-<%- include('../partials/footer.ejs') %>
