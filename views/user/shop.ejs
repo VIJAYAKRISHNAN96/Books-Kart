@@ -265,8 +265,15 @@
                                         <div class="product-action-1">
                                             <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal">
 <i class="fi-rs-search"></i></a>
-                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
-                                            <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
+                                            <!-- <a aria-label="Add To Wishlist" class="action-btn hover-up" href="/wishList"><i class="fi-rs-heart"></i></a> -->
+                                            <!-- <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="addToWishList('<%=product._id %>')"><i class="fi-rs-heart"></i></a> -->
+                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="addToWishList('<%= product._id %>')">
+                                                <i class="fi-rs-heart"></i>
+                                              </a>
+                                              
+
+                                            
+                                            <!-- <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a> -->
                                         </div>
                                         <div class="product-badges product-badges-position product-badges-mrg">
                                             <span class="hot">Hot</span>
@@ -355,6 +362,119 @@
             </div>
         </section>
     </main>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
+
+
+      
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+
+
+    <script>
+
+
+
+
+//        function addToWishList(productId) {
+//   fetch('/addToWishList', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/x-www-form-urlencoded',
+//     },
+//     body: new URLSearchParams({
+//       productId: productId,
+//     }),
+//   })
+//   .then(response => response.json())
+//   .then(data => {
+//     if (data.success) {
+//       Swal.fire({
+//         icon: 'success',
+//         title: 'Success',
+//         text: data.message,
+//         confirmButtonText: 'OK'
+//       });
+//     } else {
+//       Swal.fire({
+//         icon: 'error',
+//         title: 'Error',
+//         text: data.message,
+//         confirmButtonText: 'OK'
+//       });
+//     }
+//   })
+//   .catch(error => {
+//     console.error('Error:', error);
+//     Swal.fire({
+//       icon: 'error',
+//       title: 'Error',
+//       text: 'An error occurred. Please try again.',
+//       confirmButtonText: 'OK'
+//     });
+//   });
+// }
+function addToWishList(productId) {
+    console.log('Adding Product ID:', productId); // Log to verify the productId
+
+    
+fetch('/addToWishList', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  },
+  body: new URLSearchParams({
+    productId: productId,
+  }),
+})
+.then(response => response.json())
+.then(data => {
+  console.log('Response Data:', data); // Log response to check structure
+  if (data.success) {
+    Swal.fire({
+      icon: 'success',
+      title: 'Success',
+      text: data.message,
+      confirmButtonText: 'OK'
+    });
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: data.message,
+      confirmButtonText: 'OK'
+    });
+  }
+})
+.catch(error => {
+  console.error('Error:', error);
+  Swal.fire({
+    icon: 'error',
+    title: 'Error',
+    text: 'An error occurred. Please try again.',
+    confirmButtonText: 'OK'
+  });
+});
+
+}
+
+
+  
+
+    </script>
+
+
+
+
+
     <footer class="main">
         <section class="newsletter p-30 text-white wow fadeIn animated">
             <div class="container">

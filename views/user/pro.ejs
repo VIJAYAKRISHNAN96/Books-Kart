@@ -690,3 +690,245 @@ fetch('addToCart', {
 });
 });
 </script>  -->
+
+
+
+
+
+
+<tbody>
+    <% if (products.length === 0) { %>
+        <tr>
+            <td colspan="6" class="text-center">No products found in your wishlist.</td>
+        </tr>
+    <% } else { %>
+        <% products.forEach(product => { %>
+            <tr>
+                <!-- Handle cases where product images might be undefined -->
+                <td class="image product-thumbnail">
+                    <% if (product && product.images && product.images.length > 0) { %>
+                        <img src="/userAssets/imgs/shop/<%= product.images[0] %>" alt="Product Image">
+                    <% } else { %>
+                        <img src="/userAssets/imgs/shop/default-image.jpg" alt="Default Image">
+                    <% } %>
+                </td>
+                <!-- Handle cases where product name might be undefined -->
+                <td class="product-des product-name">
+                    <h5 class="product-name">
+                        <a href="#"><%= product ? product.name : 'Product Name Unavailable' %></a>
+                    </h5>
+                </td>
+                <!-- Handle cases where product price might be undefined -->
+                <td class="price" data-title="Price">
+                    <span>$<%= product ? (product.price ? product.price.toFixed(2) : 'N/A') : 'N/A' %></span>
+                </td>
+                <!-- Handle cases where product stock might be undefined -->
+                <td class="text-center" data-title="Stock">
+                    <% if (product && product.stock > 0) { %>
+                        <span class="color3 font-weight-bold">In Stock</span>
+                        <% if (product.stock <= 10) { %>
+                            <br><span class="font-xs" style="color: red;">Only <%= product.stock %> left</span>
+                        <% } %>
+                    <% } else { %>
+                        <span class="text-danger font-weight-bold">Out of Stock</span>
+                    <% } %>
+                </td>
+                <!-- Add to Cart or Contact Us button -->
+                <td class="text-right" data-title="Cart">
+                    <% if (product && product.stock > 0) { %>
+                        <button class="btn btn-sm" onclick="addToCart('<%=user._id %>', '<%=product._id %>')" style="background-color: #FF6B6B; border-color: #FF6B6B;">
+                            <i class="fi-rs-shopping-bag mr-5"></i>Add to cart
+                        </button>
+                    <% } else { %>
+                        <button class="btn btn-sm btn-secondary">
+                            <i class="fi-rs-headset mr-5"></i>Contact Us
+                        </button>
+                    <% } %>
+                </td>
+                <!-- Remove product button -->
+                <td class="action" data-title="Remove">
+                   
+                </td>
+            </tr>
+        <% }); %>
+    <% } %>
+</tbody>
+
+
+
+
+
+<tbody>
+    <% if (products && products.length > 0) { %>
+        <% products.forEach(product => { %>
+            <tr>
+                <td class="image product-thumbnail">
+                    <% if (product && product.images && product.images.length > 0) { %>
+                        <img src="/userAssets/imgs/shop/<%= product.images[0] %>" alt="<%= product.name %>">
+                    <% } else { %>
+                        <img src="/userAssets/imgs/shop/default-image.jpg" alt="Product image not available">
+                    <% } %>
+                </td>
+                <td class="product-des product-name">
+                    <h5 class="product-name"><a href="#"><%= product ? product.name : 'Product not available' %></a></h5>
+                </td>
+                <td class="price" data-title="Price"><span>$<%= product ? product.price.toFixed(2) : '0.00' %></span></td>
+                <td class="text-center" data-title="Stock">
+                    <% if (product && product.stock > 0) { %>
+                        <span class="color3 font-weight-bold">In Stock</span>
+                    <% } else { %>
+                        <span class="text-danger font-weight-bold">Out of Stock</span>
+                    <% } %>
+                    <% if (product && product.stock <= 10) { %>
+                        <br><span class="font-xs" style="color: red;">Only <%= product.stock %> left</span>
+                    <% } %>
+                </td>
+                <td class="text-right" data-title="Cart">
+                    <% if (product && product.stock > 0) { %>
+                        <button class="btn btn-sm" onclick="addToCart('<%= user._id %>', '<%= product._id %>')" style="background-color: #FF6B6B; border-color:  #FF6B6B;">
+                            <i class="fi-rs-shopping-bag mr-5"></i>Add to cart
+                        </button>
+                    <% } else { %>
+                        <button class="btn btn-sm btn-secondary"><i class="fi-rs-headset mr-5"></i>Contact Us</button>
+                    <% } %>
+                </td>
+                <td class="action" data-title="Remove">
+                    <a onclick="removeProduct('<%= product ? product._id : '' %>')" style="color: #FF6B6B;">
+                        <i class="fi-rs-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        <% }); %>
+    <% } else { %>
+        <tr>
+            <td colspan="6">No products in wishlist.</td>
+        </tr>
+    <% } %>
+</tbody>
+
+
+
+
+
+
+
+// addToWishList: async (req, res) => {
+    //   try {
+    //       const userId = req.session.user.id;
+    //       const productId = req.body.productId;
+    
+    //       // Find the user and add the product to the wishlist if not already present
+    //       const user = await User.findById(userId);
+    
+    //       // Check if the wishlist array exists
+    //       if (!user.wishlist) {
+    //           user.wishlist = [];
+    //       }
+    
+    //       // Check if the product is already in the wishlist
+    //       const productExists = user.wishlist.some(item => item.productId.equals(productId));
+    //       if (!productExists) {
+    //           user.wishlist.push({ productId: productId });
+    //           await user.save();
+    //       }
+    
+    //       res.status(200).send('Product added to wishlist');
+    //   } catch (error) {
+    //       console.error('Error adding to wishlist:', error);
+    //       res.status(500).send('Internal Server Error');
+    //   }
+    // },
+
+
+
+
+    <tbody>
+        <% if (products && products.length > 0) { %>
+            <% products.forEach(product => { %>
+                <tr>
+                    <td class="image product-thumbnail">
+                        <% if (product && product.images && product.images.length > 0) { %>
+                            <img src="/userAssets/imgs/shop/<%= product.images[0] %>" alt="<%= product.name %>">
+                        <% } else { %>
+                            <img src="/userAssets/imgs/shop/default-image.jpg" alt="Product image not available">
+                        <% } %>
+                    </td>
+                    <td class="product-des product-name">
+                        <h5 class="product-name"><a href="#"><%= product ? product.name : 'Product not available' %></a></h5>
+                    </td>
+                    <td class="price" data-title="Price"><span>$<%= product ? product.price.toFixed(2) : '0.00' %></span></td>
+                    <td class="text-center" data-title="Stock">
+                        <% if (product && product.stock > 0) { %>
+                            <span class="color3 font-weight-bold">In Stock</span>
+                        <% } else { %>
+                            <span class="text-danger font-weight-bold">Out of Stock</span>
+                        <% } %>
+                        <% if (product && product.stock <= 10) { %>
+                            <br><span class="font-xs" style="color: red;">Only <%= product.stock %> left</span>
+                        <% } %>
+                    </td>
+                    <td class="text-right" data-title="Cart">
+                        <% if (product && product.stock > 0) { %>
+                            <button class="btn btn-sm" onclick="addToCart('<%= user.id %>', '<%= product._id %>')" style="background-color: #FF6B6B; border-color:  #FF6B6B;">
+                                <i class="fi-rs-shopping-bag mr-5"></i>Add to cart
+                            </button>
+                        <% } else { %>
+                            <button class="btn btn-sm btn-secondary"><i class="fi-rs-headset mr-5"></i>Contact Us</button>
+                        <% } %>
+                    </td>
+
+                    <td>
+                        <button onclick="removeProduct('<%= product._id %>')" class="remove-btn">Remove</button>
+                      </td>
+
+                  
+                </tr>
+            <% }); %>
+        <% } else { %>
+            <tr>
+                <td colspan="6">No products in wishlist.</td>
+            </tr>
+        <% } %>
+    </tbody>
+
+
+      <!-- <tbody>
+                                <% if (products && products.length > 0) { %>
+                                    <% products.forEach(product => { %>
+                                        <tr>
+                                            <td class="image product-thumbnail">
+                                                <% if (product && product.images && product.images.length > 0) { %>
+                                                    <img src="/userAssets/imgs/shop/<%= product.images[0] %>" alt="<%= product.name %>">
+                                                <% } else { %>
+                                                    <img src="/userAssets/imgs/shop/default-image.jpg" alt="Product image not available">
+                                                <% } %>
+                                            </td>
+                                            <td class="product-des product-name">
+                                                <h5 class="product-name"><a href="#"><%= product ? product.name : 'Product not available' %></a></h5>
+                                            </td>
+                                            <td class="price" data-title="Price"><span>$<%= product ? product.price.toFixed(2) : '0.00' %></span></td>
+                                            <td class="text-center" data-title="Stock">
+                                                <% if (product && product.stock > 0) { %>
+                                                    <span class="color3 font-weight-bold">In Stock</span>
+                                                <% } else { %>
+                                                    <span class="text-danger font-weight-bold">Out of Stock</span>
+                                                <% } %>
+                                                <% if (product && product.stock <= 10) { %>
+                                                    <br><span class="font-xs" style="color: red;">Only <%= product.stock %> left</span>
+                                                <% } %>
+                                            </td>
+                                            <td class="text-right" data-title="Cart">
+                                                <% if (product && product.stock > 0) { %>
+                                                    <button class="btn btn-sm" onclick="addToCart('<%= user.id %>', '<%= product._id %>')" style="background-color: #FF6B6B; border-color:  #FF6B6B;">
+                                                        <i class="fi-rs-shopping-bag mr-5"></i>Add to cart
+                                                    </button>
+                                                <% } else { %>
+                                                    <button class="btn btn-sm btn-secondary"><i class="fi-rs-headset mr-5"></i>Contact Us</button>
+                                                <% } %>
+                                            </td>
+                                            <!-- <td>
+                                                <button onclick="removeProduct('<%= product._id %>')" class="remove-btn">Remove</button>
+                                            </td> -->
+                                        <!-- </tr> -->
+                                 
+                            <!-- </tbody> -->

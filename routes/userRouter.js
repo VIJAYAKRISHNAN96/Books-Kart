@@ -168,6 +168,15 @@ userRouter.post("/addToCart", auth.isLogin, userController.addToCart);
 userRouter.post("/updateCart", auth.isLogin, userController.updateCart);
 userRouter.post("/deleteCart", auth.isLogin, userController.deleteCart);
 
+userRouter.get("/wishList",auth.isLogin,userController.loadWishList);
+userRouter.post("/addToWishList",auth.isLogin,userController.addToWishList);
+
+
+userRouter.delete("/deleteWishList",auth.isLogin,userController.deleteWishList);
+
+
+
+
 userRouter.post('/placeOrder', orderManagement.placeOrder);
 userRouter.post('/cancelOrder', orderManagement.cancelOrder);
 userRouter.get('/viewOrder', orderManagement.loadOrderView);

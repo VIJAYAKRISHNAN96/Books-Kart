@@ -246,12 +246,19 @@
                                           </td>
                                           <td class="action" data-title="Remove">
                                             <!-- <td class="action" data-title="Remove"> -->
-                                                <form action="/deletcart" method="post" class="remove-form">
+                                                <!-- <form action="/deletcart" method="post" class="remove-form">
                                                   <input type="hidden" name="productId" value="<%= item.productId._id %>">
                                                   <button type="submit" class="text-muted">
                                                     <i class="fi-rs-trash" style="color: white;"></i>
                                                   </button>
-                                                </form>
+                                                </form> -->
+
+                                                <form id="deleteCartForm-<%= item.productId._id %>" action="/deletecart" method="post" class="remove-form">
+                                                  <input type="hidden" name="productId" value="<%= item.productId._id %>">
+                                                  <button type="button" class="text-muted" onclick="confirmDelete('<%= item.productId._id %>')">
+                                                      <i class="fi-rs-trash" style="color: white;"></i>
+                                                  </button>
+                                              </form>
 
 
                                             <!-- <form action="/cart/remove" method="post" class="remove-form">

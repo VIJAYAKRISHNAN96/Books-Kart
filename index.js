@@ -47,7 +47,7 @@ app.use(express.urlencoded({extended:true}));
      cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 },
    })
  );
- app.use(express.json());
+//  app.use(express.json());
  
 // Passport Configuration
 passport.use(new GoogleStrategy({

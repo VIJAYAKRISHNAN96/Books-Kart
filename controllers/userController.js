@@ -9,6 +9,7 @@ const User= require("../model/userModel");
 const Product = require("../model/productModel");
 const Cart = require("../model/cartModel")
 const Order= require("../model/orderModel");
+const WishList=require("../model/wishListModel");
 
 
 const transport = nodemailer.createTransport({
@@ -667,29 +668,6 @@ deleteCart : async (req, res) => {
 
 
 
-
-
-
-
-// loadCheckout :async(req,res)=>{
-//   try{
-//       const userId=req.session.user;
-//       const user=await User.findById(userId);
-//       const cart=await Cart.findOne({userId:userId}).populate("product.productId");
-//       // const coupon=await Coupon.find({status:"active"});
-//       // const wallet= await Wallet.findOne({user:userId});
-      
-//       let cartCount=0;
-//       if(cart){
-//          cartCount=cart.product.length;
-//       }
-//       res.render("checkout",{user,cart,cartCount})
-
-//   }catch(error){
-//       console.log(error.message);
-//   }
-// }
-
 loadCheckout : async (req, res) => {
   try {
       const userId = req.session.user.id;
@@ -711,6 +689,129 @@ loadCheckout : async (req, res) => {
       console.log(error.message);
   }
 },
+
+
+
+loadWishList: async (req, res) => {
+  try {
+      const userId = req.session.user.id;
+
+      // Ensure userId is valid
+      if (!userId) {
+          console.error('User ID is not available in the session');
+          return res.status(400).send('User not authenticated');
+      }
+
+      // Retrieve the user and populate the wishlist.productId field
+      const user = await User.findById(userId).populate('wishlist.productId');
+
+      // Check if user exists
+      if (!user) {
+          console.error('User not found');
+          return res.status(404).send('User not found');
+      }
+
+      // Handle cases where wishlist might be null or undefined
+      const products = user.wishlist && user.wishlist.length > 0
+          ? user.wishlist.map(item => item.productId)
+          : [];
+
+      // Debug: Log the products
+      console.log('Products in wishlist:', products);
+
+      // Render the wishlist view with products
+      res.render('wishList', { products });
+  } catch (error) {
+      console.error('Error loading wishlist:', error);
+      res.status(500).send('Internal Server Error');
+  }
+},
+
+
+
+
+
+// test last
+addToWishList : async (req, res) => {
+  try {
+    const userId = req.session.user.id; // Assuming userId is stored in req.session.user
+    const { productId } = req.body; // Extract productId from body (for POST request)
+
+    console.log('Received Product ID from Body:', productId); // Log productId for debugging
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'User not authenticated' });
+    }
+
+    if (!productId) {
+      return res.status(400).json({ success: false, message: 'Product ID is missing' });
+    }
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Check if the product is already in the user's wishlist
+    // const productExists = user.wishlist.some(item => item.productId.toString() === productId);
+    const productExists = user.wishlist.some(item => {
+      if (item.productId) {
+          console.log("Checking Product ID:", item.productId.toString()); // Debugging line
+          return item.productId.toString() === productId;
+      }
+      return false;
+  });
+
+    if (productExists) {
+      return res.status(400).json({ success: false, message: 'Product already in wishlist' });
+    }
+
+    // Add product to the user's wishlist
+    user.wishlist.push({ productId });
+    await user.save();
+
+    res.status(200).json({ success: true, message: 'Product added to wishlist successfully' });
+  } catch (error) {
+    console.error('Error adding to wishlist:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+},
+
+
+deleteWishList : async (req, res) => {
+  try {
+    const userId = req.session.user.id; // Ensure the user ID is available in the session
+    const productId = req.body.productId; // Ensure the product ID is sent in the request body
+
+    console.log('User ID:', userId);
+    console.log('Product ID:', productId);
+
+
+    // Ensure userId and productId are not undefined or null
+    if (!userId || !productId) {
+      console.log('User ID or Product ID is missing:', { userId, productId }); // Debugging line
+      return res.status(400).json({ success: false, message: 'User ID or Product ID is missing' });
+    }
+
+    // Delete the product from the user's wishlist
+    const wishlist = await WishList.findOneAndUpdate(
+      { userId },
+      { $pull: { products: { productId } } }, // Adjust the field name according to your schema
+      { new: true }
+    );
+
+    if (!wishlist) {
+      return res.status(404).json({ success: false, message: 'Wishlist not found or product not in wishlist' });
+    }
+
+    res.json({ success: true, message: 'Product removed from wishlist successfully' });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+}
 
 
 

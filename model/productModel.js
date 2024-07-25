@@ -20,6 +20,7 @@ const productSchema = new mongoose.Schema({
     category: { 
         type: String, 
         required: true },
+        
     images: {
         type: [String],
         validate: [arrayLimit, '{PATH} exceeds the limit of 3'],
