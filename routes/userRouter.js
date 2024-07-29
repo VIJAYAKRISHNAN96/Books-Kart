@@ -193,7 +193,7 @@ userRouter.post('/cancelOrder', orderManagement.cancelOrder)
 userRouter.get('/viewOrder', orderManagement.loadOrderView);
 
 userRouter.post('/onlineOrderPlacing',auth.isLogin, orderManagement.onlineOrderPlacing);
-userRouter.put('/checkWalletBalance', orderManagement.checkWalletBalance);
+userRouter.get('/checkWalletBalance', orderManagement.checkWalletBalance);
 userRouter.post('/walletOrder', orderManagement.walletPlaceOrder);
 userRouter.put('/returnOrder', orderManagement.returnOrder);
 

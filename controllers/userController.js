@@ -379,6 +379,9 @@ loadUser : async (req, res) => {
       // Check if wallet exists and is populated
       const wallet = user.wallet ? user.wallet : null;
 
+      console.log('Wallet:', wallet); // Debugging log
+
+
       // Render user account page with wallet data
       res.render("userAccount", { user, order, cartCount, wallet });
   } catch (error) {
@@ -820,29 +823,133 @@ deleteCart : async (req, res) => {
 
 
 
-loadCheckout : async (req, res) => {
+// loadCheckout : async (req, res) => {
+//   try {
+//       const userId = req.session.user.id;
+//       const user = await User.findById(userId);
+//       const cart = await Cart.findOne({ userId: userId }).populate("product.productId");
+//       const coupon = await Coupon.find({ status: "active" });
+//       const wallet= await Wallet.findOne({user:userId});
+
+
+//       let cartCount = 0;
+//       if (cart) {
+//           cartCount = cart.product.length;
+//       }
+
+//       // Ensure user.address is defined and is an array
+//       user.address = user.address || [];
+
+//       res.render("checkout", { user, cart, cartCount,coupon,wallet });
+
+//   } catch (error) {
+//       console.log(error.message);
+//   }
+// },
+
+
+// loadCheckout : async (req, res) => {
+//   try {
+//     const userId = req.session.user.id;
+//     const user = await User.findById(userId);
+//     const cart = await Cart.findOne({ userId: userId }).populate("product.productId");
+//     const coupon = await Coupon.find({ status: "active" });
+//     const wallet = await Wallet.findOne({ user: userId });
+
+//     let cartCount = 0;
+//     if (cart) {
+//       cartCount = cart.product.length;
+//     }
+
+//     // Ensure user.address is defined and is an array
+//     user.address = user.address || [];
+
+//     // Ensure wallet balance is defined and has a default value
+//     const walletBalance = wallet ? wallet.balance : 0;
+
+//     res.render("checkout", { user, cart, cartCount, coupon, walletBalance });
+
+//   } catch (error) {
+//     console.log(error.message);
+//   }
+// }
+
+// loadCheckout : async (req, res) => {
+//   try {
+//     const userId = req.session.user.id;
+//     const user = await User.findById(userId);
+//     const cart = await Cart.findOne({ userId: userId }).populate("product.productId");
+//     const coupon = await Coupon.find({ status: "active" });
+//     const wallet = await Wallet.findOne({ user: userId });
+
+//     let cartCount = 0;
+//     if (cart) {
+//       cartCount = cart.product.length;
+//     }
+
+//     // Ensure user.address is defined and is an array
+//     user.address = user.address || [];
+
+//     // Ensure wallet is defined and has a default value for balance
+//     const walletData = wallet || { balance: 0 };
+
+//     // Logging to verify data being passed
+//     console.log('User:', user);
+//     console.log('Cart:', cart);
+//     console.log('Coupon:', coupon);
+//     console.log('Wallet:', walletData);
+
+//     res.render("checkout", { user, cart, cartCount, coupon, wallet: walletData });
+
+//   } catch (error) {
+//     console.log(error.message);
+//     res.status(500).send('Server Error');
+//   }
+// },
+
+loadCheckout: async (req, res) => {
   try {
-      const userId = req.session.user.id;
-      const user = await User.findById(userId);
-      const cart = await Cart.findOne({ userId: userId }).populate("product.productId");
-      const coupon = await Coupon.find({ status: "active" });
-      const wallet= await Wallet.findOne({user:userId});
+    const userId = req.session.user.id;
+    const user = await User.findById(userId);
+    const cart = await Cart.findOne({ userId: userId }).populate("product.productId");
+    const coupon = await Coupon.find({ status: "active" });
 
+    let cartCount = 0;
+    if (cart) {
+      cartCount = cart.product.length;
+    }
 
-      let cartCount = 0;
-      if (cart) {
-          cartCount = cart.product.length;
-      }
+    // Ensure user.address is defined and is an array
+    user.address = user.address || [];
 
-      // Ensure user.address is defined and is an array
-      user.address = user.address || [];
+    // Logging detailed information for debugging
+    console.log('User:', JSON.stringify(user, null, 2));
+    console.log('Cart:', JSON.stringify(cart, null, 2));
+    console.log('Coupon:', JSON.stringify(coupon, null, 2));
 
-      res.render("checkout", { user, cart, cartCount,coupon,wallet });
+    // Ensure user.wallet is defined and has a default value for balance
+    const walletBalance = user.wallet ? user.wallet.balance : 0;
+
+    res.render("checkout", { user, cart, cartCount, coupon, walletBalance });
 
   } catch (error) {
-      console.log(error.message);
+    console.log(error.message);
+    res.status(500).send('Server Error');
   }
 },
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 confirmQuantity:async(req,res)=>{
   try{

@@ -653,27 +653,27 @@
                                         <p class="text-muted mt-5">Please send your cheque to Store Name, Store Street, Store Town, Store State / County, Store Postcode. </p>
                                     </div>
                                 </div>
-                                <!-- <div class="custome-radio">
-                                    <input class="form-check-input" required type="radio" name="payment_option" id="exampleRadios6" value="wallet">
-                                    <label class="form-check-label" for="exampleRadios6">Wallet</label>
-                                    <% if (wallet) { %>
-                                        <p class="mt-5">Your wallet balance is ₹<%= wallet.walletBalance.toFixed(2) %></p>
-                                    <% } else { %>
-                                        <p class="mt-5">Wallet information is not available.</p>
-                                    <% } %>
                                 
-                                </div> -->
+
+
+                                
 
                                 <div class="custome-radio">
                                     <input class="form-check-input" required type="radio" name="payment_option" id="exampleRadios6" value="wallet">
                                     <label class="form-check-label" for="exampleRadios6">Wallet</label>
-                                    <% if (wallet && wallet.walletBalance !== undefined) { %>
-                                        <p class="mt-5">Your wallet balance is ₹<%= wallet.walletBalance.toFixed(2) %></p>
+                                    <% if (walletBalance !== undefined) { %>
+                                        <p class="mt-5">Your wallet balance is ₹<%= walletBalance.toFixed(2) %></p>
                                     <% } else { %>
                                         <p class="mt-5">Wallet information is not available.</p>
                                     <% } %>
-                                </div>
-                                
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+
+
+
                                 
                                
                                
@@ -1472,6 +1472,103 @@ function OrderAfterPayment(paymentResponse, status) {
     });
 }
 
+
+function confirmWalletBalance(orderData) {
+    const encodedTotalAmount = encodeURIComponent(orderData.totalAmount);
+    
+    fetch(`/checkWalletBalance?totalAmount=${encodedTotalAmount}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.walletBalance >= orderData.totalAmount) {
+                processOrder(orderData);
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Insufficient Wallet Balance',
+                    text: 'You do not have enough balance to complete this transaction.',
+                });
+            }
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error checking wallet balance:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'There was an error checking your wallet balance. Please try again.'
+        });
+    });
+}
+
+function walletPlaceOrder(addressIndex, paymentMethod, totalAmount, couponId, subtotal) {
+    fetch(`/walletPlaceOrder`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            addressIndex: addressIndex,
+            paymentMethod: paymentMethod,
+            totalAmount: totalAmount,
+            couponId: couponId,
+            subtotal: subtotal
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Order Response:", data);
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Order Placed Successfully',
+                text: 'View My Orders',
+                confirmButtonText: 'OK'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    window.location.href = "/userAccount";
+                }
+            });
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Order Placement Failed',
+                text: data.message
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error placing order:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'There was an error placing your order. Please try again.'
+        });
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
 // function confirmWalletBalance(orderData) {
 //     fetch('/checkWalletBalance', {
 //         method: 'POST',
@@ -1509,46 +1606,88 @@ function OrderAfterPayment(paymentResponse, status) {
 //     });
 // }
 
-function confirmWalletBalance(orderData) {
-    fetch(`/checkWalletBalance?totalAmount=${orderData.totalAmount}`, {
-        method: 'PUT', // Changed to GET method
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            if (data.walletBalance >= orderData.totalAmount) {
-                processOrder(orderData);
-            } else {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Insufficient Wallet Balance',
-                    text: 'You do not have enough balance to complete this transaction.',
-                });
-            }
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: data.message
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Error checking wallet balance:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'There was an error checking your wallet balance. Please try again.'
-        });
-    });
-}
+// function confirmWalletBalance(orderData) {
+//     fetch(`/checkWalletBalance?totalAmount=${orderData.totalAmount}`, {
+//         method: 'GET', // Changed to GET method
+//         headers: {
+//             'Content-Type': 'application/json'
+//         }
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             if (data.walletBalance >= orderData.totalAmount) {
+//                 processOrder(orderData);
+//             } else {
+//                 Swal.fire({
+//                     icon: 'warning',
+//                     title: 'Insufficient Wallet Balance',
+//                     text: 'You do not have enough balance to complete this transaction.',
+//                 });
+//             }
+//         } else {
+//             Swal.fire({
+//                 icon: 'error',
+//                 title: 'Error',
+//                 text: data.message
+//             });
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error checking wallet balance:', error);
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Error',
+//             text: 'There was an error checking your wallet balance. Please try again.'
+//         });
+//     });
+// }
+
+// function walletPlaceOrder(addressIndex,paymentMethod,totalAmount,couponId,subtotal){
+    
+//     fetch(`/walletPlaceOrder`,{
+//         method: "POST",
+//         headers:{
+//             'Content-Type':'application/json'
+//         },
+//         body: JSON.stringify({
+//             addressIndex: addressIndex,
+//             paymentMethod: paymentMethod,
+//             totalAmount: totalAmount,
+//             couponId,
+//             subtotal
+
+//         })
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         console.log("testing resp",data)
+//         if(data.success){
+//             Swal.fire({
+//                 icon:"success",
+//                 title: data.message,
+//                 text:"View My Orders",
+//                 confirmButtonText :"OK"
+//             }).then((result) => {
+//                 if(result.isConfirmed){
+//                     window.location.href = "/userAccount";
+//                 }
+//             });
+//         } else {
+//             Swal.fire({
+//                 icon: 'warning',
+//                 title: 'Order Placement Failed',
+//                 text: data.message
+//             });
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error placing order:', error);
+//     });
+// }
 
 
-
-</script>
+// </script>
 
 
 
