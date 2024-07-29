@@ -653,7 +653,7 @@
                                         <p class="text-muted mt-5">Please send your cheque to Store Name, Store Street, Store Town, Store State / County, Store Postcode. </p>
                                     </div>
                                 </div>
-                                <!-- <div class="custome-radio">
+                                <div class="custome-radio">
                                     <input class="form-check-input" required type="radio" name="payment_option" id="exampleRadios6" value="wallet">
                                     <label class="form-check-label" for="exampleRadios6">Wallet</label>
                                     <% if (wallet) { %>
@@ -662,18 +662,7 @@
                                         <p class="mt-5">Wallet information is not available.</p>
                                     <% } %>
                                 
-                                </div> -->
-
-                                <div class="custome-radio">
-                                    <input class="form-check-input" required type="radio" name="payment_option" id="exampleRadios6" value="wallet">
-                                    <label class="form-check-label" for="exampleRadios6">Wallet</label>
-                                    <% if (wallet && wallet.walletBalance !== undefined) { %>
-                                        <p class="mt-5">Your wallet balance is ₹<%= wallet.walletBalance.toFixed(2) %></p>
-                                    <% } else { %>
-                                        <p class="mt-5">Wallet information is not available.</p>
-                                    <% } %>
                                 </div>
-                                
                                 
                                
                                

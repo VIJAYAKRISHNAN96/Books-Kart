@@ -319,44 +319,73 @@ const userController = {
   //   }
   // },
 
-  loadUser : async (req, res) => {
-    try {
-        const userId = req.session.user.id;
+//   loadUser : async (req, res) => {
+//     try {
+//         const userId = req.session.user.id;
 
-        // Fetch user data
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).send('User not found');
-        }
+//         // Fetch user data
+//         const user = await User.findById(userId);
+//         if (!user) {
+//             return res.status(404).send('User not found');
+//         }
 
-        // Fetch user orders
-        const order = await Order.find({ user: userId });
+//         // Fetch user orders
+//         const order = await Order.find({ user: userId });
 
-        // Calculate cart count
-        const cart = await Cart.findOne({ userId });
-        let cartCount = 0;
-        if (cart) {
-            cartCount = cart.product.length;
-        }
+//         // Calculate cart count
+//         const cart = await Cart.findOne({ userId });
+//         let cartCount = 0;
+//         if (cart) {
+//             cartCount = cart.product.length;
+//         }
 
-        // Fetch wallet data
-        const wallet = await Wallet.findOne({ user: userId });
+//         // Fetch wallet data
+//         const wallet = await Wallet.findOne({ user: userId });
 
-        // If wallet not found, set it to null or handle accordingly
-        if (!wallet) {
-            return res.status(404).render("userAccount", { user, order, cartCount, wallet: null, message: 'Wallet not found' });
-        }
+//         // If wallet not found, set it to null or handle accordingly
+//         if (!wallet) {
+//             return res.status(404).render("userAccount", { user, order, cartCount, wallet: null, message: 'Wallet not found' });
+//         }
 
-        // Render user account page with wallet data
-        res.render("userAccount", { user, order, cartCount, wallet });
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error");
-    }
+//         // Render user account page with wallet data
+//         res.render("userAccount", { user, order, cartCount, wallet });
+//     } catch (error) {
+//         console.error(error.message);
+//         res.status(500).send("Internal Server Error");
+//     }
+// },
+
+
+loadUser : async (req, res) => {
+  try {
+      const userId = req.session.user.id;
+
+      // Fetch user data, including wallet
+      const user = await User.findById(userId).populate('wallet.transactions');
+      if (!user) {
+          return res.status(404).send('User not found');
+      }
+
+      // Fetch user orders
+      const order = await Order.find({ user: userId });
+
+      // Calculate cart count
+      const cart = await Cart.findOne({ userId });
+      let cartCount = 0;
+      if (cart) {
+          cartCount = cart.product.length;
+      }
+
+      // Check if wallet exists and is populated
+      const wallet = user.wallet ? user.wallet : null;
+
+      // Render user account page with wallet data
+      res.render("userAccount", { user, order, cartCount, wallet });
+  } catch (error) {
+      console.error('Error loading user data:', error.message);
+      res.status(500).send("Internal Server Error");
+  }
 },
-
-
-
   
 
   editDetails : async (req, res) => {

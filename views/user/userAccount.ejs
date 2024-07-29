@@ -310,16 +310,17 @@
                                 </div>
 
 
-                                <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="address-tab">
+                          
+                                  <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="address-tab">
                                     <div class="wallet-container">
                                         <h2>Your Wallet</h2>
                                         <div class="wallet-balance">
                                             <span class="balance-label">Wallet Balance:</span>
                                             <% if (wallet) { %>
-                                                <% if (wallet.walletBalance > 1000) { %>
-                                                    <span class="balance-amount high-balance">₹<%= wallet.walletBalance.toFixed(2) %></span>
+                                                <% if (wallet.balance > 1000) { %>
+                                                    <span class="balance-amount high-balance">₹<%= wallet.balance.toFixed(2) %></span>
                                                 <% } else { %>
-                                                    <span class="balance-amount low-balance">₹<%= wallet.walletBalance.toFixed(2) %></span>
+                                                    <span class="balance-amount low-balance">₹<%= wallet.balance.toFixed(2) %></span>
                                                 <% } %>
                                             <% } else { %>
                                                 <span class="balance-amount no-balance">Wallet not available</span>
@@ -344,7 +345,7 @@
                                                                 <td><%= index + 1 %></td>
                                                                 <td><%= transaction.description %></td>
                                                                 <td><%= transaction.type %></td>
-                                                                <td><%= new Date(transaction.transactionDate).toLocaleDateString() %></td>
+                                                                <td><%= new Date(transaction.date).toLocaleDateString() %></td>
                                                                 <td>₹<%= transaction.amount.toFixed(2) %></td>
                                                             </tr>
                                                         <% }); %>
@@ -359,7 +360,9 @@
                                     </div>
                                 </div>
                                 
-                                
+
+
+
 
 
 

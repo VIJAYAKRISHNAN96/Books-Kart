@@ -183,6 +183,7 @@ userRouter.post("/confirmQuantity",auth.isLogin,userController.confirmQuantity);
 userRouter.delete("/deleteWishList",auth.isLogin,userController.deleteWishList);
 
 
+// userRouter.post('/createRazorpayOrder', auth.isLogin, orderManagement.createRazorpayOrder);
 
 
 userRouter.post('/placeOrder', auth.isLogin, orderManagement.placeOrder);

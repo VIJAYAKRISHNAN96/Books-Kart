@@ -59,7 +59,7 @@ const userSchema= mongoose.Schema({
         },
         phoneNumber: {
             type: Number,
-            required: true
+            // required: true
         },
         type: {
             type: String,
@@ -74,12 +74,16 @@ const userSchema= mongoose.Schema({
         }
       ],
 
-      wishlist: [
-        {
-        productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-        // quantity: { type: Number, default: 1 }
-        }
-      ]
+      wallet: {
+        balance: { type: Number, default: 0 },
+        transactions: [{
+            amount: { type: Number, required: true },
+            description: { type: String, required: true },
+            type: { type: String, enum: ['Refund', 'Credit', 'Debit'], required: true },
+            date: { type: Date, default: Date.now }
+        }]
+    }
+     
 
 });
 
