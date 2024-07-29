@@ -140,6 +140,8 @@ const userController = require("../controllers/userController");
 const orderManagement = require("../controllers/orderManagement");
 const auth = require("../middlewares/userAuth");
 const googleAuthController = require('../controllers/googleAuthController');
+const couponManagement = require("../controllers/couponManagement");
+const verifyPaymentSignature= require("../controllers/razorpayUtils");
 
 
 // Define routes and link them to controller methods
@@ -172,15 +174,34 @@ userRouter.get("/wishList",auth.isLogin,userController.loadWishList);
 userRouter.post("/addToWishList",auth.isLogin,userController.addToWishList);
 userRouter.post("/addToCartFromWishlist",auth.isLogin,userController.addToCartFromWishlist);
 
+userRouter.post("/applyCoupon",auth.isLogin,couponManagement.applyCoupon);
+
+// userRouter.post("/updateCartTotals",userController.updateCartTotalPrice);
+
+userRouter.post("/confirmQuantity",auth.isLogin,userController.confirmQuantity);
 
 userRouter.delete("/deleteWishList",auth.isLogin,userController.deleteWishList);
 
 
 
 
-userRouter.post('/placeOrder', orderManagement.placeOrder);
-userRouter.post('/cancelOrder', orderManagement.cancelOrder);
+userRouter.post('/placeOrder', auth.isLogin, orderManagement.placeOrder);
+
+userRouter.post('/cancelOrder', orderManagement.cancelOrder)
+;
 userRouter.get('/viewOrder', orderManagement.loadOrderView);
+
+userRouter.post('/onlineOrderPlacing',auth.isLogin, orderManagement.onlineOrderPlacing);
+userRouter.put('/checkWalletBalance', orderManagement.checkWalletBalance);
+userRouter.post('/walletOrder', orderManagement.walletPlaceOrder);
+userRouter.put('/returnOrder', orderManagement.returnOrder);
+
+
+// userRouter.post("createRazorpayOrder", orderManagement.createRazorpayOrder);
+
+// userRouter.post("verifyRazorpayPayment", orderManagement.verifyRazorpayPayment);
+
+userRouter.post("verifyPaymentSignature", verifyPaymentSignature.verifyPaymentSignature);
 
 userRouter.get('/checkout', auth.isLogin, userController.loadCheckout);
 

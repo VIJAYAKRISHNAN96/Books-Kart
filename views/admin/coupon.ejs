@@ -271,7 +271,7 @@
         </header> -->
         <section class="content-main">
             <div class="content-header">
-    <h2 class="content-title">Sellers list</h2>
+    <h2 class="content-title">Coupons</h2>
     <div>
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#couponModal">
             <i class="material-icons md-plus"></i> Create new
@@ -282,7 +282,7 @@
                 <header class="card-header">
                     <div class="row gx-3">
                         <div class="col-lg-4 col-md-6 me-auto">
-                            <input type="text" placeholder="Search..." class="form-control">
+                            <!-- <input type="text" placeholder="Search..." class="form-control"> -->
                         </div>
                         <div class="col-lg-2 col-md-3 col-6">
                             <select class="form-select">
@@ -293,11 +293,11 @@
                             </select>
                         </div>
                         <div class="col-lg-2 col-md-3 col-6">
-                            <select class="form-select">
-                                <option>Show 20</option>
+                            <!-- <select class="form-select"> -->
+                                <!-- <option>Show 20</option>
                                 <option>Show 30</option>
-                                <option>Show 40</option>
-                            </select>
+                                <option>Show 40</option> -->
+                            <!-- </select> -->
                         </div>
                     </div>
                 </header> <!-- card-header end// -->
@@ -306,8 +306,8 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Code</th>
+                                    <th>Coupon Name</th>
+                                    <th>Coupon Code</th>
                                     <th>Discount Amount</th>
                                     <th>Start Date</th>
                                     <th>End date</th>
@@ -373,239 +373,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 
-<!-- <script>
-    // Function to set the minimum date to today
-    document.addEventListener('DOMContentLoaded', (event) => {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('startDate').setAttribute('min', today);
-        document.getElementById('endDate').setAttribute('min', today);
-    });
 
-
-    document.getElementById('saveChangesButton').addEventListener('click', function() {
-    // Clear previous error messages
-    document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
-
-    // Get form values
-    const couponName = document.getElementById('couponName').value.trim();
-    const couponCode = document.getElementById('couponCode').value.trim();
-    const discountAmount = document.getElementById('discountAmount').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    const minimumAmount = document.getElementById('minimumAmount').value;
-    const status = document.querySelector('input[name="statusOptions"]:checked');
-
-    // Validation
-    let isValid = true;
-
-    if (!couponName) {
-        document.getElementById('couponNameError').textContent = 'Coupon Name is required';
-        isValid = false;
-    }
-    if (!couponCode) {
-        document.getElementById('couponCodeError').textContent = 'Coupon Code is required';
-        isValid = false;
-    }
-    if (discountAmount === '' || discountAmount < 0 || discountAmount >100) {
-        document.getElementById('discountAmountError').textContent = 'Discount Amount is required and should not be below zero and not more than hundred';
-        isValid = false;
-    }
-    if (!startDate) {
-        document.getElementById('startDateError').textContent = 'Start Date is required';
-        isValid = false;
-    }
-    if (!endDate) {
-        document.getElementById('endDateError').textContent = 'End Date is required';
-        isValid = false;
-    }
-    if (minimumAmount === '' || minimumAmount < 0) {
-        document.getElementById('minimumAmountError').textContent = 'Minimum Amount is required and should not be below zero';
-        isValid = false;
-    }
-    if (!status) {
-        document.getElementById('statusError').textContent = 'Status is required';
-        isValid = false;
-    }
-
-    if (isValid) {
-        const couponData = {
-            couponName,
-            couponCode,
-            discountAmount: Number(discountAmount),
-            startDate,
-            endDate,
-            minimumAmount: Number(minimumAmount),
-            status: status.value
-        };
-
-        // Perform the fetch operation
-        fetch('/addCoupon', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(couponData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Handle success or error response
-            if (data.message === "Existing coupon") {
-                document.getElementById('couponNameError').textContent = 'Coupon already exists';
-            } else if (data.message === "Existing Discount") {
-                document.getElementById('discountAmountError').textContent = 'Discount already exists';
-            } else if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: 'Coupon added successfully',
-                    confirmButtonText: 'OK'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        location.reload();
-                    }
-                });
-            }
-           
-            // You can add code here to close the modal and display a success message
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // Handle the error
-        });
-    }
-});
-
-</script> -->
-
-<!-- <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('startDate').setAttribute('min', today);
-    document.getElementById('endDate').setAttribute('min', today);
-});
-
-document.getElementById('saveChangesButton').addEventListener('click', function() {
-    console.log('Save button clicked'); // Check if the click event is triggered
-
-    // Clear previous error messages
-    document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
-
-    // Get form values
-    const couponName = document.getElementById('couponName').value.trim();
-    const couponCode = document.getElementById('couponCode').value.trim();
-    const discountAmount = document.getElementById('discountAmount').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    const minimumAmount = document.getElementById('minimumAmount').value;
-    const status = document.querySelector('input[name="statusOptions"]:checked');
-
-    console.log('Form values:', {
-        couponName,
-        couponCode,
-        discountAmount,
-        startDate,
-        endDate,
-        minimumAmount,
-        status: status ? status.value : null
-    }); // Log form values to check if they are captured correctly
-
-    // Validation
-    let isValid = true;
-
-    if (!couponName) {
-        document.getElementById('couponNameError').textContent = 'Coupon Name is required';
-        isValid = false;
-    }
-    if (!couponCode) {
-        document.getElementById('couponCodeError').textContent = 'Coupon Code is required';
-        isValid = false;
-    }
-    if (discountAmount === '' || discountAmount < 0 || discountAmount > 100) {
-        document.getElementById('discountAmountError').textContent = 'Discount Amount is required and should be between 0 and 100';
-        isValid = false;
-    }
-    if (!startDate) {
-        document.getElementById('startDateError').textContent = 'Start Date is required';
-        isValid = false;
-    }
-    if (!endDate) {
-        document.getElementById('endDateError').textContent = 'End Date is required';
-        isValid = false;
-    }
-    if (minimumAmount === '' || minimumAmount < 0) {
-        document.getElementById('minimumAmountError').textContent = 'Minimum Amount is required and should not be below zero';
-        isValid = false;
-    }
-    if (!status) {
-        document.getElementById('statusError').textContent = 'Status is required';
-        isValid = false;
-    }
-
-    if (isValid) {
-        const couponData = {
-            couponName,
-            couponCode,
-            discountAmount: Number(discountAmount),
-            startDate,
-            endDate,
-            minimumAmount: Number(minimumAmount),
-            status: status.value
-        };
-
-        console.log('Submitting coupon data:', couponData); // Log the data being submitted
-
-        // Perform the fetch operation
-        fetch('/addCoupon', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(couponData)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Server response:', data); // Log the server response
-
-            // Handle success or error response
-            if (data.message === "Existing coupon") {
-                document.getElementById('couponCodeError').textContent = 'Coupon code already exists';
-            } else if (data.message === "Existing Discount") {
-                document.getElementById('discountAmountError').textContent = 'Discount amount already exists';
-            } else if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: 'Coupon added successfully',
-                    confirmButtonText: 'OK'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        location.reload();
-                    }
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: data.message || 'An error occurred'
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'An error occurred while saving the coupon'
-            });
-        });
-    }
-});
-</script> -->
 
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -789,107 +557,7 @@ document.getElementById('saveChangesButton').addEventListener('click', function(
 
 </script>
 
-<!-- <script>
-    function deleteCoupon(couponId) {
-    console.log('Deleting coupon:', couponId);
 
-    fetch(`/admin/deleteCoupon?couponId=${couponId}`, {
-        method: 'DELETE'
-    })
-    .then(response => {
-        if (response.ok) {
-            return response.json(); // Parse JSON response
-        } else {
-            throw new Error('Network response was not ok.');
-        }
-    })
-    .then(data => {
-        // Optional: Handle the response data if needed
-        console.log('Delete response:', data);
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: 'Coupon deleted successfully',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                location.reload(); // Reload the page
-            });
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: data.message || 'Something went wrong',
-                confirmButtonText: 'OK'
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'An error occurred while deleting the coupon',
-            confirmButtonText: 'OK'
-        });
-    });
-}
-
-</script> -->
-
-
-
-<!-- delte not removed -->
-<!-- <script>
-    function deleteCoupon(couponId) {
-    // Confirm the deletion
-    Swal.fire({
-        title: 'Are you sure?',
-        text: 'This coupon will be deleted permanently.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Perform the fetch operation
-            fetch(`/admin/deleteCoupon?couponId=${couponId}`, {
-                method: 'DELETE'
-            }).then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Deleted!',
-                        text: 'Coupon has been deleted.',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        location.reload(); // Reload the page to reflect changes
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: data.message || 'Something went wrong',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Failed to delete coupon',
-                    confirmButtonText: 'OK'
-                });
-            });
-        }
-    });
-}
-
-</script>  -->
 
 
 

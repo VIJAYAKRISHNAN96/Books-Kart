@@ -228,6 +228,56 @@
         }
     }
 
+    function showReturnConfirmation(orderId, itemId) {
+        Swal.fire({
+            title: 'Return Order',
+            html: 'Are you sure you want to return this order?<br><input type="text" id="returnReason" class="swal2-input" placeholder="Enter rearon for returning">',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, return it!',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const returnReason = document.getElementById('returnReason').value;
+                // Call a function to handle order cancellation
+                returnOrder(orderId, itemId, returnReason);
+            }
+        });
+    }
+
+    async function returnOrder(orderId, itemId,) {
+        try {
+            const response = await fetch('/returnOrder', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ orderId, itemId,})
+            });
+            const data = await response.json();
+            if (response.ok) {
+                // Handle success
+                Swal.fire('Order Returned', data.message, 'success');
+                location.reload()
+              
+            } else {
+                // Handle error
+                Swal.fire('Error', data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire('Error', 'An error occurred while cancelling the order', 'error');
+        }
+       
+    }
+    
+
+
+
+
+
+
+
    
 // </script>
 

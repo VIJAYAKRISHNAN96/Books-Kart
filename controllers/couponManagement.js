@@ -157,9 +157,56 @@ const couponManagement = {
             console.error("Error deleting coupon:", error.message); // Log the error message
             res.status(500).json({ success: false, message: "Server error" });
         }
+    },
+    
+    applyCoupon:async(req,res)=>{
+        try{
+    
+            const {couponId,subTotal}=req.query;
+            const coupon=await Coupon.findById(couponId);
+    
+            if(!coupon){
+                return res.status(404).json({success:false,message:"Coupon not found"})
+            }
+    
+            if(coupon.status!=="active"){
+                return res.status(400).json({success:false,message:"Coupon is inactive"});
+            }
+    
+            const currentDate= new Date();
+    
+            if (currentDate < coupon.startDate) {
+                return res.status(400).json({ success: false, message: 'Coupon is not yet valid.' });
+            }
+    
+    
+            if(currentDate>coupon.endDate){
+                return res.status(400).json({success:false,message:"Coupon has expired"})
+            }
+    
+            if(parseFloat(subTotal) < coupon.minimumamount){
+               
+                return res.status(400).json({ success: false, message: `Minimum order amount should be ${coupon.minimumamount}` });
+            }
+    
+            const discountAmount = (parseInt(subTotal) * coupon.discountamount/100).toFixed(2);
+            const differenceAmount=(parseInt(subTotal)- discountAmount)
+    
+            return res.status(200).json({
+                success:true,
+                differenceAmount,
+                discountAmount,
+                coupon
+            })
+            
+    
+    
+        }catch(error){
+            console.log(error.message);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
     }
     
-
    
     
     

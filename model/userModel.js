@@ -51,11 +51,19 @@ const userSchema= mongoose.Schema({
         country:{
             type:String
         },
-        pincode:{
+        postalCode:{
             type:Number
         },
         addressType:{
             type:String
+        },
+        phoneNumber: {
+            type: Number,
+            required: true
+        },
+        type: {
+            type: String,
+            enum: ['home', 'office']
         }
     
     }],

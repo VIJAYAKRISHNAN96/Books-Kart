@@ -190,6 +190,10 @@
                                         <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-marker mr-10"></i>My Address</a>
                                     </li>
                                     <li class="nav-item">
+                                        <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#wallet" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-shopping-bag mr-10"></i>Wallet</a>
+                                    </li>
+
+                                    <li class="nav-item">
                                         <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="true"><i class="fi-rs-user mr-10"></i>Account details</a>
                                     </li>
                                     <li class="nav-item">
@@ -304,6 +308,61 @@
                                         <% }); %>
                                     </div>
                                 </div>
+
+
+                                <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="address-tab">
+                                    <div class="wallet-container">
+                                        <h2>Your Wallet</h2>
+                                        <div class="wallet-balance">
+                                            <span class="balance-label">Wallet Balance:</span>
+                                            <% if (wallet) { %>
+                                                <% if (wallet.walletBalance > 1000) { %>
+                                                    <span class="balance-amount high-balance">₹<%= wallet.walletBalance.toFixed(2) %></span>
+                                                <% } else { %>
+                                                    <span class="balance-amount low-balance">₹<%= wallet.walletBalance.toFixed(2) %></span>
+                                                <% } %>
+                                            <% } else { %>
+                                                <span class="balance-amount no-balance">Wallet not available</span>
+                                            <% } %>
+                                        </div>
+                                        <div class="transaction-history">
+                                            <h3>Transaction History</h3>
+                                            <table class="transaction-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Order</th>
+                                                        <th>Description</th>
+                                                        <th>Type</th>
+                                                        <th>Date</th>
+                                                        <th>Amount</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="transactionTableBody">
+                                                    <% if (wallet && wallet.transactions && wallet.transactions.length > 0) { %>
+                                                        <% wallet.transactions.forEach((transaction, index) => { %>
+                                                            <tr>
+                                                                <td><%= index + 1 %></td>
+                                                                <td><%= transaction.description %></td>
+                                                                <td><%= transaction.type %></td>
+                                                                <td><%= new Date(transaction.transactionDate).toLocaleDateString() %></td>
+                                                                <td>₹<%= transaction.amount.toFixed(2) %></td>
+                                                            </tr>
+                                                        <% }); %>
+                                                    <% } else { %>
+                                                        <tr>
+                                                            <td colspan="5">No transactions found.</td>
+                                                        </tr>
+                                                    <% } %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
+
+
+
 
                                 <div class="tab-pane fade active show" id="account-detail" role="tabpanel" aria-labelledby="account-detail-tab">
                                     <div class="card">

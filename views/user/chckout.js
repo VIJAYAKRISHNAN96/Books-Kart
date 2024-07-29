@@ -647,7 +647,7 @@
                                     </div>
                                 </div>
                                 <div class="custome-radio">
-                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios4" checked="" value="Cash On Delivery"  >
+                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios4" checked="">
                                     <label class="form-check-label" for="exampleRadios4" data-bs-toggle="collapse" data-target="#checkPayment" aria-controls="checkPayment">Cash On Delivery</label>
                                     <div class="form-group collapse in" id="checkPayment">
                                         <p class="text-muted mt-5">Please send your cheque to Store Name, Store Street, Store Town, Store State / County, Store Postcode. </p>
@@ -656,12 +656,8 @@
                                 <div class="custome-radio">
                                     <input class="form-check-input" required type="radio" name="payment_option" id="exampleRadios6" value="wallet">
                                     <label class="form-check-label" for="exampleRadios6">Wallet</label>
-                                    <% if (wallet) { %>
-                                        <p class="mt-5">Your wallet balance is ₹<%= wallet.walletBalance.toFixed(2) %></p>
-                                    <% } else { %>
-                                        <p class="mt-5">Wallet information is not available.</p>
-                                    <% } %>
                                 
+                                   
                                 </div>
                                 
                                
@@ -1280,7 +1276,6 @@ function validateAddress() {
     }
 }
 
-
 function placeOrder() {
     const selectedAddressIndex = document.querySelector('input[name="selectedAddress"]:checked');
 
@@ -1294,7 +1289,7 @@ function placeOrder() {
     }
 
     const selectedPaymentMethod = document.querySelector('input[name="payment_option"]:checked').value;
-    const totalAmount = parseFloat(document.getElementById("total").innerText); // Parse total amount to a number
+    const totalAmount = document.getElementById("total").innerText;
     const subtotal = parseFloat(document.getElementById("subtotal").innerText);
     let couponId = null; // Assuming you have a way to get the applied couponId
     if (couponApplied) {
@@ -1357,6 +1352,62 @@ function processOrder(orderData) {
     });
 }
 
+// function processRazorpayOrder(orderData) {
+
+//     fetch('/placeOrder', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(orderData)
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             const options = {
+//                 key: data.key_id,
+//                 amount: data.amount,
+//                 currency: "USD",
+//                 name: "Books Kart",
+//                 description: data.description,
+//                 image: "user_assets/myimgs/bookHivelogo.png",
+//                 order_id: data.order.id,
+//                 handler: function (response) {
+//                     OrderAfterPayment(orderData, "Success");
+//                 },
+//                 prefill: {
+//                     contact: data.contact,
+//                     name: data.name,
+//                     email: data.email
+//                 },
+//                 notes: {
+//                     description: data.description
+//                 },
+//                 theme: {
+//                     color: "#00cc66"
+//                 }
+//             };
+
+//             const razorpayObject = new Razorpay(options);
+//             razorpayObject.open();
+
+//             razorpayObject.on('payment.failed', function (response) {
+//                 console.error(response.error);
+//                 OrderAfterPayment(orderData, "Failed");
+//             });
+//         } else {
+//             Swal.fire({
+//                 icon: 'warning',
+//                 title: 'Order Placement Failed',
+//                 text: data.msg
+//             });
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error placing order:', error);
+//     });
+// }
+
 function processRazorpayOrder(orderData) {
     fetch('/placeOrder', {
         method: 'POST',
@@ -1369,13 +1420,13 @@ function processRazorpayOrder(orderData) {
     .then(data => {
         if (data.success) {
             const options = {
-                key: data.key_id,
-                amount: data.amount,
-                currency: "INR",
+                key: data.key_id, // Your Razorpay key ID
+                amount: data.amount, // Amount in paise (1 INR = 100 paise)
+                currency: "INR", // Adjust currency to INR for Indian Rupees
                 name: "Books Kart",
                 description: data.description || "Purchase from our store",
                 image: "user_assets/myimgs/bookHivelogo.png",
-                order_id: data.order_id,
+                order_id: data.order_id, // Razorpay order ID
                 handler: function (response) {
                     OrderAfterPayment(orderData, "Success");
                 },
@@ -1417,7 +1468,54 @@ function processRazorpayOrder(orderData) {
     });
 }
 
+// function OrderAfterPayment(paymentResponse, status) {
+//     fetch(`/onlineOrderPlacing`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({
+//             order_id: paymentResponse.order_id,
+//             payment_id: paymentResponse.payment_id,
+//             signature: paymentResponse.signature,
+//             status: status
+//         })
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             Swal.fire({
+//                 icon: "success",
+//                 title: 'Order Confirmed',
+//                 text: "Your payment was successful and the order has been placed.",
+//                 confirmButtonText: "OK"
+//             }).then((result) => {
+//                 if (result.isConfirmed) {
+//                     window.location.href = "/userAccount";
+//                 }
+//             });
+//         } else {
+//             Swal.fire({
+//                 icon: 'error',
+//                 title: 'Order Placement Failed',
+//                 text: data.message
+//             });
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error confirming order:', error);
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Order Placement Failed',
+//             text: 'There was an error confirming your order. Please try again.'
+//         });
+//     });
+// }
+
 function OrderAfterPayment(paymentResponse, status) {
+    console.log('Payment Response:', paymentResponse);
+    console.log('Status:', status);
+
     fetch(`/onlineOrderPlacing`, {
         method: 'POST',
         headers: {
@@ -1430,8 +1528,12 @@ function OrderAfterPayment(paymentResponse, status) {
             status: status
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('Response data:', data);
         if (data.success) {
             Swal.fire({
                 icon: "success",
@@ -1461,46 +1563,11 @@ function OrderAfterPayment(paymentResponse, status) {
     });
 }
 
-// function confirmWalletBalance(orderData) {
-//     fetch('/checkWalletBalance', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         }
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//         if (data.success) {
-//             if (data.walletBalance >= orderData.totalAmount) {
-//                 processOrder(orderData);
-//             } else {
-//                 Swal.fire({
-//                     icon: 'warning',
-//                     title: 'Insufficient Wallet Balance',
-//                     text: 'You do not have enough balance to complete this transaction.',
-//                 });
-//             }
-//         } else {
-//             Swal.fire({
-//                 icon: 'error',
-//                 title: 'Error',
-//                 text: data.message
-//             });
-//         }
-//     })
-//     .catch(error => {
-//         console.error('Error checking wallet balance:', error);
-//         Swal.fire({
-//             icon: 'error',
-//             title: 'Error',
-//             text: 'There was an error checking your wallet balance. Please try again.'
-//         });
-//     });
-// }
+
 
 function confirmWalletBalance(orderData) {
-    fetch(`/checkWalletBalance?totalAmount=${orderData.totalAmount}`, {
-        method: 'PUT', // Changed to GET method
+    fetch('/checkWalletBalance', {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         }
@@ -1536,6 +1603,96 @@ function confirmWalletBalance(orderData) {
 }
 
 
+
+
+// function OrderAfterPayment(orderData, status) {
+//     const { addressIndex, totalAmount, paymentMethod, couponId, subtotal, razorpay_payment_id, razorpay_signature } = orderData;
+
+//     fetch(`/onlineOrderPlacing?addressIndex=${addressIndex}&status=${status}&totalAmount=${totalAmount}&paymentMethod=${paymentMethod}`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({
+//             couponId,
+//             subtotal,
+//             razorpay_payment_id,
+//             razorpay_signature
+//         })
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             Swal.fire({
+//                 icon: "success",
+//                 title: 'Order Confirmed',
+//                 text: "Your payment was successful and the order has been placed.",
+//                 confirmButtonText: "OK"
+//             }).then((result) => {
+//                 if (result.isConfirmed) {
+//                     window.location.href = "/account";
+//                 }
+//             });
+//         } else {
+//             Swal.fire({
+//                 icon: 'warning',
+//                 title: 'Order Placement Failed',
+//                 text: data.message
+//             });
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error confirming order:', error);
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Order Placement Failed',
+//             text: 'There was an error confirming your order. Please try again.'
+//         });
+//     });
+// }
+
+
+// function OrderAfterPayment(orderData, paymentStatus) {
+//     fetch('/onlineOrderPlacing', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({
+//             orderData: orderData,
+//             paymentStatus: paymentStatus
+//         })
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             Swal.fire({
+//                 icon: "success",
+//                 title: data.message,
+//                 text: "View My Orders",
+//                 confirmButtonText: "OK"
+//             }).then((result) => {
+//                 if (result.isConfirmed) {
+//                     window.location.href = "/userAccount";
+//                 }
+//             });
+//         } else {
+//             Swal.fire({
+//                 icon: 'warning',
+//                 title: 'Order Placement Failed',
+//                 text: data.message
+//             });
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error processing payment response:', error);
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Order Placement Failed',
+//             text: 'There was an error processing your payment response. Please try again.'
+//         });
+//     });
+// }
 
 </script>
 

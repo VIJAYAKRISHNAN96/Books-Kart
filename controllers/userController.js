@@ -9,7 +9,9 @@ const User= require("../model/userModel");
 const Product = require("../model/productModel");
 const Cart = require("../model/cartModel")
 const Order= require("../model/orderModel");
-const WishList=require("../model/wishListModel");
+const WishList=require("../model/wishListModel"); 
+const Coupon = require("../model/couponModel");
+const Wallet= require("../model/walletModel");
 
 
 const transport = nodemailer.createTransport({
@@ -289,27 +291,72 @@ const userController = {
   //     res.status(500).send("Internal Server Error");
   //   }
   // },
+
+
+
+
+
+
+  // loadUser : async (req, res) => {
+  //   try {
+  //     const userId = req.session.user.id;
+  //     const user = await User.findById(userId);
+      
+  //     // Uncomment and use the following line to retrieve user orders
+  //     const order = await Order.find({ user: userId });
+  
+  //     // Calculate cart count
+  //     const cart = await Cart.findOne({ userId });
+  //     let cartCount = 0;
+  //     if (cart) {
+  //       cartCount = cart.product.length;
+  //     }
+  
+  //     res.render("userAccount", { user, order, cartCount });
+  //   } catch (error) {
+  //     console.error(error.message);
+  //     res.status(500).send("Internal Server Error");
+  //   }
+  // },
+
   loadUser : async (req, res) => {
     try {
-      const userId = req.session.user.id;
-      const user = await User.findById(userId);
-      
-      // Uncomment and use the following line to retrieve user orders
-      const order = await Order.find({ user: userId });
-  
-      // Calculate cart count
-      const cart = await Cart.findOne({ userId });
-      let cartCount = 0;
-      if (cart) {
-        cartCount = cart.product.length;
-      }
-  
-      res.render("userAccount", { user, order, cartCount });
+        const userId = req.session.user.id;
+
+        // Fetch user data
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        // Fetch user orders
+        const order = await Order.find({ user: userId });
+
+        // Calculate cart count
+        const cart = await Cart.findOne({ userId });
+        let cartCount = 0;
+        if (cart) {
+            cartCount = cart.product.length;
+        }
+
+        // Fetch wallet data
+        const wallet = await Wallet.findOne({ user: userId });
+
+        // If wallet not found, set it to null or handle accordingly
+        if (!wallet) {
+            return res.status(404).render("userAccount", { user, order, cartCount, wallet: null, message: 'Wallet not found' });
+        }
+
+        // Render user account page with wallet data
+        res.render("userAccount", { user, order, cartCount, wallet });
     } catch (error) {
-      console.error(error.message);
-      res.status(500).send("Internal Server Error");
+        console.error(error.message);
+        res.status(500).send("Internal Server Error");
     }
-  },
+},
+
+
+
   
 
   editDetails : async (req, res) => {
@@ -338,7 +385,7 @@ const userController = {
   
       // Create address object
       const address = {
-        houseName,
+        houseName,        
         street,
         city,
         state,
@@ -674,6 +721,7 @@ addToCart : async (req, res) => {
       return res.render('cart', { cart: { products: [], totalPrice: 0 } });
     }
 
+
     cart.totalPrice = cart.product.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
     console.log("Cart object after calculating totalPrice:", JSON.stringify(cart, null, 2));
 
@@ -748,7 +796,9 @@ loadCheckout : async (req, res) => {
       const userId = req.session.user.id;
       const user = await User.findById(userId);
       const cart = await Cart.findOne({ userId: userId }).populate("product.productId");
-      // const coupon = await Coupon.find({ status: "active" });
+      const coupon = await Coupon.find({ status: "active" });
+      const wallet= await Wallet.findOne({user:userId});
+
 
       let cartCount = 0;
       if (cart) {
@@ -758,12 +808,46 @@ loadCheckout : async (req, res) => {
       // Ensure user.address is defined and is an array
       user.address = user.address || [];
 
-      res.render("checkout", { user, cart, cartCount, });
+      res.render("checkout", { user, cart, cartCount,coupon,wallet });
 
   } catch (error) {
       console.log(error.message);
   }
 },
+
+confirmQuantity:async(req,res)=>{
+  try{
+      const userId=req.session.user;
+      const cart=await Cart.findOne({userId});
+
+      for(const item of cart.product){
+          const product= await Product.findById(item.productId);
+
+          //check of product exists
+          if(!product){
+              return res.json({success:false,message:"product not found"})
+          }
+
+          //check quantity 
+          if (item.quantity <= 0 || item.quantity>product.stock){
+              return res.json({success:false,message:"Quantity is invalid or out of stock"})
+          }
+
+          
+      }
+      //if all the checks passed
+      return res.json({success:true}) 
+
+  }catch(error){
+      console.log(error.message);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+},
+
+
+
+
+
 
 
 

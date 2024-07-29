@@ -618,3 +618,630 @@
         </div>
     </section>
 </main>
+
+
+
+
+
+
+
+
+
+<script>
+    let couponApplied = false;
+    let couponIdApplied = null;
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        // Event listener for the Apply Coupon button to show the modal
+        document.getElementById('applyCouponBtn').addEventListener('click', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('applyCouponModal'), {
+                keyboard: false
+            });
+            myModal.show();
+        });
+    
+        // Event listener for the Apply Coupon button inside the modal
+        document.getElementById('applyCouponBtnModal').addEventListener('click', function () {
+            const couponId = document.querySelector('input[name="coupon"]:checked').value;
+            const subTotal = document.getElementById('subtotal').textContent;
+            console.log(subTotal);
+    
+            if (couponId) {
+                console.log(subTotal);
+                console.log(couponId);
+    
+                // Fetch operation to the backend
+                fetch(`/applyCoupon?couponId=${couponId}&subTotal=${subTotal}`, {
+                    method: 'POST',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: data.message,
+                            text: "Coupon Applied",
+                            confirmButtonText: "OK"
+                        });
+                        // Handle success (e.g., update the total amount on the page)
+    
+                        // Update the total amount based on the response
+                        const discountRow = document.createElement('tr');
+                        discountRow.innerHTML = `
+                            <th id="discountHead">Discount</th>
+                            <td colspan="2" class="product-subtotal" id="discountRow">- ₹<span>${data.discountAmount}</span></td>
+                        `;
+                        document.querySelector('#cart-items').appendChild(discountRow);
+    
+                        document.getElementById('total').textContent = data.differenceAmount;
+    
+                        couponApplied = true;
+                        couponIdApplied = couponId;
+                        document.getElementById('applyCouponBtn').disabled = true;
+                        document.getElementById('removeCouponBtn').disabled = false;
+                    } else if (!data.success) {
+                        // Handle failure (e.g., show an error message)
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Failed to add coupon',
+                            text: data.message
+                        });
+                    }
+                    // Close the modal
+                    var myModalEl = document.getElementById('applyCouponModal');
+                    var modal = bootstrap.Modal.getInstance(myModalEl);
+                    modal.hide();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while applying the coupon.');
+                });
+            } else {
+                alert('Please select a coupon.');
+            }
+        });
+    
+        // Event listener for the Remove Coupon button
+        document.getElementById('removeCouponBtn').addEventListener('click', function () {
+            if (couponApplied) {
+                // Remove the discount row
+                const discountRow = document.getElementById('discountRow');
+                const discountHead = document.getElementById('discountHead');
+                if (discountRow) {
+                    discountRow.remove();
+                    discountHead.remove();
+                }
+    
+                // Recalculate the total amount without the coupon discount
+                const subTotal = parseFloat(document.getElementById('subtotal').textContent);
+                document.getElementById('total').textContent = subTotal.toFixed(2);
+    
+                couponApplied = false;
+                couponIdApplied = null;
+                document.getElementById('applyCouponBtn').disabled = false;
+                document.getElementById('removeCouponBtn').disabled = true;
+    
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Coupon Removed',
+                    text: 'The coupon has been successfully removed.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    });
+
+    
+
+    </script>
+
+
+    <script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    var myModal = new bootstrap.Modal(document.getElementById('addAddressModal'));
+    
+    document.querySelector('[data-bs-toggle="modal"][data-bs-target="#addAddressModal"]').addEventListener('click', function() {
+        myModal.show();
+    });
+    document.getElementById('closeModalBtn').addEventListener('click', function() {
+        myModal.hide();
+    });
+
+});
+
+
+
+    function validateAddress() {
+        // Reset previous error messages
+        document.querySelectorAll('.error-message').forEach(elem => elem.textContent = '');
+
+        // Get input values
+        const houseName = document.getElementById('houseName').value.trim();
+        const street = document.getElementById('street').value.trim();
+        const city = document.getElementById('city').value.trim();
+        const state = document.getElementById('state').value.trim();
+        const country = document.getElementById('country').value.trim();
+        const postalCode = document.getElementById('postalCode').value.trim();
+        const phoneNo = document.getElementById('phoneNo').value.trim();
+        const addressType = document.querySelector('input[name="addressType"]:checked');
+
+        let isValid = true;
+
+        // Validation for empty fields
+        if (houseName === '') {
+            document.getElementById('houseNameError').textContent = 'House Name is required';
+            isValid = false;
+        }
+
+        if (street === '') {
+            document.getElementById('streetError').textContent = 'Street is required';
+            isValid = false;
+        }
+
+        if (city === '') {
+            document.getElementById('cityError').textContent = 'City is required';
+            isValid = false;
+        }
+        if (state === '') {
+            document.getElementById('stateError').textContent = 'State is required';
+            isValid = false;
+        }
+
+        if (country === '') {
+            document.getElementById('countryError').textContent = 'Country is required';
+            isValid = false;
+        }
+
+        // Validation for postal code (should be exactly 6 digits)
+        if (!/^\d{6}$/.test(postalCode)) {
+            document.getElementById('postalCodeError').textContent = 'Postal Code should contain 6 digits';
+            isValid = false;
+        }
+
+        // Validation for phone number (should be exactly 10 digits)
+        if (!/^\d{10}$/.test(phoneNo)) {
+            document.getElementById('phoneNoError').textContent = 'Phone No should contain 10 digits';
+            isValid = false;
+        }
+
+        // Validation for address type
+        if (!addressType) {
+            document.getElementById('addressTypeError').textContent = 'Please select Address Type';
+            isValid = false;
+        }
+        if (isValid) {
+            // Data to be sent in the request body
+            const data = {
+                houseName: houseName,
+                street: street,
+                city: city,
+                state: state,
+                country: country,
+                postalCode: postalCode,
+                phoneNo: phoneNo,
+                addressType: addressType.value
+            };
+
+            // Perform fetch operation
+            fetch('/addAddress', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // Parse response body as JSON
+            })
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Address Added Successfully',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        // Hide the modal after the SweetAlert
+                        $('#addAddressModal').modal('hide');
+                        
+                        
+                        document.getElementById('addAddressForm').reset();
+                        location.reload();
+                    });
+                } else {
+                    // Handle other response errors here
+                    // For example, if there's an error message in the response
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Adding Address Failed',
+                        text: data.message || 'Unknown error occurred'
+                    }).then(() => {
+                    var myModalEl = document.getElementById('addAddressModal');
+                    var modal = bootstrap.Modal.getInstance(myModalEl);
+                    modal.hide();
+                        // Hide the modal after the SweetAlert
+                        $('#addAddressModal').modal('hide');
+                        document.getElementById('addAddressForm').reset();
+                        location.reload();
+                    });
+                }
+            })
+            .catch(error => {
+                // Handle error
+                console.error('There was a problem with the fetch operation:', error);
+                // Optionally, show an alert for failure
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Address Addition Failed',
+                    text: error.message
+                });
+            });
+        }
+    }
+
+
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Event listener for the Place Order button
+        document.getElementById('placeOrderBtn').addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default action of anchor tag
+            placeOrder();
+        });
+    });
+
+    function placeOrder() {
+        const selectedAddressIndex = document.querySelector('input[name="selectedAddress"]:checked');
+
+        if (!selectedAddressIndex) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Order Placement Failed',
+                text: "Select an appropriate address for shipment",
+            });
+            return;
+        }
+
+        const selectedPaymentMethod = "Cash On Delivery";
+        const totalAmount = document.getElementById("total").innerText;
+
+        fetch('/placeOrder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                addressIndex: selectedAddressIndex.value,
+                paymentMethod: selectedPaymentMethod,
+                totalAmount: totalAmount
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: data.message,
+                    text: "View My Orders",
+                    confirmButtonText: "OK"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/userAccount";
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Order Placement Failed',
+                    text: data.message
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error placing order:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Order Placement Failed',
+                text: 'There was an error placing your order. Please try again.'
+            });
+        });
+    }
+
+
+
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    calculateSubtotal();
+});
+
+function calculateSubtotal() {
+    const itemPrices = document.querySelectorAll('.item-price');
+    let subtotal = 0;
+    itemPrices.forEach(item => {
+        subtotal += parseFloat(item.innerText);
+    });
+    document.getElementById('subtotal').innerText = subtotal.toFixed(2);
+    document.getElementById('total').innerText = subtotal.toFixed(2);
+}
+
+document.getElementById('placeOrderBtn').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent default action of anchor tag
+
+    // Call the checkQuantity function
+    confirmQuantity();
+});
+
+function confirmQuantity() {
+    const selectedAddressIndex = document.querySelector('input[name="selectedAddress"]:checked'); 
+    if (!selectedAddressIndex) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Order Placement Failed',
+            text: "Select an appropriate address for shipment",
+        });
+        return;
+    }
+
+    fetch('/confirmQuantity', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const selectedAddressIndex = document.querySelector('input[name="selectedAddress"]:checked').value;
+            const selectedPaymentMethod = document.querySelector('input[name="payment_option"]:checked').value;
+            const totalAmount = document.getElementById("total").innerText;
+            const subtotal = document.getElementById("subtotal").innerText;
+            let couponId = null;
+            if (couponApplied) {
+                couponId = couponIdApplied;
+            }
+            
+            if (selectedPaymentMethod === "Cash On Delivery") {
+                fetch('/placeOrder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        addressIndex: selectedAddressIndex,
+                        paymentMethod: selectedPaymentMethod,
+                        totalAmount: totalAmount,
+                        couponId,
+                        subtotal
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: data.message,
+                            text: "View My Orders",
+                            confirmButtonText: "OK"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = "/account";
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Order Placement Failed',
+                            text: data.message
+                        });
+                    }
+                });
+            } else if (selectedPaymentMethod === "razorpay") {
+                fetch("/placeOrder", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        addressIndex: selectedAddressIndex,
+                        paymentMethod: selectedPaymentMethod,
+                        totalAmount: totalAmount,
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Proceed with Razorpay payment
+                        const options = {
+                            key: data.key_id,
+                            amount: data.amount,
+                            currency: "INR",
+                            name: "Book Hive",
+                            description: data.description,
+                            image: "user_assets/myimgs/bookHivelogo.png",
+                            order_id: data.order_id,
+                            handler: function (response) {
+                                console.log(response);
+                                OrderAfterPayment(selectedAddressIndex, totalAmount, selectedPaymentMethod, "Success", couponId, subtotal);
+                            },
+                            prefill: {
+                                contact: data.contact,
+                                name: data.name,
+                                email: data.email
+                            },
+                            notes: {
+                                description: data.description
+                            },
+                            theme: {
+                                color: "#00cc66"
+                            }
+                        };
+
+                        const razorpayObject = new Razorpay(options);
+                        razorpayObject.open();
+
+                        razorpayObject.on('payment.failed', function (response) {
+                            console.error(response.error);
+                            OrderAfterPayment(selectedAddressIndex, totalAmount, selectedPaymentMethod, "Failed", couponId, subtotal);
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Order Placement Failed',
+                            text: data.msg
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error placing order:', error);
+                });
+            } else if (selectedPaymentMethod === "wallet") { 
+                confirmWalletBalance(selectedAddressIndex, totalAmount, selectedPaymentMethod, couponId, subtotal);
+            }
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Order Placement Failed',
+                text: data.message,
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error confirming quantity:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'There was a problem confirming the quantity.',
+        });
+    });
+}
+
+function confirmWalletBalance(selectedAddressIndex, totalAmount, selectedPaymentMethod, couponId, subtotal) {
+    fetch('/checkWalletBalance', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.walletBalance >= totalAmount) {
+                fetch('/placeOrder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        addressIndex: selectedAddressIndex,
+                        paymentMethod: selectedPaymentMethod,
+                        totalAmount: totalAmount,
+                        couponId,
+                        subtotal
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: data.message,
+                            text: "View My Orders",
+                            confirmButtonText: "OK"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = "/account";
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Order Placement Failed',
+                            text: data.message
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error placing order:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Order Placement Failed',
+                        text: 'There was a problem placing the order.',
+                    });
+                });
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Insufficient Wallet Balance',
+                    text: 'You do not have enough balance to complete this transaction.',
+                });
+            }
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'There was a problem checking wallet balance.',
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error checking wallet balance:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'There was a problem checking wallet balance.',
+        });
+    });
+}
+
+function OrderAfterPayment(addressIndex, totalAmount, paymentMethod, status, couponId, subtotal) {
+    fetch('/placeOrder', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            addressIndex: addressIndex,
+            paymentMethod: paymentMethod,
+            totalAmount: totalAmount,
+            couponId: couponId,
+            subtotal: subtotal,
+            status: status
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: "success",
+                title: data.message,
+                text: "View My Orders",
+                confirmButtonText: "OK"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/account";
+                }
+            });
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Order Placement Failed',
+                text: data.message
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error placing order:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Order Placement Failed',
+            text: 'There was a problem placing the order.',
+        });
+    });
+}
+</script>

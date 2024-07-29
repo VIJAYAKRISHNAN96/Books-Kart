@@ -615,12 +615,18 @@
                                         <div class="coupon">
                                             <form action="#" target="_blank">
                                                 <div class="form-row row justify-content-center">
-                                                    <div class="form-group col-lg-6">
+                                                  <div class="form-group col-lg-6">
+                                                    <input class="font-medium" id="couponInput" name="Coupon" placeholder="Enter Your Coupon">
+                                                </div>
+                                                <div class="form-group col-lg-6">
+                                                    <button id="applyCouponBtn" class="btn btn-sm"><i class="fi-rs-label mr-10"></i>Apply</button>
+                                                </div>
+                                                    <!-- <div class="form-group col-lg-6">
                                                         <input class="font-medium" name="Coupon" placeholder="Enter Your Coupon">
                                                     </div>
                                                     <div class="form-group col-lg-6">
                                                         <button class="btn  btn-sm"><i class="fi-rs-label mr-10"></i>Apply</button>
-                                                    </div>
+                                                    </div> -->
                                                 </div>
                                             </form>
                                         </div>
@@ -664,86 +670,33 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
-
 <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-      // Event listener for quantity up button
-      document.querySelectorAll('.qty-up').forEach(button => {
-        button.addEventListener('click', function(event) {
-          event.preventDefault();
-          const productId = this.getAttribute('data-id');
-          const qtyElem = document.getElementById(`qty-${productId}`);
-          let quantity = parseInt(qtyElem.textContent);
-          qtyElem.textContent = ++quantity;
-        });
-      });
-    
-      // Event listener for quantity down button
-      document.querySelectorAll('.qty-down').forEach(button => {
-        button.addEventListener('click', function(event) {
-          event.preventDefault();
-          const productId = this.getAttribute('data-id');
-          const qtyElem = document.getElementById(`qty-${productId}`);
-          let quantity = parseInt(qtyElem.textContent);
-          if (quantity > 1) {
-            qtyElem.textContent = --quantity;
-          }
-        });
+  document.addEventListener('DOMContentLoaded', (event) => {
+    // Event listener for quantity up button
+    document.querySelectorAll('.qty-up').forEach(button => {
+      button.addEventListener('click', function(event) {
+        event.preventDefault();
+        const productId = this.getAttribute('data-id');
+        const qtyElem = document.getElementById(`qty-${productId}`);
+        let quantity = parseInt(qtyElem.textContent);
+        qtyElem.textContent = ++quantity;
       });
     });
-    </script>
-    
-
-<!-- <script>
-    document.getElementById('updateCartBtn').addEventListener('click', function() {
-  const quantityElements = document.querySelectorAll('.qty-val');
-  const updates = [];
-
-  quantityElements.forEach(qtyElem => {
-    const productId = qtyElem.id.replace('qty-', '');
-    const quantity = parseInt(qtyElem.textContent);
-
-    updates.push({ productId, quantity });
-  });
-
-  fetch('/updateCart', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ updates }),
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      Swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: 'Cart updated successfully!',
-        showConfirmButton: true, // Ensure confirm button is shown
-        timer: null, // Remove the timer
+  
+    // Event listener for quantity down button
+    document.querySelectorAll('.qty-down').forEach(button => {
+      button.addEventListener('click', function(event) {
+        event.preventDefault();
+        const productId = this.getAttribute('data-id');
+        const qtyElem = document.getElementById(`qty-${productId}`);
+        let quantity = parseInt(qtyElem.textContent);
+        if (quantity > 1) {
+          qtyElem.textContent = --quantity;
+        }
       });
-      // Optionally reload the page to reflect changes
-      location.reload();
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Failed to update cart. Please try again.',
-      });
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'An error occurred while updating the cart.',
     });
   });
-});
-
-</script> -->
+  </script>
 
 <script>
     document.getElementById('updateCartBtn').addEventListener('click', function() {
@@ -900,8 +853,7 @@
       });
     });
   </script>
-  
 
-    
+ 
 
 
