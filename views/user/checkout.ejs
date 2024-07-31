@@ -24,6 +24,31 @@
     }
 </style>
 
+<style>
+    #placeOrderBtn {
+        background: linear-gradient(90deg, #ff7e5f, #feb47b);
+        color: #fff;
+        padding: 12px 20px; /* Reduced padding for a smaller height */
+        border-radius: 30px;
+        font-weight: bold;
+        text-align: center;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        display: inline-block; /* Changed from block to inline-block */
+        width: auto; /* Removed full-width; it now adjusts to content */
+        min-width: 200px; /* Ensures a minimum width */
+    }
+
+    #placeOrderBtn:hover {
+        background: linear-gradient(90deg, #feb47b, #ff7e5f);
+        box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+</style>
+
+
+
 <!-- <div class="modal fade" id="applyCouponModal" tabindex="-1" aria-labelledby="applyCouponModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -630,8 +655,23 @@
                                
                                
                             </table>
-                        </div> <button class="btn btn-fill-out mt-2" id="applyCouponBtn" style="background-color: #557775; border-color:  #15f43aba;">Add Coupon</button>
-                        <button class="btn btn-fill-out mt-2" id="removeCouponBtn" disabled style="background-color: #557775; border-color:  #557775;">Remove Coupon</button>
+
+
+                            <div>
+                                <button class="btn btn-fill-out mt-2" id="applyCouponBtn" style="background-color: #28a745; border-color: #28a745;">Add Coupon</button>
+                                
+                                <button class="btn btn-fill-out mt-2" id="removeCouponBtn" disabled style="background-color: #dc3545; border-color: #dc3545;">Remove Coupon</button>
+                              </div>
+                              
+                              
+
+
+
+
+
+                        <!-- </div> <button class="btn btn-fill-out mt-2" id="applyCouponBtn" style="background-color: #557775; border-color:  #15f43aba;">Add Coupon</button>
+
+                        <button class="btn btn-fill-out mt-2" id="removeCouponBtn" disabled style="background-color: #557775; border-color:  #557775;">Remove Coupon</button> -->
 
                         <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                         <div class="payment_method">
@@ -670,9 +710,7 @@
                                   
                                   
                                   
-                                  
-
-
+                            
 
                                 
                                
@@ -695,6 +733,8 @@
 
     </section>
 </main>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -704,6 +744,140 @@
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+
+    
+<!-- gooooood -->
+<script>
+    let couponApplied = false;
+let couponIdApplied = null;
+
+document.addEventListener('DOMContentLoaded', function () {
+    var applyCouponModalEl = document.getElementById('applyCouponModal');
+    var myModal = new bootstrap.Modal(applyCouponModalEl, {
+        keyboard: false
+    });
+
+    // Event listener for the Apply Coupon button to show the modal
+    document.getElementById('applyCouponBtn').addEventListener('click', function () {
+        myModal.show();
+    });
+
+    // Event listener for the Apply Coupon button inside the modal
+    document.getElementById('applyCouponBtnModal').addEventListener('click', function () {
+        const couponId = document.querySelector('input[name="coupon"]:checked')?.value;
+        const subTotal = document.getElementById('subtotal').textContent;
+
+        if (couponId) {
+            fetch(`/applyCoupon?couponId=${couponId}&subTotal=${subTotal}`, {
+                method: 'POST',
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success || data.couponApplied) {
+                    Swal.fire({
+                        icon: "success",
+                        title: data.message || "Coupon Applied",
+                        text: "Coupon Applied Successfully",
+                        confirmButtonText: "OK"
+                    });
+
+                    const discountRow = document.createElement('tr');
+                    discountRow.innerHTML = `
+                        <th id="discountHead">Discount</th>
+                        <td colspan="2" class="product-subtotal" id="discountRow">- $<span>${data.discountAmount}</span></td>
+                    `;
+                    document.querySelector('#cart-items').appendChild(discountRow);
+
+                    document.getElementById('total').textContent = data.differenceAmount;
+
+                    couponApplied = true;
+                    couponIdApplied = couponId;
+                    document.getElementById('applyCouponBtn').disabled = true;
+                    document.getElementById('removeCouponBtn').disabled = false;
+                }
+
+                if (!data.success && data.couponApplied) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Coupon Applied with Issues',
+                        text: data.message || "Coupon applied, but there was an issue."
+                    });
+                } else if (!data.success) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Failed to Apply Coupon',
+                        text: data.message || "An error occurred."
+                    });
+                }
+
+                // Close the modal after processing
+                myModal.hide();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while applying the coupon.'
+                });
+                // Ensure the modal is closed even on error
+                myModal.hide();
+            });
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No Coupon Selected',
+                text: 'Please select a coupon.'
+            });
+        }
+    });
+
+    // Event listener for the Cancel button inside the modal
+    document.getElementById('cancelCouponBtn').addEventListener('click', function () {
+        myModal.hide();
+    });
+
+    // Automatically close the modal when clicking the close button ("X") in the top-right corner
+    applyCouponModalEl.addEventListener('hidden.bs.modal', function () {
+        myModal.hide();
+    });
+
+    // Event listener for the Remove Coupon button
+    document.getElementById('removeCouponBtn').addEventListener('click', function () {
+            if (couponApplied) {
+                // Remove the discount row
+                const discountRow = document.getElementById('discountRow');
+                const discountHead = document.getElementById('discountHead');
+                if (discountRow) {
+                    discountRow.remove();
+                    discountHead.remove();
+                }
+
+                // Recalculate the total amount without the coupon discount
+                const subTotal = parseFloat(document.getElementById('subtotal').textContent);
+                document.getElementById('total').textContent = subTotal.toFixed(2);
+
+                couponApplied = false;
+                couponIdApplied = null;
+                document.getElementById('applyCouponBtn').disabled = false;
+                document.getElementById('removeCouponBtn').disabled = true;
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Coupon Removed',
+                    text: 'The coupon has been successfully removed.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    });
+    
+
+
+</script>
 
 <!-- cpnnn -->
 <!-- <script>
@@ -805,17 +979,18 @@
                     title: 'Coupon Removed',
                     text: 'The coupon has been successfully removed.',
                     confirmButtonText: 'OK'
-                });
-            }
-        });
-    });
+                }
+</script>
 
-    
 
-    </script> -->
 
-<!-- nw cpnnn -->
-<script>
+<-- nw cpnnn  wrking  -->
+
+
+
+
+<!-- good -->
+<!-- <script>
     let couponApplied = false;
     let couponIdApplied = null;
 
@@ -921,7 +1096,127 @@
             }
         });
     });
-</script>
+</script> -->
+
+
+<!-- <script>
+    let couponApplied = false;
+    let couponIdApplied = null;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Event listener for the Apply Coupon button to show the modal
+        document.getElementById('applyCouponBtn').addEventListener('click', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('applyCouponModal'), {
+                keyboard: false
+            });
+            myModal.show();
+        });
+
+        // Event listener for the Apply Coupon button inside the modal
+        document.getElementById('applyCouponBtnModal').addEventListener('click', function () {
+            const couponId = document.querySelector('input[name="coupon"]:checked')?.value;
+            const subTotal = document.getElementById('subtotal').textContent;
+
+            if (couponId) {
+                // Fetch operation to the backend
+                fetch(`/applyCoupon?couponId=${couponId}&subTotal=${subTotal}`, {
+                    method: 'POST',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        applyCouponToUI(data);
+                    } else {
+                        showErrorMessage(data.message);
+                    }
+
+                    // Close the modal
+                    var myModalEl = document.getElementById('applyCouponModal');
+                    var modal = bootstrap.Modal.getInstance(myModalEl);
+                    modal.hide();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorMessage('An error occurred while applying the coupon.');
+                });
+            } else {
+                showErrorMessage('Please select a coupon.');
+            }
+        });
+
+        // Event listener for the Remove Coupon button
+        document.getElementById('removeCouponBtn').addEventListener('click', removeCoupon);
+    });
+
+    function applyCouponToUI(data) {
+        // Remove any existing discount row
+        removeCoupon();
+
+        // Add new discount row
+        const discountRow = document.createElement('tr');
+        discountRow.innerHTML = `
+            <th id="discountHead">Discount</th>
+            <td colspan="2" class="product-subtotal" id="discountRow">- $<span>${data.discountAmount}</span></td>
+        `;
+        document.querySelector('#cart-items').appendChild(discountRow);
+
+        // Update total
+        document.getElementById('total').textContent = data.differenceAmount.toFixed(2);
+
+        // Update UI state
+        couponApplied = true;
+        couponIdApplied = data.coupon._id;
+        document.getElementById('applyCouponBtn').disabled = true;
+        document.getElementById('removeCouponBtn').disabled = false;
+
+        // Show success message
+        Swal.fire({
+            icon: "success",
+            title: "Coupon Applied",
+            text: `Discount of $${data.discountAmount} applied successfully.`,
+            confirmButtonText: "OK"
+        });
+    }
+
+    function showErrorMessage(message) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Cannot Apply Coupon',
+            text: message
+        });
+    }
+
+    function removeCoupon() {
+        if (couponApplied) {
+            // Remove the discount row
+            const discountRow = document.getElementById('discountRow');
+            const discountHead = document.getElementById('discountHead');
+            if (discountRow) {
+                discountRow.remove();
+                discountHead.remove();
+            }
+
+            // Recalculate the total amount without the coupon discount
+            const subTotal = parseFloat(document.getElementById('subtotal').textContent);
+            document.getElementById('total').textContent = subTotal.toFixed(2);
+
+            // Reset UI state
+            couponApplied = false;
+            couponIdApplied = null;
+            document.getElementById('applyCouponBtn').disabled = false;
+            document.getElementById('removeCouponBtn').disabled = true;
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Coupon Removed',
+                text: 'The coupon has been successfully removed.',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+</script> -->
+
+
 
 
 
@@ -1368,6 +1663,68 @@ function processOrder(orderData) {
     });
 }
 
+// function processRazorpayOrder(orderData) {
+//     fetch('/placeOrder', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(orderData)
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             const options = {
+//                 key: data.key_id,
+//                 amount: data.amount,    
+//                 currency: "INR",
+//                 name: "Books Kart",
+//                 description: data.description || "Purchase from our store",
+//                 image: "user_assets/myimgs/bookHivelogo.png",
+//                 // order_id: data.order.id,
+//                 order_id: razorpayOrder.id,
+
+//                 handler: function (response) {
+//                     OrderAfterPayment(orderData, "Success");
+//                 },
+//                 prefill: {
+//                     contact: data.contact || "",
+//                     name: data.name || "",
+//                     email: data.email || ""
+//                 },
+//                 notes: {
+//                     description: data.description || ""
+//                 },
+//                 theme: {
+//                     color: "#00cc66"
+//                 }
+//             };
+
+//             const razorpayObject = new Razorpay(options);
+//             razorpayObject.open();
+
+//             razorpayObject.on('payment.failed', function (response) {
+//                 console.error('Payment failed:', response.error);
+//                 OrderAfterPayment(orderData, "Failed");
+//             });
+//         } else {
+//             Swal.fire({
+//                 icon: 'warning',
+//                 title: 'Order Placement Failed',
+//                 text: data.message || 'An error occurred while placing the order.'
+//             });
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error placing order:', error);
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Order Placement Failed',
+//             text: 'There was an error placing your order. Please try again.'
+//         });
+//     });
+// }
+
 function processRazorpayOrder(orderData) {
     fetch('/placeOrder', {
         method: 'POST',
@@ -1380,13 +1737,13 @@ function processRazorpayOrder(orderData) {
     .then(data => {
         if (data.success) {
             const options = {
-                key: data.key_id,
-                amount: data.amount,
-                currency: "INR",
+                key: data.key_id, // Your Razorpay key ID
+                amount: data.amount, // Amount in paise (1 INR = 100 paise)
+                currency: "INR", // Adjust currency to INR for Indian Rupees
                 name: "Books Kart",
                 description: data.description || "Purchase from our store",
                 image: "user_assets/myimgs/bookHivelogo.png",
-                order_id: data.order_id,
+                order_id: data.order_id, // Razorpay order ID
                 handler: function (response) {
                     OrderAfterPayment(orderData, "Success");
                 },
@@ -1416,8 +1773,12 @@ function processRazorpayOrder(orderData) {
                 title: 'Order Placement Failed',
                 text: data.message || 'An error occurred while placing the order.'
             });
-        }
+        } 
     })
+
+
+
+
     .catch(error => {
         console.error('Error placing order:', error);
         Swal.fire({
@@ -1426,9 +1787,15 @@ function processRazorpayOrder(orderData) {
             text: 'There was an error placing your order. Please try again.'
         });
     });
+
+
 }
 
+
 function OrderAfterPayment(paymentResponse, status) {
+    console.log('Payment Response:', paymentResponse);
+    console.log('Status:', status);
+
     fetch(`/onlineOrderPlacing`, {
         method: 'POST',
         headers: {
@@ -1441,8 +1808,12 @@ function OrderAfterPayment(paymentResponse, status) {
             status: status
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('Response data:', data);
         if (data.success) {
             Swal.fire({
                 icon: "success",
@@ -1473,11 +1844,10 @@ function OrderAfterPayment(paymentResponse, status) {
 }
 
 
+
 function confirmWalletBalance(orderData) {
-    const encodedTotalAmount = encodeURIComponent(orderData.totalAmount);
-    
-    fetch(`/checkWalletBalance?totalAmount=${encodedTotalAmount}`, {
-        method: 'GET',
+    fetch(`/checkWalletBalance?totalAmount=${orderData.totalAmount}`, {
+        method: 'GET', // Changed to GET method
         headers: {
             'Content-Type': 'application/json'
         }
@@ -1512,31 +1882,33 @@ function confirmWalletBalance(orderData) {
     });
 }
 
-function walletPlaceOrder(addressIndex, paymentMethod, totalAmount, couponId, subtotal) {
-    fetch(`/walletPlaceOrder`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
+function walletPlaceOrder(addressIndex,paymentMethod,totalAmount,couponId,subtotal){
+    
+    fetch(`/walletPlaceOrder`,{
+        method: "POST",
+        headers:{
+            'Content-Type':'application/json'
         },
         body: JSON.stringify({
             addressIndex: addressIndex,
             paymentMethod: paymentMethod,
             totalAmount: totalAmount,
-            couponId: couponId,
-            subtotal: subtotal
+            couponId,
+            subtotal
+
         })
     })
     .then(response => response.json())
     .then(data => {
-        console.log("Order Response:", data);
-        if (data.success) {
+        console.log("testing resp",data)
+        if(data.success){
             Swal.fire({
-                icon: 'success',
-                title: 'Order Placed Successfully',
-                text: 'View My Orders',
-                confirmButtonText: 'OK'
-            }).then(result => {
-                if (result.isConfirmed) {
+                icon:"success",
+                title: data.message,
+                text:"View My Orders",
+                confirmButtonText :"OK"
+            }).then((result) => {
+                if(result.isConfirmed){
                     window.location.href = "/userAccount";
                 }
             });
@@ -1550,13 +1922,734 @@ function walletPlaceOrder(addressIndex, paymentMethod, totalAmount, couponId, su
     })
     .catch(error => {
         console.error('Error placing order:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'There was an error placing your order. Please try again.'
-        });
     });
 }
+
+
+
+
+
+
+
+
+
+
+// function OrderAfterPayment(paymentResponse, status) {
+//     fetch(`/onlineOrderPlacing`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({
+//             order_id: paymentResponse.order_id,
+//             payment_id: paymentResponse.payment_id,
+//             signature: paymentResponse.signature,
+//             status: status
+//         })
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             Swal.fire({
+//                 icon: "success",
+//                 title: 'Order Confirmed',
+//                 text: "Your payment was successful and the order has been placed.",
+//                 confirmButtonText: "OK"
+//             }).then((result) => {
+//                 if (result.isConfirmed) {
+//                     window.location.href = "/userAccount";
+//                 }
+//             });
+//         } else {
+//             Swal.fire({
+//                 icon: 'error',
+//                 title: 'Order Placement Failed',
+//                 text: data.message
+//             });
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error confirming order:', error);
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Order Placement Failed',
+//             text: 'There was an error confirming your order. Please try again.'
+//         });
+//     });
+// }
+
+
+
+
+
+
+
+
+
+
+
+// function confirmWalletBalance(orderData) {
+//     const encodedTotalAmount = encodeURIComponent(orderData.totalAmount);
+    
+//     fetch(`/checkWalletBalance?totalAmount=${encodedTotalAmount}`, {
+//         method: 'GET',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         }
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             if (data.walletBalance >= orderData.totalAmount) {
+//                 processOrder(orderData);
+//             } else {
+//                 Swal.fire({
+//                     icon: 'warning',
+//                     title: 'Insufficient Wallet Balance',
+//                     text: 'You do not have enough balance to complete this transaction.',
+//                 });
+//             }
+//         } else {
+//             Swal.fire({
+//                 icon: 'error',
+//                 title: 'Error',
+//                 text: data.message
+//             });
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error checking wallet balance:', error);
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Error',
+//             text: 'There was an error checking your wallet balance. Please try again.'
+//         });
+//     });
+// }
+
+// function walletPlaceOrder(addressIndex, totalAmount, couponId, subtotal) {
+//     console.group('Wallet Place Order');
+//     console.log('Function called with parameters:');
+//     console.log('addressIndex:', addressIndex);
+//     console.log('totalAmount:', totalAmount);
+//     console.log('couponId:', couponId);
+//     console.log('subtotal:', subtotal);
+
+//     const orderData = {
+//         addressIndex,
+//         paymentMethod: 'wallet',
+//         totalAmount,
+//         couponId,
+//         subtotal
+//     };
+//     console.log('Prepared order data:', orderData);
+
+//     console.log('Sending fetch request to /walletPlaceOrder');
+//     fetch(`/walletPlaceOrder`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(orderData)
+//     })
+//     .then(response => {
+//         console.log('Received response from server');
+//         console.log('Response status:', response.status);
+//         console.log('Response OK:', response.ok);
+//         return response.json();
+//     })
+//     .then(data => {
+//         console.log('Parsed response data:', data);
+//         if (data.success) {
+//             console.log('Order placed successfully');
+//             Swal.fire({
+//                 icon: 'success',
+//                 title: 'Order Placed Successfully',
+//                 text: 'Your order has been placed using your wallet balance.',
+//                 confirmButtonText: 'View My Orders'
+//             }).then(result => {
+//                 if (result.isConfirmed) {
+//                     console.log('User confirmed, redirecting to /userAccount');
+//                     window.location.href = "/userAccount";
+//                 }
+//             });
+//         } else {
+//             console.error('Order placement failed:', data.message);
+//             throw new Error(data.message || 'Order placement failed');
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error in walletPlaceOrder:', error);
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Order Placement Failed',
+//             text: error.message || 'There was an error placing your order. Please try again.'
+//         });
+//     })
+//     .finally(() => {
+//         console.groupEnd('Wallet Place Order');
+//     });
+// }
+
+
+
+
+
+
+
+// function confirmWalletBalance(orderData) {
+//     const encodedTotalAmount = encodeURIComponent(orderData.totalAmount);
+
+//     fetch(`/checkWalletBalance?totalAmount=${encodedTotalAmount}`, {
+//         method: 'GET',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         }
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             if (data.walletBalance >= orderData.totalAmount) {
+//                 walletPlaceOrder(orderData.addressIndex, orderData.totalAmount, orderData.couponId, orderData.subtotal);
+//             } else {
+//                 Swal.fire({
+//                     icon: 'warning',
+//                     title: 'Insufficient Wallet Balance',
+//                     text: 'You do not have enough balance to complete this transaction.',
+//                 });
+//             }
+//         } else {
+//             Swal.fire({
+//                 icon: 'error',
+//                 title: 'Error',
+//                 text: data.message
+//             });
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error checking wallet balance:', error);
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Error',
+//             text: 'There was an error checking your wallet balance. Please try again.'
+//         });
+//     });
+// }
+
+
+
+
+
+
+// function confirmWalletBalance(addressIndex, totalAmount) {
+//     const encodedTotalAmount = encodeURIComponent(totalAmount);
+
+//     fetch(`/checkWalletBalance?totalAmount=${encodedTotalAmount}`, {
+//         method: 'GET',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         }
+//     })
+//     .then(response => response.json())
+//     .then(walletData => {
+//         if (walletData.success) {
+//             walletPlaceOrder(addressIndex, totalAmount);
+//         } else {
+//             Swal.fire({
+//                 icon: 'warning',
+//                 title: 'Insufficient Wallet Balance',
+//                 text: `Your wallet balance (₹${walletData.walletBalance.toFixed(2)}) is not enough to complete this order (₹${totalAmount.toFixed(2)}).`,
+//                 confirmButtonText: 'OK'
+//             });
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error checking wallet balance:', error);
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Error',
+//             text: 'An error occurred while checking wallet balance. Please try again.',
+//             confirmButtonText: 'OK'
+//         });
+//     });
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+// function walletPlaceOrder(addressIndex, paymentMethod, totalAmount, couponId, subtotal) {
+//     fetch(`/walletPlaceOrder?status=Success`, {
+//         method: "POST",
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({
+//             addressIndex: addressIndex,
+//             paymentMethod: paymentMethod,
+//             totalAmount: totalAmount,
+//             couponId: couponId,
+//             subtotal: subtotal
+//         })
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         console.log("testing resp", data);
+//         if (data.success) {
+//             Swal.fire({
+//                 icon: "success",
+//                 title: data.message,
+//                 text: "View My Orders",
+//                 confirmButtonText: "OK"
+//             }).then((result) => {
+//                 if (result.isConfirmed) {
+//                     window.location.href = "/userAccount";
+//                 }
+//             });
+//         } else {
+//             Swal.fire({
+//                 icon: 'warning',
+//                 title: 'Order Placement Failed',
+//                 text: data.message
+//             });
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error placing order:', error);
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Order Placement Failed',
+//             text: 'There was an error placing your order. Please try again.'
+//         });
+//     });
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// function walletPlaceOrder(addressIndex, totalAmount, couponId, subtotal) {
+//     console.group('Wallet Place Order');
+//     console.log('Function called with parameters:');
+//     console.log('addressIndex:', addressIndex);
+//     console.log('totalAmount:', totalAmount);
+//     console.log('couponId:', couponId);
+//     console.log('subtotal:', subtotal);
+
+//     const orderData = {
+//         addressIndex,
+//         paymentMethod: 'wallet',
+//         totalAmount,
+//         couponId,
+//         subtotal
+//     };
+//     console.log('Prepared order data:', orderData);
+
+//     console.log('Sending fetch request to /walletPlaceOrder');
+//     fetch(`/walletPlaceOrder`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(orderData)
+//     })
+//     .then(response => {
+//         console.log('Received response from server');
+//         console.log('Response status:', response.status);
+//         console.log('Response OK:', response.ok);
+//         return response.json();
+//     })
+//     .then(data => {
+//         console.log('Parsed response data:', data);
+//         if (data.success) {
+//             console.log('Order placed successfully');
+//             Swal.fire({
+//                 icon: 'success',
+//                 title: 'Order Placed Successfully',
+//                 text: 'Your order has been placed using your wallet balance.',
+//                 confirmButtonText: 'View My Orders'
+//             }).then(result => {
+//                 if (result.isConfirmed) {
+//                     console.log('User confirmed, redirecting to /userAccount');
+//                     window.location.href = "/userAccount";
+//                 }
+//             });
+//         } else {
+//             console.error('Order placement failed:', data.message);
+//             throw new Error(data.message || 'Order placement failed');
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error in walletPlaceOrder:', error);
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Order Placement Failed',
+//             text: error.message || 'There was an error placing your order. Please try again.'
+//         });
+//     })
+//     .finally(() => {
+//         console.groupEnd('Wallet Place Order');
+//     });
+// }
+
+
+// function walletPlaceOrder(addressIndex,paymentMethod,totalAmount,couponId,subtotal){
+    
+//     fetch(`/walletPlaceOrder`,{
+//         method: "POST",
+//         headers:{
+//             'Content-Type':'application/json'
+//         },
+//         body: JSON.stringify({
+//             addressIndex: addressIndex,
+//             paymentMethod: paymentMethod,
+//             totalAmount: totalAmount,
+//             couponId,
+//             subtotal
+
+//         })
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         console.log("testing resp",data)
+//         if(data.success){
+//             Swal.fire({
+//                 icon:"success",
+//                 title: data.message,
+//                 text:"View My Orders",
+//                 confirmButtonText :"OK"
+//             }).then((result) => {
+//                 if(result.isConfirmed){
+//                     window.location.href = "/userAccount";
+//                 }
+//             });
+//         } else {
+//             Swal.fire({
+//                 icon: 'warning',
+//                 title: 'Order Placement Failed',
+//                 text: data.message
+//             });
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error placing order:', error);
+//     });
+// }
+
+
+
+// function walletPlaceOrder(addressIndex, paymentMethod, totalAmount, couponId, subtotal) {
+//   fetch(`/walletPlaceOrder`, {
+//     method: "POST",
+//     headers: {
+//       'Content-Type': 'application/json'
+//     },
+//     body: JSON.stringify({
+//       addressIndex: addressIndex,
+//       paymentMethod: paymentMethod,
+//       totalAmount: totalAmount,
+//       couponId: couponId,
+//       subtotal: subtotal
+//     })
+//   })
+//   .then(response => response.json())
+//   .then(data => {
+//     console.log("testing resp", data);
+//     if (data.success) {
+//       Swal.fire({
+//         icon: "success",
+//         title: data.message,
+//         text: "View My Orders",
+//         confirmButtonText: "OK"
+//       }).then((result) => {
+//         if (result.isConfirmed) {
+//           window.location.href = `/orderConfirmation/${data.orderId}`;
+//         }
+//       });
+//     } else {
+//       Swal.fire({
+//         icon: 'warning',
+//         title: 'Order Placement Failed',
+//         text: data.message
+//       });
+//     }
+//   })
+//   .catch(error => {
+//     console.error('Error placing order:', error);
+//     Swal.fire({
+//       icon: 'error',
+//       title: 'Order Placement Failed',
+//       text: 'There was an error placing your order. Please try again.'
+//     });
+//   });
+// }
+
+
+// last used/////
+
+// function walletPlaceOrder(addressIndex, paymentMethod, totalAmount, couponId, subtotal) {
+//   fetch(`/walletPlaceOrder?status=Success`, {
+//     method: "POST",
+//     headers: {
+//       'Content-Type': 'application/json'
+//     },
+//     body: JSON.stringify({
+//       addressIndex: addressIndex,
+//       paymentMethod: paymentMethod.toString(),  // Convert to string
+//       totalAmount: totalAmount,
+//       couponId,  // Convert to string
+//       subtotal
+//     })
+//   })
+//   .then(response => response.json())
+//   .then(data => {
+//     console.log("testing resp", data);
+//     if (data.success) {
+//       Swal.fire({
+//         icon: "success",
+//         title: data.message,
+//         text: "View My Orders",
+//         confirmButtonText: "OK"
+//       }).then((result) => {
+//         if (result.isConfirmed) {
+//           window.location.href = "/userAccount";
+//         }
+//       });
+//     } else {
+//       Swal.fire({
+//         icon: 'warning',
+//         title: 'Order Placement Failed',
+//         text: data.message
+//       });
+//     }
+//   })
+//   .catch(error => {
+//     console.error('Error placing order:', error);
+//     Swal.fire({
+//       icon: 'error',
+//       title: 'Order Placement Failed',
+//       text: 'There was an error placing your order. Please try again.'
+//     });
+//   });
+// }
+
+// last used////////////////////
+
+// function walletPlaceOrder(addressIndex, paymentMethod, totalAmount, couponId, subtotal) {
+//   // Client-side input validation
+//   if (!addressIndex || !paymentMethod || !totalAmount || !subtotal) {
+//     Swal.fire({
+//       icon: 'error',
+//       title: 'Invalid Input',
+//       text: 'Please ensure all required fields are filled.'
+//     });
+//     return;
+//   }
+//   // Prepare the request body
+//   const requestBody = {
+//     addressIndex: addressIndex,
+//     paymentMethod: paymentMethod.toString(),
+//     totalAmount: parseFloat(totalAmount),
+//     subtotal: parseFloat(subtotal)
+//   };
+
+//   // Only include couponId if it's provided
+//   if (couponId) {
+//     requestBody.couponId = couponId.toString();
+//   }
+
+//   fetch(`/walletPlaceOrder?status=Success`, {
+//     method: "POST",
+//     headers: {
+//       'Content-Type': 'application/json'
+//     },
+//     body: JSON.stringify(requestBody)
+//   })
+//   .then(response => {
+//     if (!response.ok) {
+//       throw new Error('Network response was not ok');
+//     }
+//     return response.json();
+//   })
+//   .then(data => {
+//     console.log("Order placement response:", data);
+//     if (data.success) {
+//       Swal.fire({
+//         icon: "success",
+//         title: data.message,
+//         text: "View My Orders",
+//         confirmButtonText: "OK"
+//       }).then((result) => {
+//         if (result.isConfirmed) {
+//           window.location.href = "/userAccount";
+//         }
+//       });
+//     } else {
+//       Swal.fire({
+//         icon: 'warning',
+//         title: 'Order Placement Failed',
+//         text: data.message || 'An unknown error occurred'
+//       });
+//     }
+//   })
+//   .catch(error => {
+//     console.error('Error placing order:', error);
+//     Swal.fire({
+//       icon: 'error',
+//       title: 'Order Placement Failed',
+//       text: 'There was an error placing your order. Please try again.'
+//     });
+//   });
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// function walletPlaceOrder(addressIndex, totalAmount, couponId, subtotal) {
+//     console.log("Placing order with:", { addressIndex, totalAmount, couponId, subtotal });
+    
+//     fetch(`/walletPlaceOrder`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({
+//             addressIndex,
+//             paymentMethod: 'wallet',  // We're explicitly setting this to 'wallet'
+//             totalAmount,
+//             couponId,
+//             subtotal
+//         })
+//     })
+//     .then(response => {
+//         if (!response.ok) {
+//             return response.json().then(err => Promise.reject(err));
+//         }
+//         return response.json();
+//     })
+//     .then(data => {
+//         console.log("Order Response:", data);
+//         if (data.success) {
+//             Swal.fire({
+//                 icon: 'success',
+//                 title: 'Order Placed Successfully',
+//                 text: 'Your order has been placed using your wallet balance.',
+//                 confirmButtonText: 'View My Orders'
+//             }).then(result => {
+//                 if (result.isConfirmed) {
+//                     window.location.href = "/userAccount";
+//                 }
+//             });
+//         } else {
+//             throw new Error(data.message || 'Order placement failed');
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error placing order:', error);
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Order Placement Failed',
+//             text: error.message || 'There was an error placing your order. Please try again.'
+//         });
+//     });
+// }
+
+
+
+
+// function walletPlaceOrder(addressIndex, paymentMethod, totalAmount, couponId, subtotal) {
+//     fetch(`/walletPlaceOrder`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({
+//             addressIndex: addressIndex,
+//             paymentMethod: paymentMethod,
+//             totalAmount: totalAmount,
+//             couponId: couponId,
+//             subtotal: subtotal
+//         })
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         console.log("Order Response:", data);
+//         if (data.success) {
+//             Swal.fire({
+//                 icon: 'success',
+//                 title: 'Order Placed Successfully',
+//                 text: 'View My Orders',
+//                 confirmButtonText: 'OK'
+//             }).then(result => {
+//                 if (result.isConfirmed) {
+//                     window.location.href = "/userAccount";
+//                 }
+//             });
+//         } else {
+//             Swal.fire({
+//                 icon: 'warning',
+//                 title: 'Order Placement Failed',
+//                 text: data.message
+//             });
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error placing order:', error);
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Error',
+//             text: 'There was an error placing your order. Please try again.'
+//         });
+//     });
+// }
+
+
+
+
+
+
+
+
+
 
 
 

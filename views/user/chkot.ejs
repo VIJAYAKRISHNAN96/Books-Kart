@@ -1,4 +1,4 @@
-<%-include("../partials/header.ejs")%>    
+<%-include("../partials/header.ejs")%>
 
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
@@ -1567,7 +1567,7 @@ function OrderAfterPayment(paymentResponse, status) {
 
 function confirmWalletBalance(orderData) {
     fetch('/checkWalletBalance', {
-        method: 'POST',
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json'
         }
@@ -1601,6 +1601,7 @@ function confirmWalletBalance(orderData) {
         });
     });
 }
+
 
 
 

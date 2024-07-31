@@ -2,12 +2,23 @@ const express = require("express");
 const adminRouter = express.Router();
 const path = require('path');
 const adminController = require("../controllers/adminController");
+const userController = require("../controllers/userController");
 const couponManagement= require("../controllers/couponManagement");
+const salesReportManagement = require("../controllers/salesReportManagement");
+
+    
+
 
 const auth=require("../middlewares/adminAuth");
 
 const multer = require('multer'); 
 const orderManagement = require("../controllers/orderManagement");
+
+
+// const { salesReportManagement } = require("../controllers/salesReportManagement");
+
+
+
 // Set up multer for file uploads
 const storage = multer.diskStorage({    
     destination: function (req, file, cb) {
@@ -72,6 +83,27 @@ adminRouter.get('/coupon', couponManagement.loadCouponList);
 adminRouter.post('/addCoupon', couponManagement.addCoupon);
 adminRouter.put('/couponStatus', couponManagement.changeCouponStatus);
 adminRouter.delete('/deleteCoupon', couponManagement.deleteCoupon);
+
+
+
+adminRouter.get("/salesReport",auth.isLogin,salesReportManagement.loadSalesReport);
+adminRouter.get("/filterReport",auth.isLogin,salesReportManagement.filterSalesReport);
+adminRouter.get("/downloadPdf",auth.isLogin,salesReportManagement.downloadPDF);
+adminRouter.get("/downloadExcel",auth.isLogin,salesReportManagement.downloadExcel);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 module.exports = adminRouter;
 // module.exports= orderManagement

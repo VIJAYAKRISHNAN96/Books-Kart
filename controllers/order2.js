@@ -1366,7 +1366,7 @@ placeOrder: async (req, res) => {
 
 // new erking 
 // onlineOrderPlacing : async (req, res) => {
-//   const { addressIndex, status, totalAmount, paymentMethod } = req.query;
+//   const { addressI ndex, status, totalAmount, paymentMethod } = req.query;
 //   const { couponId, subtotal, razorpay_payment_id, razorpay_signature } = req.body;
 
 //   console.log('Received query parameters:', { addressIndex, status, totalAmount, paymentMethod });

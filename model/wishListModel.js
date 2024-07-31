@@ -11,7 +11,7 @@ const wishlistSchema = new mongoose.Schema({
         productId: {
             type: Schema.Types.ObjectId,
             ref: 'Product',
-            requried: true,
+            required: true,
         }
     }]
 }, {
@@ -20,7 +20,8 @@ const wishlistSchema = new mongoose.Schema({
 
 
 
-module.exports = mongoose.model('wishlist', wishlistSchema)
+module.exports = mongoose.model('Wishlist', wishlistSchema)
+
 
 
 

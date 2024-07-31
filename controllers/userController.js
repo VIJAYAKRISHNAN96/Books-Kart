@@ -4,13 +4,12 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 const passport = require("passport");
-
 const User= require("../model/userModel");
 const Product = require("../model/productModel");
 const Cart = require("../model/cartModel")
 const Order= require("../model/orderModel");
-const WishList=require("../model/wishListModel"); 
 const Coupon = require("../model/couponModel");
+const Wishlist= require("../model/wishListModel");
 const Wallet= require("../model/walletModel");
 
 
@@ -982,51 +981,44 @@ confirmQuantity:async(req,res)=>{
 
 
 
+ 
 
 
 
 
 
-loadWishList: async (req, res) => {
+
+// Load Wishlist
+loadWishList : async (req, res) => {
   try {
-      const userId = req.session.user.id;
+    const userId = req.session.user.id;
 
-      // Ensure userId is valid
-      if (!userId) {
-          console.error('User ID is not available in the session');
-          return res.status(400).send('User not authenticated');
-      }
+    if (!userId) {
+      console.error('User ID is not available in the session');
+      return res.status(400).send('User not authenticated');
+    }
 
-      // Retrieve the user and populate the wishlist.productId field
-      const user = await User.findById(userId).populate('wishlist.productId');
+    const user = await User.findById(userId).populate('wishlist.productId');
 
-      // Check if user exists
-      if (!user) {
-          console.error('User not found');
-          return res.status(404).send('User not found');
-      }
+    if (!user) {
+      console.error('User not found');
+      return res.status(404).send('User not found');
+    }
 
-      // Handle cases where wishlist might be null or undefined
-      const products = user.wishlist && user.wishlist.length > 0
-          ? user.wishlist.map(item => item.productId)
-          : [];
+    const products = user.wishlist.map(item => item.productId).filter(Boolean);
 
-      // Debug: Log the products
-      console.log('Products in wishlist:', products);
+    console.log('Products in wishlist:', products);
 
-      // Render the wishlist view with products
-      res.render('wishList', { products });
+    res.render('wishList', { products });
   } catch (error) {
-      console.error('Error loading wishlist:', error);
-      res.status(500).send('Internal Server Error');
+    console.error('Error loading wishlist:', error);
+    res.status(500).send('Internal Server Error');
   }
 },
 
 
 
 
-
-// test last
 addToWishList : async (req, res) => {
   try {
     const userId = req.session.user.id; // Assuming userId is stored in req.session.user
@@ -1044,6 +1036,7 @@ addToWishList : async (req, res) => {
 
     // Find the user by ID
     const user = await User.findById(userId);
+    
 
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
@@ -1075,38 +1068,39 @@ addToWishList : async (req, res) => {
 },
 
 
-deleteWishList : async (req, res) => {
+deleteWishList: async (req, res) => {
   try {
-    const userId = req.session.user.id; // Ensure the user ID is available in the session
-    const productId = req.body.productId; // Ensure the product ID is sent in the request body
+    const userId = req.session.user.id;
+    const productId = req.body.productId;
 
-    console.log('User ID:', userId);
-    console.log('Product ID:', productId);
+    console.log('Attempting to delete product from wishlist:', { userId, productId });
 
-
-    // Ensure userId and productId are not undefined or null
     if (!userId || !productId) {
-      console.log('User ID or Product ID is missing:', { userId, productId }); // Debugging line
+      console.log('User ID or Product ID is missing:', { userId, productId });
       return res.status(400).json({ success: false, message: 'User ID or Product ID is missing' });
     }
 
-    // Delete the product from the user's wishlist
-    const wishlist = await WishList.findOneAndUpdate(
-      { userId },
-      { $pull: { products: { productId } } }, // Adjust the field name according to your schema
+    const result = await User.findByIdAndUpdate(
+      userId,
+      { $pull: { Wishlist: { productId } } },
       { new: true }
     );
 
-    if (!wishlist) {
-      return res.status(404).json({ success: false, message: 'Wishlist not found or product not in wishlist' });
+    if (!result) {
+      console.log('User not found or product not in wishlist');
+      return res.status(404).json({ success: false, message: 'User not found or product not in wishlist' });
     }
 
+    console.log('Product removed from wishlist successfully');
     res.json({ success: true, message: 'Product removed from wishlist successfully' });
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
+    console.error('Error in deleteWishList:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error', details: error.message });
   }
 },
+
+
+
 
 addToCartFromWishlist: async (req, res) => {
   try {
@@ -1118,7 +1112,12 @@ addToCartFromWishlist: async (req, res) => {
     }
 
     const userId = req.session.user.id;
-    const { productId, quantity = 1 } = req.body;
+    const { productId } = req.body;
+    let quantity = parseInt(req.body.quantity) || 1; // Ensure quantity is a number, default to 1
+
+    if (isNaN(quantity) || quantity < 1) {
+      quantity = 1; // Set a minimum quantity of 1
+    }
 
     console.log(`Adding product ${productId} from wishlist with quantity ${quantity} for user ${userId}`);
 
@@ -1140,10 +1139,10 @@ addToCartFromWishlist: async (req, res) => {
 
     if (existingProductIndex > -1) {
       console.log("Product exists in cart, updating quantity");
-      cart.product[existingProductIndex].quantity += parseInt(quantity);
+      cart.product[existingProductIndex].quantity += quantity;
     } else {
       console.log("Product does not exist in cart, adding new product");
-      cart.product.push({ productId, quantity: parseInt(quantity) });
+      cart.product.push({ productId, quantity });
     }
 
     console.log("Updated cart:", JSON.stringify(cart, null, 2));
@@ -1152,9 +1151,12 @@ addToCartFromWishlist: async (req, res) => {
 
     console.log("Cart saved successfully");
 
+    // Remove the product from the wishlist
+    await User.findByIdAndUpdate(userId, { $pull: { wishlist: { productId } } });
+
     res.json({
       success: true,
-      message: 'Product added to cart successfully',
+      message: 'Product added to cart and removed from wishlist successfully',
       cartItemCount: cart.product.length,
       productName: product.name
     });
@@ -1163,6 +1165,8 @@ addToCartFromWishlist: async (req, res) => {
     res.status(500).json({ success: false, error: 'Internal Server Error', details: error.message });
   }
 },
+
+
 
 
 }
