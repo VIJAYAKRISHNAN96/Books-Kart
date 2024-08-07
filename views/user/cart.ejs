@@ -30,6 +30,7 @@
 </style>
 
 
+
 <div class="mobile-header-active mobile-header-wrapper-style">
     <div class="mobile-header-wrapper-inner">
         <div class="mobile-header-top">
@@ -212,7 +213,7 @@
                                     <th scope="col">Name</th>
                                     <th scope="col">Price</th>
                                     <th scope="col">Quantity</th>
-                                    <th scope="col">Subtotal</th>
+                                    <!-- <th scope="col">Subtotal</th> -->
                                     <th scope="col">Remove</th>
                                 </tr>
                             </thead>
@@ -233,16 +234,24 @@
                                             <h5 class="product-name"><a href="/product/<%= item.productId._id %>"><%= item.productId.name %></a></h5>
                                             <p class="font-xs"><%= item.productId.description || 'No description available' %></p>
                                           </td>
-                                          <td class="price" data-title="Price"><span>$<%= item.productId.price.toFixed(2) %></span></td>
+
+                                          <td class="price" data-title="Price"><span>$<%= (item.productId.discountPrice > 0 ? item.productId.discountPrice : item.productId.price).toFixed(2) %></span></td>
+
+                                          
+                                          <!-- <td class="price" data-title="Price"><span>$<%= item.productId.price.toFixed(2) %></span></td> -->
                                           <td class="text-center" data-title="Stock">
                                             <div class="detail-qty border radius m-auto">
                                               <a href="#" class="qty-down" data-id="<%= item.productId._id %>"><i class="fi-rs-angle-small-down"></i></a>
                                               <span class="qty-val" id="qty-<%= item.productId._id %>"><%= item.quantity %></span>
                                               <a href="#" class="qty-up" data-id="<%= item.productId._id %>"><i class="fi-rs-angle-small-up"></i></a>
-                                            </div>
+
                                           </td>
-                                          <td class="text-right" data-title="Cart">
-                                            <span>$<%= (item.productId.price * item.quantity).toFixed(2) %></span>
+                                          <!-- <td class="text-right" data-title="Cart"> -->
+
+                                          <!-- <span>$<%= (item.productId.discountPrice > 0 ? item.productId.discountPrice : item.productId.price * item.quantity).toFixed(2) %></span> -->
+
+
+                                            <!-- <span>$<%= (item.productId.price * item.quantity).toFixed(2) %></span> -->
                                           </td>
                                           <td class="action" data-title="Remove">
                                             <!-- <td class="action" data-title="Remove"> -->
@@ -256,7 +265,7 @@
                                                 <form id="deleteCartForm-<%= item.productId._id %>" action="/deletecart" method="post" class="remove-form">
                                                   <input type="hidden" name="productId" value="<%= item.productId._id %>">
                                                   <button type="button" class="text-muted" onclick="confirmDelete('<%= item.productId._id %>')">
-                                                      <i class="fi-rs-trash" style="color: white;"></i>
+                                                      <i class="fi-rs-trash" style="color: rgb(248, 8, 8);"></i>
                                                   </button>
                                               </form>
 
@@ -317,7 +326,7 @@
                     </div>
                     <div class="cart-action text-end">
                         <!-- <a class="btn  mr-10 mb-sm-15"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a> -->
-                        <a id="updateCartBtn" class="btn mr-10 mb-sm-15"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a>
+                        <a id="updateCartBtn" class="btn mr-10 mb-sm-15" style="color: #eff4f1; background-color: #198754;"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a>
 
                         
 
@@ -328,7 +337,9 @@
 
 
 
-                        <a class="btn "><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+                        <!-- <a class="btn "><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a> -->
+                        <a class="btn" style="color: rgb(245, 251, 245); background-color: #198754;" href="/shop"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+
 
                     </div>
                     <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
@@ -657,7 +668,7 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <a href="/checkout" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
+                                <a href="/checkout" class="btn" style="color: #eff4f1; background-color:#198754;"> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
                             </div>
                         </div>
                     </div>
@@ -710,7 +721,46 @@
         updates.push({ productId, quantity });
       });
     
-      fetch('/updateCart', {
+    //   fetch('/updateCart', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({ updates }),
+    //   })
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     if (data.success) {
+    //       Swal.fire({
+    //         icon: 'success',
+    //         title: 'Success',
+    //         text: 'Cart updated successfully!',
+    //         showConfirmButton: true, // Ensure confirm button is shown
+    //       }).then((result) => {
+    //         if (result.isConfirmed) {
+    //           // Reload the page after user confirms
+    //           location.reload();
+    //         }
+    //       });
+    //     } else {
+    //       Swal.fire({
+    //         icon: 'error',
+    //         title: 'Error',
+    //         text: 'Failed to update cart. Please try again.',
+    //       });
+    //     }
+    //   })
+    //   .catch(error => {
+    //     console.error('Error:', error);
+    //     Swal.fire({
+    //       icon: 'error',
+    //       title: 'Error',
+    //       text: 'An error occurred while updating the cart.',
+    //     });
+    //   });
+    // });
+    
+          fetch('/updateCart', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -724,18 +774,24 @@
             icon: 'success',
             title: 'Success',
             text: 'Cart updated successfully!',
-            showConfirmButton: true, // Ensure confirm button is shown
+            showConfirmButton: true,
           }).then((result) => {
             if (result.isConfirmed) {
-              // Reload the page after user confirms
               location.reload();
             }
           });
         } else {
+          let errorMessage = 'Failed to update cart. Please try again.';
+
+          // Check if the error is due to exceeding the quantity limit
+          if (data.message === 'Maximum 3 quantities of a book can be purchased') {
+            errorMessage = 'You cannot purchase more than 3 quantities of this book.';
+          }
+
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'Failed to update cart. Please try again.',
+            text: errorMessage,
           });
         }
       })
@@ -748,6 +804,7 @@
         });
       });
     });
+
     </script>
 
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

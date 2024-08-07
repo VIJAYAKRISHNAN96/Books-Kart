@@ -131,7 +131,9 @@
                             <div class="col-md-9">
                                 <div class="mb-4">
                                     <label for="stock" class="form-label">Stock</label>
-                                     <input type="number" class="form-control" id="stock" name="stock" value="<%= product.stock %>" required>
+                                     <!-- <input type="number" class="form-control" id="stock" name="stock" value="<%= product.stock %>" required> -->
+                                     <input type="number" class="form-control" id="stock" name="stock" min="0" required onkeydown="return false;" oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
+
                                 </div>
                             </div>
                         </div>

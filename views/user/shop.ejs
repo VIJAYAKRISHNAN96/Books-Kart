@@ -14,7 +14,73 @@
   border-radius: 5px;
 }
 
-   </style>
+ </style>
+
+ <style>
+    .product-cart-wrap {
+    height: 450px; /* Adjust the height as needed */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.product-img-action-wrap {
+    height: 60%; /* Reserve 60% of the card for the image */
+}
+
+.product-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* This ensures the image fills the container */
+}
+
+.product-content-wrap {
+    padding: 10px 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.product-category, .product-price, .product-action-1 {
+    margin-bottom: 10px; /* Adds some spacing between elements */
+}
+
+.product-category a {
+    font-size: 14px;
+    color: #999;
+}
+
+.product-content-wrap h2 {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.5em;
+    height: 3em; /* Set a fixed height for title */
+    overflow: hidden;
+    margin-bottom: 10px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.product-price ins {
+    font-size: 18px;
+    font-weight: 700;
+    color: #00cc66;
+}
+
+.product-price .old-price {
+    font-size: 14px;
+    color: #999;
+    text-decoration: line-through;
+    margin-left: 10px;
+}
+
+ </style>
     <div class="mobile-header-active mobile-header-wrapper-style">
         <div class="mobile-header-wrapper-inner">
             <div class="mobile-header-top">
@@ -248,7 +314,7 @@
                                             
                                         </ul>
                                     </div>
-                                </div> -->
+                                < </div> --> 
                             </div>
                         </div>
                         <div class="row product-grid-3">
@@ -290,11 +356,21 @@
                                             </span>
                                         </div>
                                         <div class="product-price">
-                                            <span><%= product.price %> </span>
-                                            <span class="old-price">$245.8</span>
+                                            <ins><span class="text-brand">$<%= product.discountPrice.toFixed(2) %></span></ins>
+                                            <ins><span class="old-price">$<%= product.price %></span></ins>
+                                            <!-- <span><%= product.price %> </span> -->
+                                            <!-- <span class="old-price">$245.8</span> -->
                                         </div>
                                         <div class="product-action-1 show">
-                                            <a aria-label="Add To Cart" class="action-btn hover-up" href="shop-cart.html"><i class="fi-rs-shopping-bag-add"></i></a>
+
+                                            <button aria-label="Add To Cart" class="action-btn hover-up" onclick="addToCart('<%= product._id %>')">
+                                                <i class="fi-rs-shopping-bag-add"></i>
+                                            </button>
+                                            
+                                            
+                                            
+                                               
+                                            <!-- <a aria-label="Add To Cart" class="action-btn hover-up" href="/addToCart"><i class="fi-rs-shopping-bag-add"></i></a> -->
                                         </div>
                                     </div>
                                 </div>
@@ -381,47 +457,62 @@
 
     <script>
 
+function addToCart(productId) {
+    console.log('Adding Product ID:', productId);
+
+    fetch('/addToCart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ productId }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                title: 'Added to Cart!',
+                text: `${data.quantity} ${data.quantity > 1 ? 'items' : 'item'} of ${data.productName} ${data.quantity > 1 ? 'have' : 'has'} been added to your cart.`,
+                icon: 'success',
+                confirmButtonText: 'Continue Shopping'
+            });
+            // Optional: Update mini cart or cart icon if you have one
+            // updateMiniCart(data.cartItemCount, data.totalPrice);
+        } else if (data.error === 'User not logged in') {
+            Swal.fire({
+                title: 'Not Logged In',
+                text: 'Please log in to add items to your cart.',
+                icon: 'warning',
+                confirmButtonText: 'Log In'
+            }).then(() => {
+                window.location.href = '/login'; // Redirect to login page
+            });
+        } else {
+            Swal.fire({
+                title: 'Error!',
+                text: data.error || 'Failed to add product to cart',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    })
+    .catch((error) => {
+        console.error('Fetch error:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'An error occurred. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    });
+   
+}
 
 
 
-//        function addToWishList(productId) {
-//   fetch('/addToWishList', {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/x-www-form-urlencoded',
-//     },
-//     body: new URLSearchParams({
-//       productId: productId,
-//     }),
-//   })
-//   .then(response => response.json())
-//   .then(data => {
-//     if (data.success) {
-//       Swal.fire({
-//         icon: 'success',
-//         title: 'Success',
-//         text: data.message,
-//         confirmButtonText: 'OK'
-//       });
-//     } else {
-//       Swal.fire({
-//         icon: 'error',
-//         title: 'Error',
-//         text: data.message,
-//         confirmButtonText: 'OK'
-//       });
-//     }
-//   })
-//   .catch(error => {
-//     console.error('Error:', error);
-//     Swal.fire({
-//       icon: 'error',
-//       title: 'Error',
-//       text: 'An error occurred. Please try again.',
-//       confirmButtonText: 'OK'
-//     });
-//   });
-// }
+
+
+
 function addToWishList(productId) {
     console.log('Adding Product ID:', productId); // Log to verify the productId
 

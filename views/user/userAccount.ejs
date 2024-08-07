@@ -1,5 +1,102 @@
 <%-include("../partials/header.ejs")%>
 
+
+
+<!-- <style>
+    .pagination {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+.pagination a {
+    color: #333;
+    padding: 8px 16px;
+    text-decoration: none;
+    margin: 0 4px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.pagination a.active {
+    background-color: #FF6B6B;
+    color: white;
+    border-color: #FF6B6B;
+}
+
+.pagination a:hover {
+    background-color: #f2f2f2;
+}
+
+.pagination a.prev, .pagination a.next {
+    font-weight: bold;
+}
+
+</style> -->
+
+<style>
+    .hide-account-details-tab {
+        display: none;
+    }
+</style>
+
+
+<style>
+    .pagination {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+.pagination a {
+    color: #333;
+    padding: 8px 16px;
+    text-decoration: none;
+    margin: 0 4px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.pagination a.active {
+    background-color: #FF6B6B;
+    color: white;
+    border-color: #FF6B6B;
+}
+
+.pagination a:hover {
+    background-color: #f2f2f2;
+}
+
+.pagination a.prev, .pagination a.next {
+    font-weight: bold;
+}
+
+.pagination span {
+    padding: 8px 16px;
+    color: #999;
+    margin: 0 4px;
+}
+
+</style>
+
+<style>
+    .tab-content > .tab-pane {
+  display: none;
+}
+
+.tab-content > .active {
+  display: block;
+}
+
+</style>
+
+
+
+
 <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -178,28 +275,37 @@
                             <div class="dashboard-menu">
                                 <ul class="nav flex-column" role="tablist">
                                     <li class="nav-item">
-                                        <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="false"><i class="fi-rs-settings-sliders mr-10"></i>Dashboard</a>
+                                        <a class="nav-link show" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="false">
+                                            <i class="fi-rs-settings-sliders mr-10"></i>Dashboard
+                                        </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="false"><i class="fi-rs-shopping-bag mr-10"></i>Orders</a>
-                                    </li>
-                                    <!-- <li class="nav-item">
-                                        <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab" href="#track-orders" role="tab" aria-controls="track-orders" aria-selected="false"><i class="fi-rs-shopping-cart-check mr-10"></i>Track Your Order</a>
-                                    </li> -->
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-marker mr-10"></i>My Address</a>
+                                        <a class="nav-link active" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="false">
+                                            <i class="fi-rs-shopping-bag mr-10"></i>Orders
+                                        </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#wallet" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-shopping-bag mr-10"></i>Wallet</a>
-                                    </li>
-
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="true"><i class="fi-rs-user mr-10"></i>Account details</a>
+                                        <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="false">
+                                            <i class="fi-rs-marker mr-10"></i>My Address
+                                        </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="/logout"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
+                                        <a class="nav-link" id="wallet-tab" data-bs-toggle="tab" href="#wallet" role="tab" aria-controls="wallet" aria-selected="false">
+                                            <i class="fi-rs-shopping-bag mr-10"></i>Wallet
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="false">
+                                            <i class="fi-rs-user mr-10"></i>Account details
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/logout">
+                                            <i class="fi-rs-sign-out mr-10"></i>Logout
+                                        </a>
                                     </li>
                                 </ul>
+                                
                             </div>
                         </div>
                         <div class="col-md-8">
@@ -214,7 +320,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                                <!-- <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
                                     <div class="card">
                                         <div class="card-header">
                                             <h5 class="mb-0">Your Orders</h5>
@@ -275,8 +381,103 @@
                                                         <% } %>
                                                     </tbody>
 
+                                                    <div class="pagination">
+                                                        <% if (currentPage > 1) { %>
+                                                          <a href="?page=<%= currentPage - 1 %>">Previous</a>
+                                                        <% } %>
+                                                      
+                                                        <% for (let i = 1; i <= totalPages; i++) { %>
+                                                          <a href="?page=<%= i %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+                                                        <% } %>
+                                                      
+                                                        <% if (currentPage < totalPages) { %>
+                                                          <a href="?page=<%= currentPage + 1 %>">Next</a>
+                                                        <% } %>
+                                                      </div>
+
                                                 </table>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div> -->
+                                
+                                <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Your Orders</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Order</th>
+                                                            <th>Date</th>
+                                                            <th>Status</th>
+                                                            <th>Total</th>
+                                                            <th>Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% if (order && order.length > 0) { %>
+                                                            <% order.forEach((orderItem, index) => { %>
+                                                                <tr>
+                                                                    <td>
+                                                                        <% let imageCount = 0; %>
+                                                                        <% let allItemsCancelled = true; %>
+                                                                        <% orderItem.items.forEach((prod, prodIndex) => { %>
+                                                                            <% if (prod.status !== 'Cancelled') { %>
+                                                                                <% allItemsCancelled = false; %>
+                                                                            <% } %>
+                                                                            <% if (prod.productId.images && prod.productId.images.length > 0) { %>
+                                                                                <% if (imageCount % 2 === 0 && imageCount !== 0) { %>
+                                                                                    <br>
+                                                                                <% } %>
+                                                                                <img src="/userAssets/imgs/shop/<%= prod.productId.images[0] %>" alt="Product Image" style="max-width: 50px; display: inline-block; margin-right: 10px;">
+                                                                                <% imageCount++; %>
+                                                                            <% } %>
+                                                                        <% }) %>
+                                                                    </td>
+                                                                    <td><%= orderItem.orderDate ? orderItem.orderDate.toDateString() : 'N/A' %></td>
+                                                                    <td>
+                                                                        <% if (allItemsCancelled) { %>
+                                                                            Cancelled
+                                                                        <% } else { %>
+                                                                            <%= orderItem.orderStatus %>
+                                                                        <% } %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= orderItem.billTotal ? orderItem.billTotal : 'N/A' %> for <%= orderItem.items.length %> item(s)
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="/viewOrder?id=<%= orderItem._id %>" class="btn-small d-block" style="color: #FF6B6B;">View</a>
+                                                                    </td>
+                                                                </tr>
+                                                            <% }); %>
+                                                        <% } else { %>
+                                                            <tr>
+                                                                <td colspan="5">No orders found</td>
+                                                            </tr>
+                                                        <% } %>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                
+                                            <!-- Pagination Controls -->
+                                            <div class="pagination mt-3">
+                                                <% if (currentPage > 1) { %>
+                                                    <a href="?page=<%= currentPage - 1 %>" class="btn btn-secondary">Previous</a>
+                                                <% } %>
+                                                
+                                                <% for (let i = 1; i <= totalPages; i++) { %>
+                                                    <a href="?page=<%= i %>" class="btn <%= currentPage === i ? 'btn-primary' : 'btn-light' %>"><%= i %></a>
+                                                <% } %>
+                                                
+                                                <% if (currentPage < totalPages) { %>
+                                                    <a href="?page=<%= currentPage + 1 %>" class="btn btn-secondary">Next</a>
+                                                <% } %>
+                                            </div>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -365,11 +566,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                
-
-
-
-
 
 
 
@@ -421,6 +617,16 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
+<script>
+    // Example condition
+    var shouldHideAccountDetailsTab = false; // Set this based on your logic
+
+    if (shouldHideAccountDetailsTab) {
+        document.getElementById('accountDetailsTab').style.display = 'none';
+    }
+</script>
 
 
 <script>

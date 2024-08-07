@@ -56,6 +56,8 @@ adminRouter.get("/adminlogin", auth.isLogOut, adminController.loadAdminLogin);
 adminRouter.post("/adminLogin", adminController.processAdminLogin);
 adminRouter.get("/logout", adminController.logout);
 adminRouter.get("/dashboard", auth.isLogin, adminController.loadDashboard);
+// adminRouter.get("/loadGraph", auth.isLogin, adminController.loadGraph);
+
 adminRouter.get("/products", adminController.loadProduct);
 adminRouter.get("/addProduct", adminController.loadaddProductpage);
 // adminRouter.post('/addProduct', upload.array('images', 3), adminController.addProduct);

@@ -17,6 +17,15 @@
     <link href="/adminAssets/css/main.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+  <style>
+    .filter-button.active {
+    background-color: #007bff; /* Example color */
+    color: white;
+    border-color: #007bff;
+}
+
+  </style>
 </head>
 
 <body>
@@ -155,7 +164,11 @@
                                                 <div class="product-item"><%= item.productPrice.toFixed(2) %></div>
                                             <% }) %>
                                         </td>
-                                        <td><%= orders.couponId ? orders.couponAmount.toFixed(2) : '0.00' %></td>
+                                        <!-- <td><%= orders.couponId ? orders.couponAmount.toFixed(2) : '0.00' %></td> -->
+                                            <!-- <td> <%= orders.couponId && orders.couponAmount ? orders.couponAmount.toFixed(2) : '0.00' %> </td> -->
+                                            <td><%= orders.couponAmount.toFixed(2) %></td>
+
+
                                         <td class="text-end"><%= orders.billTotal.toFixed(2) %></td>
                                     </tr>
                                 <% }) %>
@@ -235,6 +248,21 @@
         let monthlyFilter = document.getElementById("monthlyButton");
         let yearlyFilter = document.getElementById("yearlyButton");
         let customFilterButton = document.getElementById("filterButton");
+
+        const buttons = [dailyFilter, weeklyFilter, monthlyFilter, yearlyFilter, customFilterButton];
+
+buttons.forEach(button => {
+    button.addEventListener("click", function() {
+        // Remove 'active' class from all buttons
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        // Add 'active' class to the clicked button
+        this.classList.add('active');
+
+        // Apply your custom filter logic here
+        applyFilter();
+    });
+});
     
         dailyFilter.addEventListener("click", applyFilter);
         weeklyFilter.addEventListener("click", applyFilter);

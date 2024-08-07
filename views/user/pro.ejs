@@ -998,3 +998,147 @@ fetch('addToCart', {
                                 }
                               },
                               
+
+
+
+checkot
+
+<script>
+    let couponApplied = false;
+let couponIdApplied = null;
+
+document.addEventListener('DOMContentLoaded', function () {
+    var applyCouponModalEl = document.getElementById('applyCouponModal');
+    var myModal = new bootstrap.Modal(applyCouponModalEl, {
+        keyboard: false
+    });
+
+    // Event listener for the Apply Coupon button to show the modal
+    document.getElementById('applyCouponBtn').addEventListener('click', function () {
+        myModal.show();
+    });
+
+    // Event listener for the Apply Coupon button inside the modal
+    document.getElementById('applyCouponBtnModal').addEventListener('click', function () {
+        const couponId = document.querySelector('input[name="coupon"]:checked')?.value;
+        const subTotal = document.getElementById('subtotal').textContent;
+
+        if (couponId) {
+            fetch(`/applyCoupon?couponId=${couponId}&subTotal=${subTotal}`, {
+                method: 'POST',
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success || data.couponApplied) {
+                    Swal.fire({
+                        icon: "success",
+                        title: data.message || "Coupon Applied",
+                        text: "Coupon Applied Successfully",
+                        confirmButtonText: "OK"
+                    });
+
+                    const discountRow = document.createElement('tr');
+                    discountRow.innerHTML = `
+                        <th id="discountHead">Discount</th>
+                        <td colspan="2" class="product-subtotal" id="discountRow">- $<span>${data.discountAmount}</span></td>
+                    `;
+                    document.querySelector('#cart-items').appendChild(discountRow);
+
+                    document.getElementById('total').textContent = data.differenceAmount;
+
+                    couponApplied = true;
+                    couponIdApplied = couponId;
+                    document.getElementById('applyCouponBtn').disabled = true;
+                    document.getElementById('removeCouponBtn').disabled = false;
+                }
+
+                if (!data.success && data.couponApplied) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Coupon Applied with Issues',
+                        text: data.message || "Coupon applied, but there was an issue."
+                    });
+                } else if (!data.success) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Failed to Apply Coupon',
+                        text: data.message || "An error occurred."
+                    });
+                }
+
+                // Close the modal after processing
+                myModal.hide();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while applying the coupon.'
+                });
+                // Ensure the modal is closed even on error
+                myModal.hide();
+            });
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No Coupon Selected',
+                text: 'Please select a coupon.'
+            });
+        }
+    });
+
+    // Event listener for the Cancel button inside the modal
+    document.getElementById('cancelCouponBtn').addEventListener('click', function () {
+        myModal.hide();
+    });
+
+    // Automatically close the modal when clicking the close button ("X") in the top-right corner
+    applyCouponModalEl.addEventListener('hidden.bs.modal', function () {
+        myModal.hide();
+    });
+
+    // Event listener for the Remove Coupon button
+    document.getElementById('removeCouponBtn').addEventListener('click', function () {
+            if (couponApplied) {
+                // Remove the discount row
+                const discountRow = document.getElementById('discountRow');
+                const discountHead = document.getElementById('discountHead');
+                if (discountRow) {
+                    discountRow.remove();
+                    discountHead.remove();
+                }
+
+                // Recalculate the total amount without the coupon discount
+                const subTotal = parseFloat(document.getElementById('subtotal').textContent);
+                document.getElementById('total').textContent = subTotal.toFixed(2);
+
+                couponApplied = false;
+                couponIdApplied = null;
+                document.getElementById('applyCouponBtn').disabled = false;
+                document.getElementById('removeCouponBtn').disabled = true;
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Coupon Removed',
+                    text: 'The coupon has been successfully removed.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    });
+    
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+

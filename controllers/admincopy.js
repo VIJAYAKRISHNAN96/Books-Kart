@@ -5,7 +5,6 @@ const Order = require("../model/orderModel");
 const sharp = require("sharp");
 const fs = require("fs");
 const path = require('path');
-const moment = require("moment");
 
 
 // const User = require("../model/userModel");
@@ -50,381 +49,28 @@ const adminController = {
   },
 
 
-
-// separating
-
-// loadDashboard : async (req, res) => {
-//   try {
-//     console.log("Starting loadDashboard");
-
-//     const products = await productModel.find();
-//     console.log("Products fetched:", products.length);
-
-//     const categories = await categoryModel.find();
-
-//     const orders = await Order.find({ orderStatus: "Delivered" });
-//     console.log("Total delivered orders:", orders.length);
-
-//     const oneYearAgo = new Date();
-//     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-//     const recentOrders = await Order.find({ 
-//       orderStatus: "Delivered",
-//       orderDate: { $gte: oneYearAgo }
-//     });
-//     console.log("Delivered orders in the last year:", recentOrders.length);
-
-
-
-
-//     // Calculate total and monthly revenue
-//     const totalRevenue = orders.reduce((acc, order) => acc + order.billTotal, 0);
-//     const currentMonth = moment().month() + 1;
-//     const currentYear = moment().year();
-//     const monthlyOrders = orders.filter(order =>
-//       moment(order.createdOn).month() + 1 === currentMonth &&
-//       moment(order.createdOn).year() === currentYear
-//     );
-//     const monthlyRevenue = monthlyOrders.reduce((acc, order) => acc + order.billTotal, 0);
-
-//     // Aggregate Top 10 Best-Selling Products
-//     const topSellingProducts = await Order.aggregate([
-//       { $unwind: "$items" },
-//       { $group: { 
-//         _id: "$items.productId", 
-//         name: { $first: "$items.name" },
-//         totalSold: { $sum: "$items.quantity" } 
-//       }},
-//       { $sort: { totalSold: -1 } },
-//       { $limit: 10 }
-//     ]);
-
-//     // Aggregate Top 10 Best-Selling Categories
-//     const topSellingCategories = await Order.aggregate([
-//       { $unwind: "$items" },
-//       {
-//         $lookup: {
-//           from: "products",
-//           localField: "items.productId",
-//           foreignField: "_id",
-//           as: "productDetails"
-//         }
-//       },
-//       { $unwind: { path: "$productDetails", preserveNullAndEmptyArrays: true } },
-//       { $group: { 
-//         _id: "$productDetails.category", 
-//         totalSold: { $sum: "$items.quantity" } 
-//       }},
-//       { $sort: { totalSold: -1 } },
-//       { $limit: 10 },
-//       {
-//         $lookup: {
-//           from: "categories",
-//           localField: "_id",
-//           foreignField: "_id",
-//           as: "categoryDetails"
-//         }
-//       },
-//       { $unwind: { path: "$categoryDetails", preserveNullAndEmptyArrays: true } },
-//       { $project: {
-//         _id: 1,
-//         totalSold: 1,
-//         categoryName: { $ifNull: ["$categoryDetails.name", "Unknown Category"] }
-//       }}
-//     ]);
-
-//     // Aggregate sales data
-
-//     const salesData = await adminController.aggregateSalesData();
-//     console.log("Sales data aggregated:", salesData.length);
-
-
-//     // Process the data for different intervals
-//     const dailySalesData = adminController.processDailySalesData(salesData);
-//     const weeklySalesData = adminController.processWeeklySalesData(salesData);
-//     const monthlySalesData = adminController.processMonthlySalesData(salesData);
-//     const yearlySalesData = adminController.processYearlySalesData(salesData);
-
-//   console.log('Daily Sales Data:', dailySalesData);
-//   console.log('Weekly Sales Data:', weeklySalesData);
-//   console.log('Monthly Sales Data:', monthlySalesData);
-//   console.log('Yearly Sales Data:', yearlySalesData);
-
-//     res.render("dashboard", {
-//       orders,
-//       products,
-//       categories,
-//       totalRevenue,
-//       monthlyRevenue,
-//       topSellingProducts,
-//       topSellingCategories,
-//       salesData,
-//       dailySalesData,
-//       weeklySalesData,
-//       monthlySalesData,
-//       yearlySalesData
-//     });
-//   } catch (error) {
-//     console.error("Error loading dashboard:", error);
-//     res.status(500).send("Error loading dashboard: " + error.message);
-//   }
-// },
-
-loadDashboard: async (req, res) => {
-  try {
-    console.log("Starting loadDashboard");
-
-    const perPage = 10; // Number of items per page
-    const currentPage = parseInt(req.query.page) || 1;
-
-    // Fetch total counts for pagination
-    const totalProducts = await productModel.countDocuments();
-    const totalOrders = await Order.countDocuments({ orderStatus: "Delivered" });
-
-    const products = await productModel
-      .find()
-      .skip((currentPage - 1) * perPage)
-      .limit(perPage);
-
-    const orders = await Order.find({ orderStatus: "Delivered" })
-    .sort({ createdOn: -1 }) 
-    .skip((currentPage - 1) * perPage)
-      .limit(perPage);
-
-    console.log("Products fetched:", products.length);
-    console.log("Total delivered orders:", orders.length);
-
-    const categories = await categoryModel.find();
-
-    const oneYearAgo = new Date();
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-    const recentOrders = await Order.find({
-      orderStatus: "Delivered",
-      orderDate: { $gte: oneYearAgo }
-    });
-    console.log("Delivered orders in the last year:", recentOrders.length);
-
-    // Calculate total and monthly revenue
-    const totalRevenue = orders.reduce((acc, order) => acc + order.billTotal, 0);
-    const currentMonth = moment().month() + 1;
-    const currentYear = moment().year();
-    const monthlyOrders = orders.filter(order =>
-      moment(order.createdOn).month() + 1 === currentMonth &&
-      moment(order.createdOn).year() === currentYear
-    );
-    const monthlyRevenue = monthlyOrders.reduce((acc, order) => acc + order.billTotal, 0);
-
-    // Aggregate Top 10 Best-Selling Products
-    const topSellingProducts = await Order.aggregate([
-      { $unwind: "$items" },
-      { $group: { 
-        _id: "$items.productId", 
-        name: { $first: "$items.name" },
-        totalSold: { $sum: "$items.quantity" } 
-      }},
-      { $sort: { totalSold: -1 } },
-      { $limit: 10 }
-    ]);
-
-    // Aggregate Top 10 Best-Selling Categories
-    const topSellingCategories = await Order.aggregate([
-      { $unwind: "$items" },
-      {
-        $lookup: {
-          from: "products",
-          localField: "items.productId",
-          foreignField: "_id",
-          as: "productDetails"
-        }
-      },
-      { $unwind: { path: "$productDetails", preserveNullAndEmptyArrays: true } },
-      { $group: { 
-        _id: "$productDetails.category", 
-        totalSold: { $sum: "$items.quantity" } 
-      }},
-      { $sort: { totalSold: -1 } },
-      { $limit: 10 },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "_id",
-          foreignField: "_id",
-          as: "categoryDetails"
-        }
-      },
-      { $unwind: { path: "$categoryDetails", preserveNullAndEmptyArrays: true } },
-      { $project: {
-        _id: 1,
-        totalSold: 1,
-        categoryName: { $ifNull: ["$categoryDetails.name", "Unknown Category"] }
-      }}
-    ]);
-
-    // Aggregate sales data
-    const salesData = await adminController.aggregateSalesData();
-    console.log("Sales data aggregated:", salesData.length);
-
-    // Process the data for different intervals
-    const dailySalesData = adminController.processDailySalesData(salesData);
-    const weeklySalesData = adminController.processWeeklySalesData(salesData);
-    const monthlySalesData = adminController.processMonthlySalesData(salesData);
-    const yearlySalesData = adminController.processYearlySalesData(salesData);
-
-    console.log('Daily Sales Data:', dailySalesData);
-    console.log('Weekly Sales Data:', weeklySalesData);
-    console.log('Monthly Sales Data:', monthlySalesData);
-    console.log('Yearly Sales Data:', yearlySalesData);
-
-    const totalPages = Math.ceil(totalOrders / perPage);
-
-    res.render("dashboard", {
-      orders,
-      products,
-      categories,
-      totalRevenue,
-      monthlyRevenue,
-      topSellingProducts,
-      topSellingCategories,
-      salesData,
-      dailySalesData,
-      weeklySalesData,
-      monthlySalesData,
-      yearlySalesData,
-      currentPage,
-      totalPages
-    });
-  } catch (error) {
-    console.error("Error loading dashboard:", error);
-    res.status(500).send("Error loading dashboard: " + error.message);
-  }
-},
-
-
-aggregateSalesData: async () => {
-  try {
-    const startDate = new Date();
-    startDate.setFullYear(startDate.getFullYear() - 1);
-    console.log("Start date for aggregation:", startDate);
-
-    const salesData = await Order.aggregate([
-      {
-        $match: {
-          orderDate: { $gte: startDate },
-          orderStatus: "Delivered"
-        },
-      },
-      {
-        $group: {
-          _id: {
-            year: { $year: "$orderDate" },
-            month: { $month: "$orderDate" },
-            week: { $week: "$orderDate" },
-            day: { $dayOfMonth: "$orderDate" },
-          },
-          totalSales: { $sum: "$billTotal" },
-          count: { $sum: 1 },
-        },
-      },
-      {
-        $sort: { "_id.year": 1, "_id.month": 1, "_id.week": 1, "_id.day": 1 },
-      },
-    ]);
-
-    console.log("Raw sales data:", JSON.stringify(salesData, null, 2));
-    return salesData;
-  } catch (error) {
-    console.error("Error in aggregateSalesData:", error);
-    return [];
-  }
-},
-
-// Process daily sales data
-processDailySalesData(salesData) {
-  let dailyData = {};
-
-  salesData.forEach((item) => {
-    const date = `${item._id.year}-${item._id.month}-${item._id.day}`;
-
-    if (!dailyData[date]) {
-      dailyData[date] = 0;
-    }
-    dailyData[date] += item.totalSales;
-  });
-
-  const labels = Object.keys(dailyData);
-  const data = Object.values(dailyData);
-
-  return { labels, data };
-},
-
-// Process weekly sales data
-processWeeklySalesData(salesData) {
-  let weeklyData = {};
-
-  salesData.forEach((item) => {
-    const week = moment(
-      item._id.year + "-" + item._id.month + "-" + item._id.day,
-      "YYYY-MM-DD"
-    ).isoWeek();
-    const year = item._id.year;
-    const weekYear = `${year}-W${week}`;
-
-    if (!weeklyData[weekYear]) {
-      weeklyData[weekYear] = 0;
-    }
-    weeklyData[weekYear] += item.totalSales;
-  });
-
-  const labels = Object.keys(weeklyData);
-  const data = Object.values(weeklyData);
-
-  return { labels, data };
-},
-
-// Process monthly sales data
-processMonthlySalesData(salesData) {
-  let monthlyData = {};
-
-  salesData.forEach((item) => {
-    const monthYear = `${item._id.year}-${item._id.month}`;
-
-    if (!monthlyData[monthYear]) {
-      monthlyData[monthYear] = 0;
-    }
-    monthlyData[monthYear] += item.totalSales;
-  });
-
-  const labels = Object.keys(monthlyData);
-  const data = Object.values(monthlyData);
-
-  return { labels, data };
-},
-
-// Process yearly sales data
-processYearlySalesData(salesData) {
-  let yearlyData = {};
-
-  salesData.forEach((item) => {
-    const year = item._id.year;
-
-    if (!yearlyData[year]) {
-      yearlyData[year] = 0;
-    }
-    yearlyData[year] += item.totalSales;
-  });
-
-  const labels = Object.keys(yearlyData);
-  const data = Object.values(yearlyData);
-
-  return { labels, data };
-},
-
-
-
-
-
-
-
-
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  loadDashboard: (req, res) => {
+    res.render("dashboard");
+  },
 
   loadProduct: async (req, res) => {
     try {
@@ -840,5 +486,7 @@ loadUserlist: async (req, res) => {
 };
 
 module.exports = adminController;
+
+
 
 

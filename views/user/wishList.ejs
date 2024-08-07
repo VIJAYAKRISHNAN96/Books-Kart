@@ -412,11 +412,17 @@
                                                         <% } %>
                                                     </td>
                                                     <td>
-                                                        <form action="/wishlist/delete" method="POST" style="display: inline;">
+
+                                                        <button type="button" class="remove-btn" onclick="confirmDelete('<%= product._id %>')">Remove</button>
+
+
+
+
+                                                        <!-- <form action="/deleteWishlist" method="DELETE" style="display: inline;">
                                                             <input type="hidden" name="_method" value="DELETE">
                                                             <input type="hidden" name="productId" value="<%= product._id %>">
                                                             <button type="button" class="remove-btn" onclick="confirmDelete('<%= product._id %>')">Remove</button>
-                                                        </form>
+                                                        </form> -->
                                                     </td>
                                                 </tr>
                                             <% } %>
@@ -450,9 +456,9 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
+<!-- wrking -->
 
-
-<script>
+<!-- <script>
     function confirmDelete(productId) {
         Swal.fire({
             title: 'Are you sure?',
@@ -485,80 +491,47 @@
             }
         })
     }
+</script> -->
+
+<script>
+    function confirmDelete(productId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Use AJAX to delete the product from the wishlist
+            $.ajax({
+                url: '/deleteWishlist',
+                method: 'DELETE',
+                contentType: 'application/json', // Ensure content type is JSON
+                data: JSON.stringify({ productId: productId }), // Send data as JSON string
+                success: function(response) {
+                    if (response.success) {
+                        // Remove the product row from the table
+                        $('#product-row-' + productId).remove();
+                        Swal.fire('Deleted!', 'Product has been removed from your wishlist.', 'success');
+                    } else {
+                        Swal.fire('Error!', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error!', 'An error occurred while removing the product from your wishlist.', 'error');
+                }
+            });
+        }
+    });
+}
+
 </script>
 
-<!-- <script>
-    function addToCart(productId, productName, quantity = 1) {
-    fetch('/addToCart', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ productId, quantity }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Swal.fire({
-                title: 'Added to Cart!',
-                text: `${quantity} ${quantity > 1 ? 'items' : 'item'} of ${productName} ${quantity > 1 ? 'have' : 'has'} been added to your cart.`,
-                icon: 'success',
-                confirmButtonText: 'Continue Shopping'
-            });
-            // Optional: Update mini cart or cart icon if you have one
-            // updateMiniCart(data.cartItemCount, data.totalPrice);
-        } else {
-            Swal.fire({
-                title: 'Error!',
-                text: data.error || 'Failed to add product to cart',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-        }
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-        Swal.fire({
-            title: 'Error!',
-            text: 'An unexpected error occurred',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    });
-}
 
 
-</script> -->
-
-
-<!-- <script>
-  function addToCart(userId, productId) {
-    // Send an AJAX request to your server
-    fetch('addToCart', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: userId, productId: productId })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Product successfully added to cart
-            alert('Product added to cart!');
-            // Optionally, update the cart count or refresh the page
-            // updateCartCount();
-        } else {
-            // Handle error
-            alert('Failed to add product to cart. Please try again.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred. Please try again.');
-    });
-}
-</script> -->
 
 
 

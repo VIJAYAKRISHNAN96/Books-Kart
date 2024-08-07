@@ -389,9 +389,22 @@
                                                     <span class="qty-val" id="quantity-value">1</span>
                                                     <a href="#" class="qty-up" onclick="updateQuantity(1); return false;"><i class="fi-rs-angle-small-up"></i></a>
                                                 </div>
+
                                                 <div class="product-extra-link2">
+                                                    <% if (product.stock > 0) { %>
+                                                        <button onclick="addToCart('<%= product._id %>', '<%= product.name %>')" class="btn btn-primary">Add to Cart</button>
+                                                    <% } else { %>
+                                                        <button class="btn btn-danger" disabled>Out of Stock</button>
+                                                    <% } %>
+                                                </div>
+                                                
+
+
+                                                <!-- <div class="product-extra-link2">
                                                     <button onclick="addToCart('<%= product._id %>', '<%= product.name %>')">Add to Cart</button>
-                                            </div>
+                                            </div> -->
+
+
                                             </div>
                                         
                                               

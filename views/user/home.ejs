@@ -1,5 +1,155 @@
 <%-include("../partials/header.ejs")%>
 
+<!-- <style>
+    .product-cart-wrap {
+    height: 380px; /* Adjust the height as needed */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 20px;
+    padding: 15px; /* Adjust padding to make the card a bit smaller */
+}
+
+.product-img-action-wrap {
+    height: 65%; /* Reserve 65% of the card height for the image */
+}
+.product-img {
+    height: 250px; /* Set a specific height for the image container */
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.product-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Ensures the whole image fits within the container */
+}
+/* .product-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures image fills the container without distortion */
+
+/* .product-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Change to 'cover' if you want the image to fill the card */
+    /* display: block;
+    border-radius: 8px; */
+
+
+
+.product-content-wrap {
+    padding: 10px 0; /* Reducing the padding to make the content area smaller */
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.product-category {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 8px; /* Add space between category and title */
+}
+
+.product-content-wrap h2 {
+    font-size: 14px; /* Smaller font size for title */
+    font-weight: 600;
+    line-height: 1.2em;
+    height: 2.4em; /* Set a fixed height for title */
+    overflow: hidden;
+    margin-bottom: 10px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.product-price {
+    font-size: 16px; /* Smaller font size for price */
+    font-weight: 700;
+    color: #00cc66;
+    margin-bottom: 8px; /* Space between price and any buttons or actions */
+}
+
+</style> -->
+
+<style>
+  .product-cart-wrap {
+    height: 380px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 20px;
+    padding: 15px;
+}
+
+.product-img-action-wrap {
+    height: 65%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-img {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.product-img img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.product-content-wrap {
+    padding: 10px 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Rest of the styles remain the same */
+
+.product-category {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 8px; /* Add space between category and title */
+}
+
+.product-content-wrap h2 {
+    font-size: 14px; /* Smaller font size for title */
+    font-weight: 600;
+    line-height: 1.2em;
+    height: 2.4em; /* Set a fixed height for title */
+    overflow: hidden;
+    margin-bottom: 10px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.product-price {
+    font-size: 16px; /* Smaller font size for price */
+    font-weight: 700;
+    color: #00cc66;
+    margin-bottom: 8px; /* Space between price and any buttons or actions */
+}
+
+</style>
+
+
 
 
    <!-- Quick view -->

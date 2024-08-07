@@ -102,6 +102,7 @@
 </style>
 <body>
     <h1>Order Details</h1>
+
     <table>
         <thead>
             <tr>
@@ -125,9 +126,14 @@
                     <td data-input-id="<%= item._id %>"><%= item.status %></td>
                     <td><%= order.paymentStatus %></td>
                     <td><%= order.paymentMethod %></td>
-                    <td>₹<%= item.productPrice.toFixed(2) %></td>
+                    <!-- <td>$<%= item.productPrice.toFixed(2) %></td>
                     <td><%= item.quantity %></td>
-                    <td>₹<%= (item.productPrice * item.quantity).toFixed(2) %></td>
+                    <td>$<%= (item.productPrice * item.quantity).toFixed(2) %></td> -->
+                    <td>$<%= (item.productPrice ? item.productPrice.toFixed(2) : '0.00') %></td>
+                     <td><%= item.quantity || 0 %></td>
+                    <td>$<%= (item.productPrice && item.quantity ? (item.productPrice * item.quantity).toFixed(2) : '0.00') %></td>
+
+
                     <td>
                         <% if(item.status==="Delivered") {%>
                             <button onclick="showReturnConfirmation('<%= order._id %>', '<%= item._id %>')" data-input-id="<%= item._id %>" style="background-color: #FF6B6B; border-color:  #FF6B6B; color: white;">Return</button>
@@ -136,20 +142,28 @@
                             <% if (item.status === 'Pending' || item.status === 'Confirmed') { %>
                                 <button onclick="showCancelConfirmation('<%= order._id %>', '<%= item._id %>')" data-input-id="<%= item._id %>" style="background-color: #FF6B6B; border-color:  #FF6B6B; color: white; " >Cancel</button>
                             <% } else { %>
-                                -
+                                
                             <% } %>
                         <%} else { %>
                             <button onclick="showCancelConfirmation('<%= order._id %>', '<%= item._id %>')" data-input-id="<%= item._id %>" style="background-color: #FF6B6B; border-color:  #FF6B6B; color: white;" disabled >Order Cancelled</button>
                         <% } %>
                     </td>
+                    <!-- <div style="text-align: right; margin-top: 20px;"> -->
+                        <div style="text-align:right; margin-top: 20px; margin-right: 15%; width: 95%;">
+
+                        <% if(order.paymentStatus=== "Failed") { %>
+                            <button onclick="retryPayment('<%= order._id %>','<%=order.billTotal%>')" data-input-id="<%= order._id %>" style="padding: 10px 20px; background-color: #557775; color: white; border: none; border-radius: 5px; cursor: pointer;">Retry Payment</button>
+                        <%}else if(order.orderStatus=="Delivered") { %>
+                            <button onclick="downloadInvoice('<%= order._id %>')" style="padding: 10px 20px; background-color: #557775; color: white; border: none; border-radius: 5px; cursor: pointer;">Download Invoice</button>
+                        <%}else { %>
+                            -
+                        <%}%>
+                    </div>
                 </tr>
             <% }); %>
+
         </tbody>
 
-       
-
-
-      
 
          
     </table>
@@ -160,7 +174,9 @@
         <tbody>
             <tr>
                 <th>Grand Total</th>
-                <td id="grandTotal">₹<%= order.billTotal.toFixed(2) %></td>
+                <!-- <td id="grandTotal">$<%= order.billTotal.toFixed(2) %></td> -->
+                <td id="grandTotal">$<%= order.billTotal ? order.billTotal.toFixed(2) : '0.00' %></td>
+
             </tr>
             <tr>
                 <th>Shipping Address</th>
@@ -175,15 +191,31 @@
         </tbody>
     </table>
 
-    <div class="action-buttons">
-        <!-- Removed retry payment and download invoice buttons as per request -->
-    </div>
+   
+
+
+
+
+
+
+
+
+
+
+    <!-- <div class="action-buttons">
+        < Removed retry payment and download invoice buttons as per request -->
+    <!-- </div>  -->
 </body>
 
 <%- include("../partials/footer.ejs") %>
 
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+
+
 <script>
     
 
@@ -267,7 +299,6 @@
     function showReturnConfirmation(orderId, itemId) {
         Swal.fire({
             title: 'Return Order',
-            html: 'Are you sure you want to return this order?<br><input type="text" id="returnReason" class="swal2-input" placeholder="Enter rearon for returning">',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Yes, return it!',
@@ -306,7 +337,165 @@
         }
        
     }
-    
+
+  
+
+    function retryOrderPlace(orderId, totalAmount, status) {
+    fetch(`/retryPayment`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            orderId,
+            totalAmount,
+            status
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.message === "Order placed successfully") {
+                Swal.fire({
+                    icon: "success",
+                    title: 'Order Confirmed',
+                    text: "Your payment was successful and the order has been placed.",
+                    confirmButtonText: "OK"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }
+                });
+            } else if (data.message === "Payment failed retry") {
+                Swal.fire({
+                    icon: "error",
+                    title: 'Payment Failed',
+                    text: data.message,
+                    confirmButtonText: "Ok"
+                });
+            }
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Order Placement Failed',
+                text: data.message
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error confirming order:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Order Placement Failed',
+            text: 'There was an error confirming your order. Please try again.'
+        });
+    });
+}
+
+
+function retryPayment(orderId, totalAmount) {
+    console.log("billtotal", totalAmount);
+    fetch("/retryOrder", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            orderId: orderId,
+            totalAmount: totalAmount
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log("success");
+            // Proceed with Razorpay payment
+            const options = {
+                key: data.key_id,
+                amount: data.amount,
+                currency: "INR",
+                name: "Books Kart",
+                description: data.description,
+                image: "",
+                order_id: data.order_id,
+                handler: function (response) {
+                    console.log(response);
+                    retryOrderPlace(orderId, totalAmount, "Success");
+                },
+                prefill: {
+                    contact: data.contact,
+                    name: data.name,
+                    email: data.email
+                },
+                notes: {
+                    description: data.description
+                },
+                theme: {
+                    color: "#00cc66"
+                },
+            };
+
+            const razorpayObject = new Razorpay(options);
+            razorpayObject.open();
+
+            razorpayObject.on('payment.failed', function (response) {
+                console.error(response.error);
+                retryOrderPlace(orderId, totalAmount, "Failed");
+            });
+        } else {
+            // Handle errors if the order couldn't be placed
+            Swal.fire({
+                icon: 'warning',
+                title: 'Order Placement Failed',
+                text: data.msg
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error placing order:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Order Placement Failed',
+            text: 'There was an error placing your order. Please try again.'
+        });
+    });
+}
+
+async function downloadInvoice(orderId) {
+    try {
+        const response = await fetch(`/downloadInvoice?orderId=${orderId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `invoice_${orderId}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        } else {
+            const data = await response.json();
+            Swal.fire('Error', data.message, 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire('Error', 'An error occurred while downloading the invoice', 'error');
+    }
+}
+
+
+
+
+
+
+
 
 
 

@@ -176,6 +176,8 @@ userRouter.post("/addToCartFromWishlist",auth.isLogin,userController.addToCartFr
 
 userRouter.post("/applyCoupon",auth.isLogin,couponManagement.applyCoupon);
 
+userRouter.post("/removeCoupon",couponManagement.removeCoupon);
+
 // userRouter.post("/updateCartTotals",userController.updateCartTotalPrice);
 
 userRouter.post("/confirmQuantity",auth.isLogin,userController.confirmQuantity);
@@ -188,8 +190,7 @@ userRouter.delete("/deleteWishList",auth.isLogin,userController.deleteWishList);
 
 userRouter.post('/placeOrder', auth.isLogin, orderManagement.placeOrder);
 
-userRouter.post('/cancelOrder', orderManagement.cancelOrder)
-;
+userRouter.post('/cancelOrder', orderManagement.cancelOrder);
 userRouter.get('/viewOrder', orderManagement.loadOrderView);
 
 userRouter.post('/onlineOrderPlacing',auth.isLogin, orderManagement.onlineOrderPlacing);
@@ -197,6 +198,11 @@ userRouter.post('/onlineOrderPlacing',auth.isLogin, orderManagement.onlineOrderP
 userRouter.get('/checkWalletBalance', orderManagement.checkWalletBalance);
 userRouter.post('/walletPlaceOrder', orderManagement.walletPlaceOrder);
 userRouter.put('/returnOrder', orderManagement.returnOrder);
+userRouter.get('/downloadInvoice', orderManagement.downloadInvoice);
+userRouter.put('/retryOrder', orderManagement.retryOrder);
+userRouter.post('/retryPayment', orderManagement.retryPayment);
+
+userRouter.get('/searchResults', userController.searchProduct);
 
 
 // userRouter.post("createRazorpayOrder", orderManagement.createRazorpayOrder);

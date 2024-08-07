@@ -15,14 +15,74 @@
     <link rel="shortcut icon" type="image/x-icon" href="userAssets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link rel="stylesheet" href="userAssets/css/main.css?v=3.4">
+    
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">  
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
 
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+
+   <style>
+    .search-container {
+  display: flex;
+  justify-content: flex-left; /* Align the form to the right side */
+  width: 100%;
+  max-width: 600px; /* Adjust the width as needed */
+  margin: 0 auto;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 500px; /* Adjust the form width as needed */
+}
+
+.search-input {
+  flex-grow: 1;
+  padding: 10px 20px;
+  border: 1px solid #ddd;
+  border-radius: 25px; /* Rounded corners on all sides */
+  font-size: 16px;
+  outline: none;
+}
+
+.search-button {
+   
+  position: absolute; /* Position the button absolutely */
+  right: 290px;
+  margin-left: 50px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 90%; /* Circular button */
+  width: 100px; /* Adjust the button size as needed */
+
+  cursor: pointer;
+  outline: none;
+  color: white;
+  transition: background-color 0.3s ease;
+  font-size: 5px;
+}
+
+.search-button:hover {
+  background-color: #0056b3;
+}
+
+.search-button i {
+  font-size: 15px; /* Adjust icon size if needed */
+}
+
+.search-container {
+  position: relative; /* Ensure the button stays within the container */
+}
+
+   </style>
 
 
 </head>
+
 <div class="modal fade custom-modal" id="quickViewModal" tabindex="-1" aria-labelledby="quickViewModalLabel" aria-hidden="true">
     <div class="modal-dialog">
     <div class="modal-content">              
@@ -204,22 +264,12 @@
                     <a href="/"><img src="/userAssets/imgs/theme/nw-logo.jpg" alt="logo"></a>
                 </div>
                 <div class="header-right">
-                    <div class="search-style-2">
-                        <form action="#">
-                            <select class="select-active">
-                                <option>All Categories</option>
-                                <option>Novel's</option>
-                                <option>Story's</option>
-                                <option>Travel</option>
-                                <option>Knowledge</option>
-                                <option>Biography</option>
-                                <option>Education</option>
-                                <option>Children's</option>
-                                <!-- <option>Luggage</option>
-                                <option>Shoes</option>
-                                <option>Mother & Kids</option> -->
-                            </select>
-                            <input type="text" placeholder="Search for items...">
+                    <div class="search-container">
+                        <form action="/searchResults" method="GET">
+                            <input type="text" name="q" class="search-input" placeholder="Search for items..." required>
+                            <button type="submit" class="search-button">
+                                <i class="fas fa-search"></i>
+                            </button>
                         </form>
                     </div>
                     <div class="header-action-right">

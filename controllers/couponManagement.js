@@ -164,6 +164,8 @@ const couponManagement = {
     //     }
     // }
 
+
+
     applyCoupon: async (req, res) => {
         try {
             console.log("Received request with query:", req.query);
@@ -222,7 +224,7 @@ const couponManagement = {
             return res.status(200).json({
                 success: true,
                 differenceAmount,
-                discountAmount,
+                discountAmount,     
                 coupon
             });
     
@@ -230,9 +232,65 @@ const couponManagement = {
             console.log("Error in applyCoupon function:", error.message);
             return res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
-    }
+    },
     
-      
+  
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    removeCoupon: async (req, res) => {
+        try {
+            console.log("Received request to remove coupon:", req.body);
+            const { couponId, userId } = req.body;
+            console.log("Coupon ID to remove:", couponId);
+    
+            if (!couponId) {
+                return res.status(400).json({ success: false, message: "Coupon ID is required." });
+            }
+    
+            // Remove coupon from session (if using session-based approach)
+            if (req.session && req.session.appliedCoupon) {
+                delete req.session.appliedCoupon;
+            }
+    
+            // Update user's cart (if applicable)
+            // This is just an example, adjust according to your data model
+            if (userId) {
+                await Cart.findOneAndUpdate(
+                    { userId: userId },
+                    { $unset: { appliedCoupon: "" } }
+                );
+            }
+    
+            // Recalculate order total (if necessary)
+            // This would depend on how you're storing the cart and its items
+    
+            console.log("Coupon removed successfully");
+            return res.status(200).json({
+                success: true,
+                message: "Coupon removed successfully"
+                // You might want to send back the updated cart total here
+            });
+        } catch (error) {
+            console.log("Error in removeCoupon function:", error.message);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+    }  
       
    
       

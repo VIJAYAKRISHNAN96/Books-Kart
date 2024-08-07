@@ -35,7 +35,190 @@ const orderManagement = {
 
 
 
+// working code
 
+// placeOrder: async (req, res) => {
+//   console.log("placeOrder function called");
+//   try {
+//       const userId = req.session.user.id;
+//       console.log("User ID:", userId);
+
+//       const cart = await Cart.findOne({ userId }).populate("product.productId");
+//       if (!cart || !cart.product.length) {
+//           console.log("Cart is empty for user:", userId);
+//           return res.status(400).json({ success: false, message: "Cart is empty" });
+//       }
+
+//       const user = await User.findById(userId);
+//       if (!user) {
+//           console.log("User not found for ID:", userId);
+//           return res.status(404).json({ success: false, message: "User not found" });
+//       }
+
+//       if (!user.address || user.address.length === 0) {
+//           console.log("User has no saved addresses");
+//           return res.status(400).json({ success: false, message: "No saved addresses found" });
+//       }
+
+//       const { addressIndex, paymentMethod, totalAmount, couponcode, couponId } = req.body;
+//       let { subtotal } = req.body;
+
+//       console.log("Received values:", { addressIndex, paymentMethod, totalAmount, couponcode, couponId,subtotal });
+
+//       if (addressIndex === undefined || isNaN(parseInt(addressIndex)) || addressIndex < 0 || addressIndex >= user.address.length) {
+//           console.log("Invalid address index:", addressIndex);
+//           return res.status(400).json({ success: false, message: "Invalid address index" });
+//       }
+
+//       if (!subtotal || isNaN(parseFloat(subtotal))) {
+//           subtotal = cart.product.reduce((acc, item) => {
+//               const price = item.productId.discountPrice > 0 ? item.productId.discountPrice : item.productId.price;
+//               return acc + price * item.quantity;   
+//           }, 0);
+//           console.log("Calculated subtotal:", subtotal);
+//       }
+
+//       if (!subtotal || isNaN(parseFloat(subtotal))) {
+//           console.log("Invalid subtotal after calculation:", subtotal);
+//           return res.status(400).json({ success: false, message: "Invalid subtotal" });
+//       }
+
+//       const selectedAddress = user.address[parseInt(addressIndex)];
+//       if (!selectedAddress) {
+//           console.log("Selected address is undefined for index:", addressIndex);
+//           return res.status(400).json({ success: false, message: "Invalid address" });
+//       }
+
+//       console.log("Selected address:", selectedAddress);
+//       const coupon = null;
+//       let couponAmount = 0;
+//       let billTotal = subtotal;
+
+//       if (couponId) {
+//           const coupon = await Coupon.findById(couponId);
+//           if (coupon) {
+//               couponAmount = (parseFloat(subtotal) * coupon.discountamount) / 100;
+//               billTotal = parseFloat(subtotal) - coupon.discountamount;
+//               console.log("Coupon applied:", couponcode, "Discount amount:", couponAmount);
+//           } else {
+//               console.log("Invalid coupon code:", couponcode);
+//           }
+//       }
+
+//       const items = cart.product.map((item) => {
+//           const price = item.productId.discountPrice > 0 ? item.productId.discountPrice : item.productId.price;
+//           return {
+//               productId: item.productId._id,
+//               name: item.productId.name,
+//               image: item.productId.image,
+//               productPrice: price,
+//               quantity: item.quantity,
+//               price: price * item.quantity,
+//               status: paymentMethod === "Cash On Delivery" ? "Confirmed" : "Pending",
+//           };
+//       });
+//      console.log("Coupon" + coupon)
+//       console.log("billTotal" + billTotal)
+
+//       if (isNaN(billTotal)) {
+//           console.log("Invalid total amount:", totalAmount, "or subtotal:", subtotal);
+//           return res.status(400).json({ success: false, message: "Invalid total amount" });
+//       }
+
+//       const newOrder = new Order({
+//           orderId: uuidv4(),
+//           user: userId,
+//           items,
+//           billTotal,
+//           shippingAddress: {
+//               houseName: selectedAddress.houseName,
+//               street: selectedAddress.street,
+//               city: selectedAddress.city,
+//               state: selectedAddress.state,
+//               country: selectedAddress.country,
+//               postalCode: selectedAddress.postalCode,
+//           },
+//           paymentMethod,
+//           paymentStatus: paymentMethod === "Cash On Delivery" ? "Pending" : "Success",
+//           couponAmount,
+//           couponCode: couponcode || "",
+//           couponId: coupon ? coupon._id : null,
+//       });
+
+//       console.log("New order created:", newOrder);
+
+//       if (paymentMethod === "Cash On Delivery") {
+//           await newOrder.save();
+//           console.log("Order placed with Cash On Delivery");
+
+//           // Update product stock
+//           for (const item of newOrder.items) {
+//               await Product.findByIdAndUpdate(item.productId, {
+//                   $inc: { stock: -item.quantity }
+//               });
+//           }
+
+//           // Clear the cart
+//           await Cart.findOneAndDelete({ userId });
+//           console.log("Cart cleared for user:", userId);
+
+//           res.status(201).json({ success: true, message: "Order placed successfully" });
+//       } else if (paymentMethod === "razorpay") {
+//           const razorpayOrder = await razorpayInstance.orders.create({
+//               amount: billTotal * 100, // amount in smallest currency unit
+//               currency: "INR",
+//               receipt: newOrder.orderId,
+//               payment_capture: 1
+//           });
+
+//           console.log("Razorpay order created:", razorpayOrder);
+
+//           res.status(201).json({
+//               success: true,
+//               key_id: process.env.RAZORPAY_KEY_ID,
+//               amount: razorpayOrder.amount,
+//               currency: razorpayOrder.currency,
+//               name: "Books Kart",
+//               description: "Purchase from our store",
+//               order_id: razorpayOrder.id,
+//               contact: user.phone || "",
+//               name: user.name || "",
+//               email: user.email || "",
+//               receipt: razorpayOrder.receipt
+//           });
+//       } 
+//       else if (paymentMethod === "wallet") {
+//         const walletBalance = user.wallet ? user.wallet.balance : 0;
+//         if (walletBalance >= newOrder.billTotal) {
+//           user.wallet.balance -= newOrder.billTotal;
+//           user.wallet.transactions.push({
+//             amount: newOrder.billTotal,
+//             orderId : uuidv4(),
+//             description: 'Wallet Transaction',
+//             type: "Debit",
+//             transactionDate: new Date(),
+//           });
+//           console.log("Wallet balance updated:", user.wallet.balance);
+//           console.log("Wallet transactions:", user.wallet.transactions);
+
+//           await newOrder.save();
+//           await user.save();
+//           await Cart.findOneAndDelete({ userId });
+//           res.status(201).json({ success: true, message: "Order placed successfully" });    
+//         } else {
+//           res.status(400).json({ success: false, message: "Insufficient wallet balance" });
+//         }
+//       }else {
+//         res.status(400).json({ success: false, message: "Invalid payment method" });
+//       }
+//   } catch (error) {
+//     console.error("Error placing order:", error);
+//     res.status(500).json({ success: false, message: "Internal Server Error" });
+//   }
+// },
+
+
+// new try
 
 placeOrder: async (req, res) => {
   console.log("placeOrder function called");
@@ -60,10 +243,10 @@ placeOrder: async (req, res) => {
           return res.status(400).json({ success: false, message: "No saved addresses found" });
       }
 
-      const { addressIndex, paymentMethod, totalAmount, couponcode } = req.body;
+      const { addressIndex, paymentMethod, totalAmount, couponcode, couponId } = req.body;
       let { subtotal } = req.body;
 
-      console.log("Received values:", { addressIndex, paymentMethod, totalAmount, couponcode, subtotal });
+      console.log("Received values:", { addressIndex, paymentMethod, totalAmount, couponcode, couponId,subtotal });
 
       if (addressIndex === undefined || isNaN(parseInt(addressIndex)) || addressIndex < 0 || addressIndex >= user.address.length) {
           console.log("Invalid address index:", addressIndex);
@@ -73,7 +256,7 @@ placeOrder: async (req, res) => {
       if (!subtotal || isNaN(parseFloat(subtotal))) {
           subtotal = cart.product.reduce((acc, item) => {
               const price = item.productId.discountPrice > 0 ? item.productId.discountPrice : item.productId.price;
-              return acc + price * item.quantity;
+              return acc + price * item.quantity;   
           }, 0);
           console.log("Calculated subtotal:", subtotal);
       }
@@ -92,10 +275,13 @@ placeOrder: async (req, res) => {
       console.log("Selected address:", selectedAddress);
       const coupon = null;
       let couponAmount = 0;
-      if (couponcode) {
-          const coupon = await Coupon.findOne({ couponcode });
+      let billTotal = subtotal;
+
+      if (couponId) {
+          const coupon = await Coupon.findById(couponId);
           if (coupon) {
               couponAmount = (parseFloat(subtotal) * coupon.discountamount) / 100;
+              billTotal = parseFloat(subtotal) - coupon.discountamount;
               console.log("Coupon applied:", couponcode, "Discount amount:", couponAmount);
           } else {
               console.log("Invalid coupon code:", couponcode);
@@ -114,8 +300,9 @@ placeOrder: async (req, res) => {
               status: paymentMethod === "Cash On Delivery" ? "Confirmed" : "Pending",
           };
       });
+     console.log("Coupon" + coupon)
+      console.log("billTotal" + billTotal)
 
-      const billTotal = coupon ? parseFloat(totalAmount) : parseFloat(subtotal);
       if (isNaN(billTotal)) {
           console.log("Invalid total amount:", totalAmount, "or subtotal:", subtotal);
           return res.status(400).json({ success: false, message: "Invalid total amount" });
@@ -218,6 +405,19 @@ placeOrder: async (req, res) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+// wrking code
 
 onlineOrderPlacing: async (req, res) => {
   try {
@@ -343,6 +543,17 @@ onlineOrderPlacing: async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 },
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -875,20 +1086,54 @@ walletPlaceOrder: async (req, res) => {
     }
   },
 
+
+
+// loadOrder: async (req, res) => {
+//   try {
+//       const page = parseInt(req.query.page) || 1;
+//       const perPage = 10;
+//       const totalOrderCount = await Order.countDocuments({});
+//       const totalPages = Math.ceil(totalOrderCount / perPage);
+//       const skip = (page - 1) * perPage;
+
+//       const orders = await Order.find({}).populate('user').skip(skip).limit(perPage).sort({ orderDate: -1 });
+//       res.render("order", { orders, currentPage: page, totalPages });
+//   } catch (error) {
+//       console.log(error.message);
+//   }
+// },
+
+
 loadOrder: async (req, res) => {
   try {
-      const page = parseInt(req.query.page) || 1;
-      const perPage = 10;
-      const totalOrderCount = await Order.countDocuments({});
-      const totalPages = Math.ceil(totalOrderCount / perPage);
-      const skip = (page - 1) * perPage;
+      const page = parseInt(req.query.page) || 1; // Current page number
+      const perPage = 10; // Number of orders per page
+      const totalOrderCount = await Order.countDocuments({}); // Total number of orders
+      const totalPages = Math.ceil(totalOrderCount / perPage); // Total pages based on the number of orders and perPage
+      const skip = (page - 1) * perPage; // Number of orders to skip for pagination
 
       const orders = await Order.find({}).populate('user').skip(skip).limit(perPage).sort({ orderDate: -1 });
+
+      // Render the 'order' page with orders, current page, and total pages
       res.render("order", { orders, currentPage: page, totalPages });
   } catch (error) {
-      console.log(error.message);
+      console.log(error.message); // Log any errors
+      res.status(500).send("Internal Server Error");
   }
 },
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 changeOrderStatus: async (req, res) => {
@@ -944,9 +1189,501 @@ loadOrderDetails: async (req, res) => {
   } catch (error) {
       console.log(error.message);
   }
+},
+
+
+// downloadInvoice : async (req, res) => {
+//   try {
+//     const { orderId } = req.query;
+
+//     const order = await Order.findById(orderId).populate("user");
+
+//     if (!order) {
+//       return res.status(404).json({ message: "Order not found" });
+//     }
+
+//     generateInvoicePDF(order, res);
+//   } catch (error) {
+//     console.log(error.message);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// },
+
+//  generateInvoicePDF : async function (order, res) {
+//   const doc = new PDFDocument();
+//   const filename = `invoice_${order._id}.pdf`;
+
+//   res.setHeader("Content-Type", "application/pdf");
+//   res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+
+//   doc.pipe(res);
+
+//   doc.fontSize(20).text("Invoice", { align: "center" });
+//   doc.moveDown();
+
+//   // Add order details
+//   doc.fontSize(12).text(`Order ID: ${order._id}`);
+//   doc.text(`Order Date: ${new Date(order.orderDate).toLocaleString("en-IN")}`);
+//   doc.text(`Payment Method: ${order.paymentMethod}`);
+//   doc.text(`Payment Status: ${order.paymentStatus}`);
+//   doc.text(
+//     `Shipping Address: ${order.shippingAddress.houseName}, ${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state}, ${order.shippingAddress.country}, ${order.shippingAddress.postalCode}`
+//   );
+//   doc.moveDown();
+
+//   // Create the table data
+//   const table = {
+//     headers: ["Product Name", "Quantity", "Price", "Total Price"],
+//     rows: order.items.map(item => [
+//       item.productName, // Assuming productName is the field for the product title
+//       item.quantity,
+//       `₹${item.productPrice.toFixed(2)}`,
+//       `₹${(item.productPrice * item.quantity).toFixed(2)}`
+//     ])
+//   };
+
+//   // Draw the table with styling
+//   doc.table(table, {
+//     prepareHeader: () => doc.font("Helvetica-Bold").fontSize(12),
+//     prepareRow: (row, i) => doc.font("Helvetica").fontSize(10),
+//     width: 500, 
+//     align: "center", 
+//     padding: 5, 
+//     colors: ["#AE2424", "#AE2424", "#AE2424", "#AE2424"], 
+//     borderWidth: 1,
+//     headerBorderWidth: 1, 
+//     rowEvenBackground: "#AE2424" 
+//   });
+   
+//   doc.moveDown();
+
+//   // Add total amount and coupon details
+//   if (order.couponAmount > 0) {
+//     doc.text(`Coupon Amount: ₹${order.couponAmount.toFixed(2)}`);
+//   }
+//   doc.text(`Grand Total: ₹${order.billTotal.toFixed(2)}`);
+
+//   doc.end();
+// },
+
+
+
+// downloadInvoice : async (req, res) => {
+//   try {
+//     const { orderId } = req.query;
+
+//     const order = await Order.findById(orderId).populate("user");
+
+//     if (!order) {
+//       return res.status(404).json({ message: "Order not found" });
+//     }
+
+//     const doc = new PDFDocument();
+//     const filename = `invoice_${order._id}.pdf`;
+
+//     res.setHeader("Content-Type", "application/pdf");
+//     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+
+//     doc.pipe(res);
+
+//     // Add title and basic order details
+//     doc.fontSize(20).text("Invoice", { align: "center" });
+//     doc.moveDown();
+//     doc.fontSize(12).text(`Order ID: ${order._id}`);
+//     doc.text(`Order Date: ${new Date(order.orderDate).toLocaleString("en-IN")}`);
+//     doc.text(`Payment Method: ${order.paymentMethod}`);
+//     doc.text(`Payment Status: ${order.paymentStatus}`);
+//     doc.text(
+//       `Shipping Address: ${order.shippingAddress.houseName}, ${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state}, ${order.shippingAddress.country}, ${order.shippingAddress.postalCode}`
+//     );
+//     doc.moveDown();
+
+//     // Add table headers
+//     const tableTop = 200;
+//     const itemCodeX = 50;
+//     const descriptionX = 150;
+//     const quantityX = 300;
+//     const priceX = 350;
+//     const totalX = 400;
+
+//     doc.fontSize(12).text("Product Name", itemCodeX, tableTop, { bold: true });
+//     doc.text("Quantity", quantityX, tableTop, { bold: true });
+//     doc.text("Price", priceX, tableTop, { bold: true });
+//     doc.text("Total Price", totalX, tableTop, { bold: true });
+
+//     let yPos = tableTop + 20;
+
+//     // Add table rows
+//     order.items.forEach(item => {
+//       doc.text(item.name, itemCodeX, yPos);
+//       doc.text(item.quantity, quantityX, yPos);
+//       doc.text(`₹${item.productPrice.toFixed(2)}`, priceX, yPos);
+//       doc.text(`₹${(item.productPrice * item.quantity).toFixed(2)}`, totalX, yPos);
+//       yPos += 20;
+//     });
+
+//     doc.moveDown();
+
+//     // Add total amount and coupon details
+//     if (order.couponAmount > 0) {
+//       doc.text(`Coupon Amount: $${order.couponAmount.toFixed(2)}`, { align: "right" });
+//     }
+//     doc.text(`Grand Total: $${order.billTotal.toFixed(2)}`, { align: "right" });
+
+//     doc.end();
+
+//   } catch (error) {
+//     console.log(error.message);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// },
+
+
+// wrking now error
+// downloadInvoice : async (req, res) => {
+//   try {
+//     const { orderId } = req.query;
+
+//     const order = await Order.findById(orderId).populate('user');
+
+//     if (!order) {
+//       return res.status(404).json({ message: 'Order not found' });
+//     }
+
+//     const doc = new PDFDocument({ margin: 50 });
+//     const filename = `invoice_${order._id}.pdf`;
+
+//     res.setHeader('Content-Type', 'application/pdf');
+//     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+//     doc.pipe(res);
+
+//     // Header
+//     doc.fontSize(20).text('INVOICE', { align: 'center', underline: true });
+//     doc.moveDown(1.5);
+
+//     // Order Details
+//     doc.fontSize(12).text(`Order ID: ${order._id}`, { continued: true });
+//     doc.text(`Date: ${new Date(order.orderDate).toLocaleString('en-IN')}`, { align: 'right' });
+//     doc.moveDown(0.5);
+
+//     doc.text(`Payment Method: ${order.paymentMethod}`, { continued: true });
+//     doc.text(`Payment Status: ${order.paymentStatus}`, { align: 'right' });
+//     doc.moveDown(0.5);
+
+//     // Shipping Address
+//     doc.text(`Shipping Address:`, { underline: true });
+//     doc.text(`${order.shippingAddress.houseName}, ${order.shippingAddress.street}`);
+//     doc.text(`${order.shippingAddress.city}, ${order.shippingAddress.state}`);
+//     doc.text(`${order.shippingAddress.country} - ${order.shippingAddress.postalCode}`);
+//     doc.moveDown(1);
+
+//     // Table Headers
+//     const tableTop = 250;
+//     const itemX = 50;
+//     const quantityX = 250;
+//     const priceX = 320;
+//     const totalX = 400;
+
+//     doc
+//       .fontSize(12)
+//       .font('Helvetica-Bold')
+//       .text('Product Name', itemX, tableTop)
+//       .text('Quantity', quantityX, tableTop)
+//       .text('Price', priceX, tableTop)
+//       .text('Total', totalX, tableTop);
+
+//     // Draw a horizontal line after headers
+//     doc.moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
+
+//     let yPos = tableTop + 20;
+
+//     // Table Rows
+//     doc.font('Helvetica');
+//     order.items.forEach(item => {
+//       doc
+//         .text(item.name, itemX, yPos)
+//         .text(item.quantity, quantityX, yPos)
+//         .text(`₹${item.productPrice.toFixed(2)}`, priceX, yPos)
+//         .text(`₹${(item.productPrice * item.quantity).toFixed(2)}`, totalX, yPos);
+//       yPos += 20;
+//     });
+
+//     // Draw a horizontal line after the last row
+//     doc.moveTo(50, yPos).lineTo(550, yPos).stroke();
+
+//     // Total and Coupon Details
+//     yPos += 20;
+//     doc
+//       .font('Helvetica-Bold')
+//       .text('Subtotal:', totalX - 100, yPos, { continued: true })
+//       // .text(`₹${order.billTotal.toFixed(2)}`, { align: 'right' });
+//       .text(`₹${order.subtotal.toFixed(2)}`, { align: 'right' });
+
+      
+
+//     if (order.couponAmount > 0) {
+//       yPos += 20;
+//       doc
+//         .font('Helvetica-Bold')
+//         .text('Coupon Discount:', totalX - 100, yPos, { continued: true })
+//         .text(`-₹${order.couponAmount.toFixed(2)}`, { align: 'right' });
+//     }
+
+//     yPos += 20;
+//     doc
+//       .font('Helvetica-Bold')
+//       .text('Grand Total:', totalX - 100, yPos, { continued: true })
+//       .text(`₹${order.billTotal.toFixed(2)}`, { align: 'right' });
+
+//     // Footer
+//     doc.moveDown(2);
+//     doc.fontSize(10).text('Thank you for your purchase!', { align: 'center' });
+
+//     doc.end();
+//   } catch (error) {
+//     console.log(error.message);
+//     res.status(500).json({ message: 'Internal Server Error' });
+//   }
+// },
+
+
+
+downloadInvoice: async (req, res) => {
+  try {
+    console.log('Download invoice request received'); // Start of function
+
+    const { orderId } = req.query;
+    console.log('Order ID:', orderId); // Log the order ID received
+
+    const order = await Order.findById(orderId).populate('user');
+    console.log('Order found:', order); // Log the order object
+
+    if (!order) {
+      console.log('Order not found');
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    const doc = new PDFDocument({ margin: 50 });
+    const filename = `invoice_${order._id}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    console.log('Headers set, starting PDF generation');
+
+    doc.pipe(res);
+
+    // Header
+    doc.fontSize(20).text('INVOICE', { align: 'center', underline: true });
+    doc.moveDown(1.5);
+
+    // Order Details
+    doc.fontSize(12).text(`Order ID: ${order._id}`, { continued: true });
+    doc.text(`Date: ${new Date(order.orderDate).toLocaleString('en-IN')}`, { align: 'right' });
+    doc.moveDown(0.5);
+
+    doc.text(`Payment Method: ${order.paymentMethod}`, { continued: true });
+    doc.text(`Payment Status: ${order.paymentStatus}`, { align: 'right' });
+    doc.moveDown(0.5);
+
+    console.log('Order details added to PDF');
+
+    // Shipping Address
+    doc.text(`Shipping Address:`, { underline: true });
+    doc.text(`${order.shippingAddress.houseName}, ${order.shippingAddress.street}`);
+    doc.text(`${order.shippingAddress.city}, ${order.shippingAddress.state}`);
+    doc.text(`${order.shippingAddress.country} - ${order.shippingAddress.postalCode}`);
+    doc.moveDown(1);
+
+    console.log('Shipping address added to PDF');
+
+    // Table Headers
+    const tableTop = 250;
+    const itemX = 50;
+    const quantityX = 250;
+    const priceX = 320;
+    const totalX = 400;
+
+    doc
+      .fontSize(12)
+      .font('Helvetica-Bold')
+      .text('Product Name', itemX, tableTop)
+      .text('Quantity', quantityX, tableTop)
+      .text('Price', priceX, tableTop)
+      .text('Total', totalX, tableTop);
+
+    doc.moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
+    let yPos = tableTop + 20;
+
+    console.log('Table headers added to PDF');
+
+    // Table Rows
+    doc.font('Helvetica');
+    order.items.forEach((item, index) => {
+      console.log(`Adding item ${index + 1}:`, item);
+      doc
+        .text(item.name, itemX, yPos)
+        .text(item.quantity, quantityX, yPos)
+        .text(`₹${item.productPrice.toFixed(2)}`, priceX, yPos)
+        .text(`₹${(item.productPrice * item.quantity).toFixed(2)}`, totalX, yPos);
+      yPos += 20;
+    });
+
+    doc.moveTo(50, yPos).lineTo(550, yPos).stroke();
+
+    console.log('Table rows added to PDF');
+
+    // Calculate Subtotal
+    const subtotal = order.items.reduce((sum, item) => {
+      const itemTotal = item.productPrice * item.quantity;
+      return sum + itemTotal;
+    }, 0);
+    
+    console.log('Calculated Subtotal:', subtotal); // Log the calculated subtotal
+
+    // Total and Coupon Details
+    yPos += 20;
+    doc
+      .font('Helvetica-Bold')
+      .text('Subtotal:', totalX - 100, yPos, { continued: true })
+      .text(`₹${subtotal.toFixed(2)}`, { align: 'right' });
+
+    if (order.couponAmount > 0) {
+      yPos += 20;
+      console.log('Adding coupon discount');
+      doc
+        .font('Helvetica-Bold')
+        .text('Coupon Discount:', totalX - 100, yPos, { continued: true })
+        .text(`-₹${order.couponAmount.toFixed(2)}`, { align: 'right' });
+    }
+
+    yPos += 20;
+    doc
+      .font('Helvetica-Bold')
+      .text('Grand Total:', totalX - 100, yPos, { continued: true })
+      .text(`₹${order.billTotal.toFixed(2)}`, { align: 'right' });
+
+    console.log('Totals added to PDF');
+
+    // Footer
+    doc.moveDown(2);
+    doc.fontSize(10).text('Thank you for your purchase!', { align: 'center' });
+
+    console.log('Footer added, finishing PDF');
+    doc.end();
+  } catch (error) {
+    console.log('Error occurred:', error); // Log the full error
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+retryOrder : async (req, res) => {
+  try {
+    const { orderId, totalAmount } = req.body;
+
+    const options = {
+      amount: totalAmount * 100, // amount in the smallest currency unit
+      currency: "INR",
+      receipt: `receipt_${orderId}`,
+    };
+
+    razorpayInstance.orders.create(options, function (err, order) {
+      if (!err) {
+        res.status(200).json({
+          success: true,
+          msg: "Order Created",
+          order_id: order.id,
+          amount: totalAmount * 100,
+          key_id: process.env.RAZOR_PAY_KEY,
+          product_name: "Book's Kart  ",
+          description: "Payment for retry order",
+          contact: "8988776655", // Ensure this is dynamic in real-world use
+          name: "", // Ensure this is dynamic in real-world use
+          email: "", // Ensure this is dynamic in real-world use
+        });
+      } else {
+        console.log("Error in Razorpay order creation:", err);
+        res.status(500).json({ success: false, message: "Failed to create order" });
+      }
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+},
+
+retryPayment :async (req, res) => {
+  try {
+    const { orderId, totalAmount, status } = req.body;
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    order.paymentStatus = status;
+
+    await order.save();
+
+    if (status === "Failed") {
+      return res.status(201).json({ success: true, message: "Payment failed, please retry" });
+    }
+
+    res.status(201).json({ success: true, message: "Order placed successfully" });
+
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 }
 
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

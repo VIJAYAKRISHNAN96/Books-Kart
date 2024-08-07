@@ -51,6 +51,14 @@
             cursor: pointer;
         }
     </style>
+
+    
+
+    
+
+
+
+
 </head>
 <body>
     
@@ -204,15 +212,15 @@
                              <div class="col-md-9">
                               <div class="mb-4">
                                 <label class="form-label">Regular Price in USD</label>
-                                <input type="text" placeholder="$00.0" class="form-control" name="price" value="<%= product ? product.price : '' %>" required>
+                                <input type="text" placeholder="$000" class="form-control" name="price" value="<%= product ? product.price : '' %>" required>
                               </div>
                               <div class="mb-4">
                                 <label class="form-label">Discount Price</label>
-                                <input type="number" class="form-control" id="discount-price" name="discountPrice" value="<%= product ? product.discountPrice : '' %>" required>
+                                <input type="number"  placeholder="$000" class="form-control" id="discount-price" name="discountPrice" value="<%= product ? product.discountPrice : '' %>" required>
                               </div>
                               <div class="mb-4">
                                 <label class="form-label">Discount in percentage</label>
-                                <input type="text" placeholder="00%" class="form-control" id="discount-percentage" name="discountPercentage" value="<%= product ? (product.price && product.discountPrice) ? Math.floor(((product.price - product.discountPrice) / product.price) * 100) : 0 : '' %>%" required>
+                                <input type="text" placeholder="%" class="form-control" id="discount-percentage" name="discountPercentage" value="<%= product ? (product.price && product.discountPrice) ? Math.floor(((product.price - product.discountPrice) / product.price) * 100) : 0 : '' %>%" required>
                               </div>
                                 <!-- <div class="mb-4">
                                     <label class="form-label">Regular Price in USD</label>
@@ -254,7 +262,13 @@
                             <div class="col-md-9">
                               <div class="mb-4">
                                 <label for="stock" class="form-label">Stock</label>
-                                <input type="number" class="form-control" id="stock" name="stock" required>
+                             <!-- <input type="number" class="form-control" id="stock" name="stock" min="0" required> -->
+                             <input type="number" class="form-control" id="stock" name="stock" min="0" required onkeydown="return false;" oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
+
+
+
+
+                                <!-- <input type="number" class="form-control" id="stock" name="stock" required> -->
                             </div>
                             </div>
                         </div>

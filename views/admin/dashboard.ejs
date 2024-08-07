@@ -15,6 +15,47 @@
     <link rel="shortcut icon" type="image/x-icon" href="/adminAssets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link href="/adminAssets/css/main.css" rel="stylesheet" type="text/css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <!-- <style>
+        .chart-container {
+            position: relative;
+            height: 50vh;
+            width: 75vw;
+            margin: 20px auto;
+        }
+        .chart-btn {
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+    </style> -->
+
+ 
+
+      <style>
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 70vh;
+            width: 80vw;
+        }
+        .chart-container canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+    </style>
+
+    
+
+
+
+
+
 </head>
 
 <body>
@@ -192,7 +233,7 @@
                 </ul>
             </div>
         </header>
-        <section class="content-main">
+        <!-- <section class="content-main">
             <div class="content-header">
                 <div>
                     <h2 class="content-title card-title">Dashboard </h2>
@@ -643,8 +684,8 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div> <!-- table-responsive end// -->
-                </div>
+                    </div> < table-responsive end// -->
+                <!-- </div>
             </div>
             <div class="pagination-area mt-30 mb-50">
                 <nav aria-label="Page navigation example">
@@ -658,7 +699,275 @@
                     </ul>
                 </nav>
             </div>
-        </section> <!-- content-main end// -->
+        </section> content-main end// -->
+        
+
+        <section class="content-main">
+            <div class="content-header">
+              <div>
+                <h2 class="content-title card-title">Dashboard</h2>
+                <p>Whole data about your business here</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-3">
+                <div class="card card-body mb-4">
+                  <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                      <i class="text-primary material-icons md-monetization_on"></i>
+                    </span>
+                    <div class="text">
+                      <h6 class="mb-1 card-title">Revenue</h6>
+                      <span>$<%= totalRevenue.toFixed(2) %></span>
+                      <span class="text-sm"> In transit products not included</span>
+                    </div>
+                  </article>
+                </div>
+              </div>
+              <div class="col-lg-3">
+                <div class="card card-body mb-4">
+                  <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-success-light">
+                      <i class="text-success material-icons md-local_shipping"></i>
+                    </span>
+                    <div class="text">
+                      <h6 class="mb-1 card-title">Orders</h6>
+                      <span><%= orders.length %></span>
+                      <span class="text-sm"> Excluding orders in transit</span>
+                    </div>
+                  </article>
+                </div>
+              </div>
+              <div class="col-lg-3">
+                <div class="card card-body mb-4">
+                  <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-warning-light">
+                      <i class="text-warning material-icons md-qr_code"></i>
+                    </span>
+                    <div class="text">
+                      <h6 class="mb-1 card-title">Products</h6>
+                      <span><%= products.length %></span>
+                      <span class="text-sm"> In <%= categories.length %> Categories</span>
+                    </div>
+                  </article>
+                </div>
+              </div>
+              <div class="col-lg-3">
+                <div class="card card-body mb-4">
+                  <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-info-light">
+                      <i class="text-info material-icons md-shopping_basket"></i>
+                    </span>
+                    <div class="text">
+                      <h6 class="mb-1 card-title">Monthly Earning</h6>
+                      <span>$<%= monthlyRevenue.toFixed(2) %></span>
+                      <span class="text-sm"> Revenue based on current month</span>
+                    </div>
+                  </article>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-8 col-lg-12">
+                    <div class="card mb-4">
+                      <article class="card-body">
+                        <h5 class="card-title">Sale statistics</h5>
+                        <div>
+                          <button id="showDailyChart" class="btn btn-primary chart-btn">
+                            Daily
+                          </button>
+                          <button id="showWeeklyChart" class="btn btn-primary chart-btn">
+                            Weekly
+                          </button>
+                          <button id="showMonthlyChart" class="btn btn-primary chart-btn">
+                            Monthly
+                          </button>
+                          <button id="showYearlyChart" class="btn btn-primary chart-btn">
+                            Yearly
+                          </button>
+                        </div>
+                        <div
+                          class="chart-container"
+                          style="position: relative; height: 50vh; width: 75vw"
+                        >
+                          <canvas id="dailySalesChart" style="display: none"></canvas>
+                          <canvas id="weeklySalesChart" style="display: none"></canvas>
+                          <canvas id="monthlySalesChart" style="display: none"></canvas>
+                          <canvas id="yearlySalesChart" style="display: none"></canvas>
+                        </div>
+                      </article>
+                    </div>
+                  </div>
+              
+  
+
+  <!-- Tables Column -->
+  <div class="col-xl-4 col-lg-12">
+    <div id="dashboardCarousel" class="carousel slide" data-ride="carousel">
+      <div class="carousel-inner">
+        <!-- First Table -->
+        <div class="carousel-item active">
+          <div class="card mb-4 card-body">
+            <h5 class="card-title text-center">Top Selling Products</h5>
+            <table class="table m-1">
+              <thead class="text-center">
+                <tr>
+                  <th>No.</th>
+                  <th>Product</th>
+                  <th>Sales Count</th>
+                </tr>
+              </thead>
+              <tbody class="text-center">
+                <% topSellingProducts.forEach((product, index) => { %>
+                <tr>
+                  <td><%= index + 1 %></td>
+                  <td><%= product.name %></td>
+                  <td><%= product.totalSold %></td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Second Table -->
+        <div class="carousel-item">
+          <div class="card mb-4 card-body">
+            <h5 class="card-title text-center">Top Selling Categories</h5>
+            <table class="table m-1">
+              <thead class="text-center">
+                <tr>
+                  <th>No.</th>
+                  <th>Category</th>
+                  <th>Sales Count</th>
+                </tr>
+              </thead>
+              <tbody class="text-center">
+                <% topSellingCategories.forEach((category, index) => { %>
+                <tr>
+                  <td><%= index + 1 %></td>
+                  <td><%= category._id %></td>
+                  <td><%= category.totalSold %></td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+                  <!-- Carousel controls -->
+                  <a class="carousel-control-prev" href="#dashboardCarousel" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                  </a>
+                  <a class="carousel-control-next" href="#dashboardCarousel" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="card mb-4">
+                <header class="card-header">
+                    <h4 class="card-title">Latest orders</h4>
+                    <!-- Filters and search options -->
+                </header>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-middle table-nowrap mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" class="text-center">
+                                        <div class="form-check align-middle">
+                                            <!-- <input class="form-check-input" type="checkbox" id="transactionCheck01">
+                                            <label class="form-check-label" for="transactionCheck01"></label> -->
+                                        </div>
+                                    </th>
+                                    <!-- Table headers -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                               
+
+                                <% orders.forEach(order => { %>
+                                    <% order.items.forEach(item => { %>
+                                        <tr>
+                                            <td class="text-center">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="transactionCheck<%= item._id %>">
+                                                    <label class="form-check-label" for="transactionCheck<%= item._id %>"></label>
+                                                </div>
+                                            </td>
+                                            <td><a href="#" class="fw-bold"><%= order._id %></a></td>
+                                            <td><%= user.name %></td>
+                                            <td><%= new Date(order.orderDate).toDateString() %></td>
+                                            <td>$<%= item.productPrice.toFixed(2) %></td>
+                                            <td> <%= item.status %> </td>
+
+
+                                              
+                                            <td><i class="material-icons md-payment font-xxl text-muted mr-5"></i> <%= order.paymentMethod %></td>
+                                        </tr>
+                                    <% }); %>
+                                <% }) %>
+
+                                
+                            </tbody>
+                        </table>
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination">
+                                <% if (currentPage > 1) { %>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                <% } %>
+                                <% for (let i = 1; i <= totalPages; i++) { %>
+                                    <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                                    </li>
+                                <% } %>
+                                <% if (currentPage < totalPages) { %>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                <% } %>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+          </section>
+        
+     
+
+        <!-- Pagination Controls -->
+
+        
+        
+       
+        
+        
+        
+        
+        
+        
+        
+        
+        
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">
                 <div class="col-sm-6">
@@ -676,7 +985,7 @@
                 <div class="preloader d-flex align-items-center justify-content-center">
                     <div class="preloader-inner position-relative">
                         <div class="text-center">
-                            <h5 class="mb-5">Now Loading</h5>
+                            <!-- <h5 class="mb-5">Now Loading</h5> -->
                             <div class="loader">
                                 <div class="bar bar1"></div>
                                 <div class="bar bar2"></div>
@@ -687,16 +996,375 @@
                 </div>
             </div>
         </footer>
+
+
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> <!-- jQuery -->
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script> <!-- Popper.js -->
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+        
+
+     
+
+
+
+
+
+
+
+
+
+
+
     </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <!-- <script>
+        // Sales Chart Data
+        const dailySalesData = <%- JSON.stringify(dailySalesData) %>;
+        const weeklySalesData = <%- JSON.stringify(weeklySalesData) %>;
+        const monthlySalesData = <%- JSON.stringify(monthlySalesData) %>;
+        const yearlySalesData = <%- JSON.stringify(yearlySalesData) %>;
+      
+        const ctxDaily = document.getElementById('dailySalesChart').getContext('2d');
+        const ctxWeekly = document.getElementById('weeklySalesChart').getContext('2d');
+        const ctxMonthly = document.getElementById('monthlySalesChart').getContext('2d');
+        const ctxYearly = document.getElementById('yearlySalesChart').getContext('2d');
+      
+        const dailySalesChart = new Chart(ctxDaily, {
+          type: 'line',
+              data: {
+                labels: dailySalesData.labels,
+                datasets: [{
+                  label: 'Sales',
+                  data: dailySalesData.data,
+                  fill: true,
+                  backgroundColor: 'rgba(75,192,192,0.2)',
+                  borderColor: 'rgba(75,192,192,1)',
+                  borderWidth: 1,
+                  pointBackgroundColor: 'rgba(75,192,192,1)'
+                }]
+              },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      
+        const weeklySalesChart = new Chart(ctxWeekly, {
+          type: 'line',
+          data: {
+            labels: weeklySalesData.labels,
+            datasets: [{
+              label: 'Weekly Sales',
+              data: weeklySalesData.data,
+              fill: true,
+              backgroundColor: 'rgba(75,192,192,0.2)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1,
+              pointBackgroundColor: 'rgba(75,192,192,1)'
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      
+        const monthlySalesChart = new Chart(ctxMonthly, {
+          type: 'line',
+          data: {
+            labels: monthlySalesData.labels,
+            datasets: [{
+              label: 'Monthly Sales',
+              data: monthlySalesData.data,
+              fill: true,
+              backgroundColor: 'rgba(54, 162, 235, 0.2)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1,
+              pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      
+        const yearlySalesChart = new Chart(ctxYearly, {
+          type: 'bar',
+          data: {
+            labels: yearlySalesData.labels,
+            datasets: [{
+              label: 'Yearly Sales',
+              data: yearlySalesData.data,
+              backgroundColor: 'rgba(153, 102, 255, 0.2)',
+              borderColor: 'rgba(153, 102, 255, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      
+        // Show and Hide Charts
+        document.getElementById('showDailyChart').addEventListener('click', () => {
+          document.getElementById('dailySalesChart').style.display = 'block';
+          document.getElementById('weeklySalesChart').style.display = 'none';
+          document.getElementById('monthlySalesChart').style.display = 'none';
+          document.getElementById('yearlySalesChart').style.display = 'none';
+        });
+      
+        document.getElementById('showWeeklyChart').addEventListener('click', () => {
+          document.getElementById('dailySalesChart').style.display = 'none';
+          document.getElementById('weeklySalesChart').style.display = 'block';
+          document.getElementById('monthlySalesChart').style.display = 'none';
+          document.getElementById('yearlySalesChart').style.display = 'none';
+        });
+      
+        document.getElementById('showMonthlyChart').addEventListener('click', () => {
+          document.getElementById('dailySalesChart').style.display = 'none';
+          document.getElementById('weeklySalesChart').style.display = 'none';
+          document.getElementById('monthlySalesChart').style.display = 'block';
+          document.getElementById('yearlySalesChart').style.display = 'none';
+        });
+      
+        document.getElementById('showYearlyChart').addEventListener('click', () => {
+          document.getElementById('dailySalesChart').style.display = 'none';
+          document.getElementById('weeklySalesChart').style.display = 'none';
+          document.getElementById('monthlySalesChart').style.display = 'none';
+          document.getElementById('yearlySalesChart').style.display = 'block';
+        });
+      
+        // Display the first chart by default
+        document.getElementById('showDailyChart').click();
+      </script> -->
+
+
+
+      <script>
+        function validateChartData(data) {
+            return data && Array.isArray(data.labels) && Array.isArray(data.data) && data.labels.length === data.data.length;
+        }
+
+        const dailySalesData = <%- JSON.stringify(dailySalesData) %>;
+        const weeklySalesData = <%- JSON.stringify(weeklySalesData) %>;
+        const monthlySalesData = <%- JSON.stringify(monthlySalesData) %>;
+        const yearlySalesData = <%- JSON.stringify(yearlySalesData) %>;
+      
+        const ctxDaily = document.getElementById('dailySalesChart').getContext('2d');
+        const ctxWeekly = document.getElementById('weeklySalesChart').getContext('2d');
+        const ctxMonthly = document.getElementById('monthlySalesChart').getContext('2d');
+        const ctxYearly = document.getElementById('yearlySalesChart').getContext('2d');
+      
+        if (validateChartData(dailySalesData)) {
+            const dailySalesChart = new Chart(ctxDaily, {
+                type: 'line',
+                data: {
+                    labels: dailySalesData.labels,
+                    datasets: [{
+                        label: 'Daily Sales',
+                        data: dailySalesData.data,
+                        fill: true,
+                        backgroundColor: 'rgba(75,192,192,0.2)',
+                        borderColor: 'rgba(75,192,192,1)',
+                        borderWidth: 1,
+                        pointBackgroundColor: 'rgba(75,192,192,1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        } else {
+            console.error('Invalid daily sales data');
+        }
+      
+        if (validateChartData(weeklySalesData)) {
+            const weeklySalesChart = new Chart(ctxWeekly, {
+                type: 'line',
+                data: {
+                    labels: weeklySalesData.labels,
+                    datasets: [{
+                        label: 'Weekly Sales',
+                        data: weeklySalesData.data,
+                        fill: true,
+                        backgroundColor: 'rgba(75,192,192,0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        pointBackgroundColor: 'rgba(75,192,192,1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        } else {
+            console.error('Invalid weekly sales data');
+        }
+      
+        if (validateChartData(monthlySalesData)) {
+            const monthlySalesChart = new Chart(ctxMonthly, {
+                type: 'line',
+                data: {
+                    labels: monthlySalesData.labels,
+                    datasets: [{
+                        label: 'Monthly Sales',
+                        data: monthlySalesData.data,
+                        fill: true,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        } else {
+            console.error('Invalid monthly sales data');
+        }
+      
+        if (validateChartData(yearlySalesData)) {
+            const yearlySalesChart = new Chart(ctxYearly, {
+                type: 'bar',
+                data: {
+                    labels: yearlySalesData.labels,
+                    datasets: [{
+                        label: 'Yearly Sales',
+                        data: yearlySalesData.data,
+                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        } else {
+            console.error('Invalid yearly sales data');
+        }
+      
+        document.getElementById('showDailyChart').addEventListener('click', () => {
+            document.getElementById('dailySalesChart').style.display = 'block';
+            document.getElementById('weeklySalesChart').style.display = 'none';
+            document.getElementById('monthlySalesChart').style.display = 'none';
+            document.getElementById('yearlySalesChart').style.display = 'none';
+        });
+      
+        document.getElementById('showWeeklyChart').addEventListener('click', () => {
+            document.getElementById('dailySalesChart').style.display = 'none';
+            document.getElementById('weeklySalesChart').style.display = 'block';
+            document.getElementById('monthlySalesChart').style.display = 'none';
+            document.getElementById('yearlySalesChart').style.display = 'none';
+        });
+      
+        document.getElementById('showMonthlyChart').addEventListener('click', () => {
+            document.getElementById('dailySalesChart').style.display = 'none';
+            document.getElementById('weeklySalesChart').style.display = 'none';
+            document.getElementById('monthlySalesChart').style.display = 'block';
+            document.getElementById('yearlySalesChart').style.display = 'none';
+        });
+      
+        document.getElementById('showYearlyChart').addEventListener('click', () => {
+            document.getElementById('dailySalesChart').style.display = 'none';
+            document.getElementById('weeklySalesChart').style.display = 'none';
+            document.getElementById('monthlySalesChart').style.display = 'none';
+            document.getElementById('yearlySalesChart').style.display = 'block';
+        });
+      
+        // Display the first chart by default
+        document.getElementById('showDailyChart').click();
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
     <script src="/adminAssets/js/vendors/jquery-3.6.0.min.js"></script>
     <script src="/adminAssets/js/vendors/bootstrap.bundle.min.js"></script>
     <script src="/adminAssets/js/vendors/select2.min.js"></script>
     <script src="/adminAssets/js/vendors/perfect-scrollbar.js"></script>
     <script src="/adminAssets/js/vendors/jquery.fullscreen.min.js"></script>
-    <script src="/adminAssets/js/vendors/chart.js"></script>
+    <!-- <script src="/adminAssets/js/vendors/chart.js"></script> -->
     <!-- Main Script -->
     <script src="/adminAssets/js/main.js" type="text/javascript"></script>
     <script src="/adminAssets/js/custom-chart.js" type="text/javascript"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+   
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
 </body>
 
 </html>

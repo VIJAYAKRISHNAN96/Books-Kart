@@ -40,6 +40,8 @@ const productSchema = new mongoose.Schema({
         min:0
     }
 });
+productSchema.index({ name: 'text', description: 'text' });
+
 
 function arrayLimit(val) {
     return val.length <= 3;

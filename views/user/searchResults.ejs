@@ -1,0 +1,150 @@
+
+
+
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Search Results</title>
+     <style>
+         body {
+             font-family: Arial, sans-serif;
+             background-color: #f8f9fa;
+             color: #333;
+             margin: 0;
+             padding: 0;
+             display: flex;
+             flex-direction: column;
+             min-height: 100vh;
+         }
+ 
+         .container {
+             width: 90%;
+             max-width: 1200px;
+             margin: 20px auto;
+             padding: 20px;
+             background-color: #fff;
+             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+             border-radius: 8px;
+         }
+ 
+         h2 {
+             color: #333;
+             font-size: 24px;
+             margin-bottom: 20px;
+             text-align: center;
+         }
+ 
+         .product-grid {
+             display: flex;
+             flex-wrap: wrap;
+             gap: 20px;
+             justify-content: center;
+         }
+ 
+         .product-card {
+             border: 1px solid #ddd;
+             border-radius: 8px;
+             padding: 15px;
+             width: calc(33.333% - 40px);
+             box-sizing: border-box;
+             text-align: center;
+             background-color: #fff;
+             transition: transform 0.2s ease, box-shadow 0.2s ease;
+         }
+ 
+         .product-card:hover {
+             transform: translateY(-5px);
+             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+         }
+ 
+         .product-card img {
+             max-width: 50%;
+             height: auto;
+             border-radius: 8px;
+             margin-bottom: 15px;
+         }
+ 
+         .product-card h3 {
+             font-size: 20px;
+             margin: 10px 0;
+             color: #333;
+         }
+ 
+         .product-card p {
+             font-size: 18px;
+             color: #007bff;
+             margin: 10px 0;
+         }
+ 
+         .product-card a {
+             display: inline-block;
+             margin-top: 15px;
+             padding: 10px 20px;
+             background-color: #007bff;
+             color: white;
+             border-radius: 5px;
+             text-decoration: none;
+             transition: background-color 0.3s ease;
+         }
+ 
+         .product-card a:hover {
+             background-color: #0056b3;
+         }
+ 
+         p.no-results {
+             text-align: center;
+             font-size: 18px;
+             color: #555;
+             margin-top: 40px;
+         }
+ 
+         .back-to-home {
+             display: block;
+             margin: 40px auto 0;
+             text-align: center;
+             font-size: 18px;
+             color: #007bff;
+             text-decoration: none;
+             transition: color 0.3s ease;
+         }
+ 
+         .back-to-home:hover {
+             color: #0056b3;
+         }
+     </style>
+ </head>
+ <body>
+     <div class="container">
+         <h2>Search Results for "<%= query %>"</h2>
+         
+         <% if (products.length > 0) { %>
+             <div class="product-grid">
+                 <% products.forEach(product => { %>
+                     <div class="product-card">
+                      <img class="default-img" src="/userAssets/imgs/shop/<%= product.images[0] %>" alt="">
+
+                         <!-- <img src="<%= product.imageUrl %>" alt="<%= product.name %>"> -->
+                         <h3><%= product.name %></h3>
+                         <p><%= product.price.toFixed(2) %> USD</p>
+                         <a href="/product?id=<%= product._id %>"> View Product</a>
+
+                         <!-- <a href="/product/<%= product._id %>">View Product</a> -->
+                     </div>
+                 <% }) %>
+             </div>
+         <% } else { %>
+             <p class="no-results">No products found matching your search.</p>
+         <% } %>
+ 
+         <a href="/" class="back-to-home">Back to Home</a>
+     </div>
+ </body>
+ </html>
+ 
+
+
+
+
+
