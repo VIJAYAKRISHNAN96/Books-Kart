@@ -714,7 +714,9 @@
                                   <div class="product-cart-wrap small hover-up">
                                     <div class="product-img-action-wrap">
                                       <div class="product-img product-img-zoom">
-                                        <a href="/product/<%= product._id %>" tabindex="0">
+                                        <!-- <a href="/product/<%= product._id %>" tabindex="0"> -->
+                                            <a href="/product?id=<%= product._id %>">
+
               
                                             <img class="default-img" src="/userAssets/imgs/shop/<%= product.images[0] %>" alt="<%= product.name %>">
                                             <img class="hover-img" src="/userAssets/imgs/shop/<%= product.images[0] %>" alt="<%= product.name %>">
@@ -724,12 +726,13 @@
                                     </div>
                                     <div class="product-content-wrap">
                                       <h2><a href="shop-product-right.html" tabindex="0"><%=product.name %></a></h2>
-                                      <div class="rating-result" title="90%">
+                                      
+                                      <!-- <div class="rating-result" title="90%">
                                         <span>
                                         </span>
-                                      </div>
+                                      </div> -->
                                       <div class="product-price">
-                                        <span><%=product.price%> </span>
+                                        <span>$<%=product.price%> </span>
                                       </div>
                                     </div>
                                   </div>
@@ -752,6 +755,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="./userAssets/js/shop.js?v=3.4"></script>
+
 
 
 
@@ -862,51 +867,13 @@ function addToCart(productId, productName) {
 
 
 
-    <%- include("../partials/footer.ejs") %>
     
     
     
     
    
-    <!-- Preloader Start -->
-    <!-- <div id="preloader-active">
-        <div class="preloader d-flex align-items-center justify-content-center">
-            <div class="preloader-inner position-relative">
-                <div class="text-center">
-                    <h5 class="mb-5">Now Loading</h5>
-                    <div class="loader">
-                        <div class="bar bar1"></div>
-                        <div class="bar bar2"></div>
-                        <div class="bar bar3"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
-    <!-- Vendor JS-->
-    <script src="userAssets/js/vendor/modernizr-3.6.0.min.js"></script>
-    <script src="userAssets/js/vendor/jquery-3.6.0.min.js"></script>
-    <script src="userAssets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
-    <script src="userAssets/js/vendor/bootstrap.bundle.min.js"></script>
-    <script src="userAssets/js/plugins/slick.js"></script>
-    <script src="userAssets/js/plugins/jquery.syotimer.min.js"></script>
-    <script src="userAssets/js/plugins/wow.js"></script>
-    <script src="userAssets/js/plugins/jquery-ui.js"></script>
-    <script src="userAssets/js/plugins/perfect-scrollbar.js"></script>
-    <script src="userAssets/js/plugins/magnific-popup.js"></script>
-    <script src="userAssets/js/plugins/select2.min.js"></script>
-    <script src="userAssets/js/plugins/waypoints.js"></script>
-    <script src="userAssets/js/plugins/counterup.js"></script>
-    <script src="userAssets/js/plugins/jquery.countdown.min.js"></script>
-    <script src="userAssets/js/plugins/images-loaded.js"></script>
-    <script src="userAssets/js/plugins/isotope.js"></script>
-    <script src="userAssets/js/plugins/scrollup.js"></script>
-    <script src="userAssets/js/plugins/jquery.vticker-min.js"></script>
-    <script src="userAssets/js/plugins/jquery.theia.sticky.js"></script>
-    <script src="userAssets/js/plugins/jquery.elevatezoom.js"></script>
-    
-
-    <!-- Template  JS -->
-    <script src="./userAssets/js/main.js?v=3.4"></script>
-    <script src="./userAssets/js/shop.js?v=3.4"></script>
+  
+   
 </body>
+
+<%- include("../partials/footer.ejs") %>

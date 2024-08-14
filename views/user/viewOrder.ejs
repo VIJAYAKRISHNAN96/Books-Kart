@@ -107,61 +107,49 @@
         <thead>
             <tr>
                 <th>Order Date</th>
-                <th>Product Details</th>
-                <th>Order Status</th>
+                <th>Product Image</th>
+                <th>Product Name</th>
+                <th>Status</th>
                 <th>Payment Status</th>
                 <th>Payment Method</th>
-                <th>Product Price</th>
+                <th>Price</th>
                 <th>Quantity</th>
-                <th>Total Price</th>
-                <th>Action</th>
+                <th>Total</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             <% order.items.forEach(item => { %>
                 <tr>
                     <td><%= order.orderDate.toDateString() %></td>
-                    <!-- <td><img src="/uploads/<%= item.image[0] %>" alt="Product Image" style="width: 100px; height: 120px;"></td> -->
-                    <td><%= item.name || 'Product' %></td>
+                    <td>
+                        <% if (item.productId && item.productId.images && item.productId.images.length > 0) { %>
+                            <img src="/userAssets/imgs/shop/<%= item.productId.images[0] %>" alt="Product Image" style="width: 100px; height: 120px;">
+                        <% } else { %>
+                            <span>No Image Available</span>
+                        <% } %>
+                    </td>
+                    <td><%= item.productId.name || 'Product' %></td>
                     <td data-input-id="<%= item._id %>"><%= item.status %></td>
                     <td><%= order.paymentStatus %></td>
                     <td><%= order.paymentMethod %></td>
-                    <!-- <td>$<%= item.productPrice.toFixed(2) %></td>
-                    <td><%= item.quantity %></td>
-                    <td>$<%= (item.productPrice * item.quantity).toFixed(2) %></td> -->
                     <td>$<%= (item.productPrice ? item.productPrice.toFixed(2) : '0.00') %></td>
-                     <td><%= item.quantity || 0 %></td>
+                    <td><%= item.quantity || 0 %></td>
                     <td>$<%= (item.productPrice && item.quantity ? (item.productPrice * item.quantity).toFixed(2) : '0.00') %></td>
-
-
                     <td>
-                        <% if(item.status==="Delivered") {%>
+                        <% if(item.status === "Delivered") { %>
                             <button onclick="showReturnConfirmation('<%= order._id %>', '<%= item._id %>')" data-input-id="<%= item._id %>" style="background-color: #FF6B6B; border-color:  #FF6B6B; color: white;">Return</button>
-                        <%}%>
-                        <% if (item.status!="Cancelled") { %>
+                        <% } %>
+                        <% if (item.status !== "Cancelled") { %>
                             <% if (item.status === 'Pending' || item.status === 'Confirmed') { %>
-                                <button onclick="showCancelConfirmation('<%= order._id %>', '<%= item._id %>')" data-input-id="<%= item._id %>" style="background-color: #FF6B6B; border-color:  #FF6B6B; color: white; " >Cancel</button>
-                            <% } else { %>
-                                
+                                <button onclick="showCancelConfirmation('<%= order._id %>', '<%= item._id %>')" data-input-id="<%= item._id %>" style="background-color: #FF6B6B; border-color:  #FF6B6B; color: white;">Cancel</button>
                             <% } %>
-                        <%} else { %>
-                            <button onclick="showCancelConfirmation('<%= order._id %>', '<%= item._id %>')" data-input-id="<%= item._id %>" style="background-color: #FF6B6B; border-color:  #FF6B6B; color: white;" disabled >Order Cancelled</button>
+                        <% } else { %>
+                            <button onclick="showCancelConfirmation('<%= order._id %>', '<%= item._id %>')" data-input-id="<%= item._id %>" style="background-color: #FF6B6B; border-color:  #FF6B6B; color: white;" disabled>Order Cancelled</button>
                         <% } %>
                     </td>
-                    <!-- <div style="text-align: right; margin-top: 20px;"> -->
-                        <div style="text-align:right; margin-top: 20px; margin-right: 15%; width: 95%;">
-
-                        <% if(order.paymentStatus=== "Failed") { %>
-                            <button onclick="retryPayment('<%= order._id %>','<%=order.billTotal%>')" data-input-id="<%= order._id %>" style="padding: 10px 20px; background-color: #557775; color: white; border: none; border-radius: 5px; cursor: pointer;">Retry Payment</button>
-                        <%}else if(order.orderStatus=="Delivered") { %>
-                            <button onclick="downloadInvoice('<%= order._id %>')" style="padding: 10px 20px; background-color: #557775; color: white; border: none; border-radius: 5px; cursor: pointer;">Download Invoice</button>
-                        <%}else { %>
-                            -
-                        <%}%>
-                    </div>
                 </tr>
             <% }); %>
-
         </tbody>
 
 
@@ -174,7 +162,7 @@
         <tbody>
             <tr>
                 <th>Grand Total</th>
-                <!-- <td id="grandTotal">$<%= order.billTotal.toFixed(2) %></td> -->
+                <!-- <td id="grandTotal">$<%= order.billTotal %></td> -->
                 <td id="grandTotal">$<%= order.billTotal ? order.billTotal.toFixed(2) : '0.00' %></td>
 
             </tr>

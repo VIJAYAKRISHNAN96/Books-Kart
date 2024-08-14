@@ -217,6 +217,7 @@ const salesReportManagement = {
         .populate("user")
         .populate("items.productId")
         .populate("couponId")
+        .sort({ orderDate: -1 })
         .skip((page - 1) * perPage)
         .limit(perPage);
 

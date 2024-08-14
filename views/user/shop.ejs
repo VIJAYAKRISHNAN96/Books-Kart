@@ -1,4 +1,5 @@
 <%-include("../partials/header.ejs")%>
+
     <!-- Quick view -->
    <style>
     .active-category a {
@@ -330,7 +331,7 @@
                                         </div>
                                         <div class="product-action-1">
                                             <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal">
-<i class="fi-rs-search"></i></a>
+                                            <i class="fi-rs-search"></i></a>
                                             <!-- <a aria-label="Add To Wishlist" class="action-btn hover-up" href="/wishList"><i class="fi-rs-heart"></i></a> -->
                                             <!-- <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="addToWishList('<%=product._id %>')"><i class="fi-rs-heart"></i></a> -->
                                             <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="addToWishList('<%= product._id %>')">
@@ -342,7 +343,7 @@
                                             <!-- <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a> -->
                                         </div>
                                         <div class="product-badges product-badges-position product-badges-mrg">
-                                            <span class="hot">Hot</span>
+                                            <!-- <span class="hot">Hot</span> -->
                                         </div>
                                     </div>
                                     <div class="product-content-wrap">
@@ -350,11 +351,11 @@
                                             <a href="shop-grid-right.html"><%= product.category %></a>
                                         </div>
                                         <h2><a href="shop-product-right.html"><%= product.name %></a></h2>
-                                        <div class="rating-result" title="90%">
+                                        <!-- <div class="rating-result" title="90%">
                                             <span>
                                                 <span>90%</span>
                                             </span>
-                                        </div>
+                                        </div> -->
                                         <div class="product-price">
                                             <ins><span class="text-brand">$<%= product.discountPrice.toFixed(2) %></span></ins>
                                             <ins><span class="old-price">$<%= product.price %></span></ins>
@@ -362,16 +363,13 @@
                                             <!-- <span class="old-price">$245.8</span> -->
                                         </div>
                                         <div class="product-action-1 show">
-
-                                            <button aria-label="Add To Cart" class="action-btn hover-up" onclick="addToCart('<%= product._id %>')">
+                                            <% if (product.stock > 0) { %>
+                                              <button aria-label="Add To Cart" class="action-btn hover-up" onclick="addToCart('<%= product._id %>')">
                                                 <i class="fi-rs-shopping-bag-add"></i>
-                                            </button>
-                                            
-                                            
-                                            
-                                               
-                                            <!-- <a aria-label="Add To Cart" class="action-btn hover-up" href="/addToCart"><i class="fi-rs-shopping-bag-add"></i></a> -->
-                                        </div>
+                                              </button>
+                                            <% } %>
+                                          </div>
+                                        
                                     </div>
                                 </div>
                             </div>

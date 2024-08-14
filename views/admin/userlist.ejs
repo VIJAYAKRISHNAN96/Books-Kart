@@ -17,6 +17,25 @@
     <link href="/adminAssets/css/main.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+  <style>
+    .custom-btn.block {
+    background-color: #ff4d4d; /* Red color for 'Block' */
+    color: white;
+}
+
+.custom-btn.unblock {
+    background-color: #4CAF50; /* Green color for 'Unblock' */
+    color: white;
+}
+
+  </style>
+
+
+
+
+
+
 </head>
 
 <body>
@@ -24,7 +43,7 @@
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
             <a href="/admin/dashboard" class="brand-wrap">
-                <img src="/adminAssets/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
+                <img src="/userAssets/imgs/page/book1.png" class="logo" alt="Evara Dashboard">
             </a>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
@@ -171,43 +190,15 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Users</th>
+                                    <th>Users </th>
                                     <th>Email</th>
                                     <th>Status</th>
                                     <th>Registered</th>
-                                    <th class="text-end"> Action </th>
+                                    <th class="text-justify"> Action </th>
                                 </tr>
                             </thead>
                             <tbody>
-    <% userList.forEach(user => { %>
-        <tr>
-            <td width="40%">
-                <a href="#" class="itemside">
-                    <div class="left">
-                        <img src="/adminAssets/imgs/people/avatar2.jpg" class="img-sm img-avatar" alt="Userpic">
-                    </div>
-                    <div class="info pl-3">
-                        <h6 class="mb-0 title"><%= user.name %></h6>
-                    </div>
-                </a>
-            </td>
-            <td><%= user.email %></td>
-            <td>
-                <span id="status_<%= user._id %>" class="badge rounded-pill <%= user.isBlocked ? 'bg-danger' : 'bg-success' %>">
-                    <%= user.isBlocked ? 'Blocked' : 'Active' %>
-                </span>
-            </td>
-            <td>08.07.2022</td>
-            <td class="text-end">
-                <button class="btn btn-sm rounded font-sm mt-15 custom-btn" onclick="confirmToggleBlock('<%= user._id %>', '<%= user.isBlocked %>')">
-                    <%= user.isBlocked ? 'Unblock' : 'Block' %>
-                </button>
-            </td>
-        </tr>
-    <% }); %>
-                            </tbody>
-                            <!-- <tbody>
-                                <% userList.forEach(user => { %>
+                            <% userList.forEach(user => { %>
                                 <tr>
                                     <td width="40%">
                                         <a href="#" class="itemside">
@@ -215,27 +206,35 @@
                                                 <img src="/adminAssets/imgs/people/avatar2.jpg" class="img-sm img-avatar" alt="Userpic">
                                             </div>
                                             <div class="info pl-3">
-                                                <h6 class="mb-0 title"> <%= user.name %></h6>
-                                                <!- <small class="text-muted">Seller ID: #439</small> -->
-                                            <!-- </div>
+                                                <h6 class="mb-0 title"><%= user.name %></h6>
+                                            </div>
                                         </a>
-                                    </td> -->
-                                    <!-- <td><%= user.email %></td> -->
-                                      <!-- <td>
+                                    </td>
+                                    <td><%= user.email %></td>
+                                    <td>
                                         <span id="status_<%= user._id %>" class="badge rounded-pill <%= user.isBlocked ? 'bg-danger' : 'bg-success' %>">
-                                          <%= user.isBlocked ? 'Blocked' : 'Active' %>
+                                            <%= user.isBlocked ? 'Blocked' : 'Active' %>
                                         </span>
-                                      </td>
-                                      <td>08.07.2022</td>
-                                      <td class="text-end">
-                                        <button class="btn btn-sm rounded font-sm mt-15 custom-btn" onclick="confirmToggleBlock('<%= user._id %>', <%= user.isBlocked %>)">
-                                          <%= user.isBlocked ? 'Unblock' : 'Block' %>
-                                        </button>
-                                      </td> -->
-                                    <!-- </tr> -->
-                                    <!-- <% }) %> -->
+                                    </td>
 
-                            <!-- </tbody>  -->
+                                    <td><%= new Date(user.createdAt).toDateString() %></td>
+
+                                    
+                                      
+
+
+                                    
+                                    <td class="text-justify">
+                                        <button class="btn btn-sm rounded font-sm mt-15 custom-btn <%= user.isBlocked ? 'unblock' : 'block' %>" 
+                                            onclick="confirmToggleBlock('<%= user._id %>', '<%= user.isBlocked %>')">
+                                            <%= user.isBlocked ? 'Unblock' : 'Block' %>
+                                        </button>
+
+                                    </td>
+                                </tr>
+                            <% }); %>
+                            </tbody>
+                           
                         </table> <!-- table-responsive.// -->
                     </div>
                 </div> <!-- card-body end// -->

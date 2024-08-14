@@ -22,49 +22,70 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
+   
+
 
    <style>
     .search-container {
   display: flex;
   justify-content: flex-left; /* Align the form to the right side */
-  width: 100%;
-  max-width: 600px; /* Adjust the width as needed */
+  width: 200%;
+  max-width: 650px; /* Adjust the width as needed */
   margin: 0 auto;
+  right: 60px;
+  left: 100px;
+  position: relative;
+  top: 10px;
+  
+
+
 }
 
 .search-form {
   display: flex;
   align-items: center;
-  width: 100%;
-  max-width: 500px; /* Adjust the form width as needed */
+  width: 200%;
+  max-width: 600px; /* Adjust the form width as needed */
+  
 }
 
 .search-input {
   flex-grow: 1;
-  padding: 10px 20px;
+  padding: 15px 25px;
   border: 1px solid #ddd;
-  border-radius: 25px; /* Rounded corners on all sides */
+  border-radius: 10px; /* Rounded corners on all sides */
   font-size: 16px;
-  outline: none;
+  outline:none;
 }
 
 .search-button {
    
   position: absolute; /* Position the button absolutely */
-  right: 290px;
+  right: 330px;
   margin-left: 50px;
-  padding: 5px 10px;
+  padding: 15px;
   background-color: #007bff;
   border: none;
-  border-radius: 90%; /* Circular button */
-  width: 100px; /* Adjust the button size as needed */
-
+  width: 15%; /* Adjusted width for a smaller button */
+  height: 45px; /* Ensures the button is circular */
+  align-items: center; /* Center the icon vertically */
+  justify-content: center; /* Center the icon horizontally */
+  border-radius: 35px; /* Rounded corners on all sides */
+  font-size: 20px; /* Adjusted font size for the icon */
   cursor: pointer;
   outline: none;
   color: white;
   transition: background-color 0.3s ease;
-  font-size: 5px;
+ 
+
 }
+
+
+
+.search-button i {
+    font-size: 20px; /* Adjust icon size if needed */
+  }
+
 
 .search-button:hover {
   background-color: #0056b3;
@@ -72,6 +93,7 @@
 
 .search-button i {
   font-size: 15px; /* Adjust icon size if needed */
+  position: center;
 }
 
 .search-container {
@@ -261,7 +283,7 @@
         <div class="container">
             <div class="header-wrap">
                 <div class="logo logo-width-1">
-                    <a href="/"><img src="/userAssets/imgs/theme/nw-logo.jpg" alt="logo"></a>
+                    <a href="/"><img src="/userAssets/imgs/page/book1.png" alt="logo"></a>
                 </div>
                 <div class="header-right">
                     <div class="search-container">
@@ -285,43 +307,7 @@
                                     <img alt="Evara" src="/userAssets/imgs/theme/icons/icon-cart.svg">
                                     <span class="pro-count blue"></span>
                                 </a>
-                                <!-- <div class="cart-dropdown-wrap cart-dropdown-hm2">
-                                    <ul>
-                                        <li>
-                                            <div class="shopping-cart-img">
-                                                <a href="shop-product-right.html"><img alt="Evara" src="/userAssets/imgs/shop/thumbnail-3.jpg"></a>
-                                            </div>
-                                            <div class="shopping-cart-title">
-                                                <h4><a href="shop-product-right.html">Daisy Casual Bag</a></h4>
-                                                <h4><span>1 × </span>$800.00</h4>
-                                            </div>
-                                            <div class="shopping-cart-delete">
-                                                <a href="#"><i class="fi-rs-cross-small"></i></a>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="shopping-cart-img">
-                                                <a href="shop-product-right.html"><img alt="Evara" src="/userAssets/imgs/shop/thumbnail-2.jpg"></a>
-                                            </div>
-                                            <div class="shopping-cart-title">
-                                                <h4><a href="shop-product-right.html">Corduroy Shirts</a></h4>
-                                                <h4><span>1 × </span>$3200.00</h4>
-                                            </div>
-                                            <div class="shopping-cart-delete">
-                                                <a href="#"><i class="fi-rs-cross-small"></i></a>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                    <div class="shopping-cart-footer">
-                                        <div class="shopping-cart-total">
-                                            <h4>Total <span>$4000.00</span></h4>
-                                        </div>
-                                        <div class="shopping-cart-button">
-                                            <a href="/cart" class="outline">View cart</a>
-                                            <a href="shop-checkout.html">Checkout</a>
-                                        </div>
-                                    </div>
-                                </div> -->
+                                
                             </div>
                         </div>
                     </div>

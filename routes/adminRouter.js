@@ -69,6 +69,7 @@ adminRouter.post('/addProduct', upload.array('images', 3), adminController.loada
 adminRouter.get('/editProduct/:id', adminController.loadeditProductpage);
 adminRouter.post('/editProduct/:id', upload.array('images', 3), adminController.editProduct);
 adminRouter.get('/deleteProduct/:id', adminController.deleteProduct);
+adminRouter.get('/unlistProduct/:id', adminController.unlistProduct);
 adminRouter.get("/category", adminController.loadCategory);
 adminRouter.post('/category/edit/:id', adminController.editCategory);
 adminRouter.post('/category/delete/:id', adminController.deleteCategory);

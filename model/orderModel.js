@@ -32,10 +32,10 @@ const orderSchema = Schema({
             type: String,
             required: true
         },
-        image: [{
-            type: String,
+        image: {
+            type: [String],
             required: true
-        }],
+        },
         productPrice: {
             type: Number,
             required: true

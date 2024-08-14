@@ -2,48 +2,10 @@
 
 
 
+
+
+
 <!-- <style>
-    .pagination {
-    display: flex;
-    justify-content: center;
-    padding: 10px;
-    margin-top: 20px;
-}
-
-.pagination a {
-    color: #333;
-    padding: 8px 16px;
-    text-decoration: none;
-    margin: 0 4px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-}
-
-.pagination a.active {
-    background-color: #FF6B6B;
-    color: white;
-    border-color: #FF6B6B;
-}
-
-.pagination a:hover {
-    background-color: #f2f2f2;
-}
-
-.pagination a.prev, .pagination a.next {
-    font-weight: bold;
-}
-
-</style> -->
-
-<style>
-    .hide-account-details-tab {
-        display: none;
-    }
-</style>
-
-
-<style>
     .pagination {
     display: flex;
     justify-content: center;
@@ -81,20 +43,252 @@
     margin: 0 4px;
 }
 
+</style> -->
+
+<style>
+    .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.pagination .btn {
+    border-radius: 5px;
+    padding: 8px 16px;
+    font-size: 14px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination .btn-outline-primary {
+    border: 1px solid #007bff;
+    color: #007bff;
+    background-color: #fff;
+}
+
+.pagination .btn-outline-primary:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.pagination .btn-primary {
+    background-color: #007bff;
+    color: #fff;
+    border: 1px solid #007bff;
+}
+
+.pagination .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.pagination .btn-light {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #6c757d;
+}
+
+.pagination .btn-light:hover {
+    background-color: #e2e6ea;
+    color: #495057;
+}
+
+.pagination .btn[disabled] {
+    pointer-events: none;
+    opacity: 0.65;
+}
+
 </style>
 
 <style>
-    .tab-content > .tab-pane {
-  display: none;
+    /* Wallet Section Styling */
+.wallet-container {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.tab-content > .active {
-  display: block;
+.wallet-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.wallet-balance {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+.balance-label {
+    font-weight: 600;
+    margin-right: 10px;
+    color: #6c757d;
+}
+
+.balance-amount {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.high-balance {
+    color: #28a745;
+}
+
+.low-balance {
+    color: #dc3545;
+}
+
+.no-balance {
+    color: #6c757d;
+}
+
+.transaction-history {
+    margin-top: 30px;
+}
+
+.transaction-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.transaction-table {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.transaction-table thead {
+    background-color: #343a40;
+    color: #fff;
+}
+
+.transaction-table th, .transaction-table td {
+    padding: 12px;
+    text-align: center;
+}
+
+.transaction-table th {
+    font-weight: 600;
+}
+
+.transaction-table td {
+    font-size: 16px;
+}
+
+.transaction-table tbody tr:nth-child(odd) {
+    background-color: #f8f9fa;
+}
+
+.transaction-table tbody tr:nth-child(even) {
+    background-color: #e9ecef;
+}
+
+.transaction-table tbody tr:hover {
+    background-color: #dee2e6;
+    cursor: pointer;
+}
+
+.text-center {
+    text-align: center;
+    color: #6c757d;
 }
 
 </style>
 
+<style>
+    /* Orders Section Styling */
+.order-card {
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: #ffffff;
+}
 
+.order-header {
+    background-color: #007bff;
+    color: #ffffff;
+    padding: 15px 20px;
+    border-radius: 8px 8px 0 0;
+    text-align: center;
+}
+
+.order-body {
+    padding: 20px;
+}
+
+.table-responsive {
+    margin-top: 20px;
+}
+
+.order-table thead {
+    background-color: #343a40;
+    color: #ffffff;
+    text-align: center;
+}
+
+.order-table th,
+.order-table td {
+    padding: 12px 15px;
+    text-align: center;
+}
+
+.order-products img {
+    max-width: 50px;
+    display: inline-block;
+    margin-right: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.order-status .badge {
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 12px;
+}
+
+.order-status .badge-danger {
+    background-color: #dc3545;
+}
+
+.order-status .badge-success {
+    background-color: #28a745;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination .btn {
+    margin: 0 5px;
+    min-width: 40px;
+    text-align: center;
+}
+
+.pagination .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #ffffff;
+}
+
+.pagination .btn-light {
+    background-color: #f8f9fa;
+    border-color: #f8f9fa;
+}
+
+.pagination .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+</style>
 
 
 <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
@@ -274,31 +468,32 @@
                         <div class="col-md-4">
                             <div class="dashboard-menu">
                                 <ul class="nav flex-column" role="tablist">
-                                    <li class="nav-item">
+                                    <!-- <li class="nav-item">
                                         <a class="nav-link show" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="false">
                                             <i class="fi-rs-settings-sliders mr-10"></i>Dashboard
                                         </a>
-                                    </li>
+                                    </li> -->
                                     <li class="nav-item">
-                                        <a class="nav-link active" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="false">
+                                        <a class="nav-link active " id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="true">
+                                            <i class="fi-rs-user mr-10"></i>Account details
+                                        </a>
+                                    </li>
+                                    <li class="nav-item ">
+                                        <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="true">
                                             <i class="fi-rs-shopping-bag mr-10"></i>Orders
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="false">
+                                        <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true">
                                             <i class="fi-rs-marker mr-10"></i>My Address
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" id="wallet-tab" data-bs-toggle="tab" href="#wallet" role="tab" aria-controls="wallet" aria-selected="false">
+                                        <a class="nav-link" id="wallet-tab" data-bs-toggle="tab" href="#wallet" role="tab" aria-controls="wallet" aria-selected="true">
                                             <i class="fi-rs-shopping-bag mr-10"></i>Wallet
                                         </a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link " id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="false">
-                                            <i class="fi-rs-user mr-10"></i>Account details
-                                        </a>
-                                    </li>
+                                   
                                     <li class="nav-item">
                                         <a class="nav-link" href="/logout">
                                             <i class="fi-rs-sign-out mr-10"></i>Logout
@@ -310,16 +505,44 @@
                         </div>
                         <div class="col-md-8">
                             <div class="tab-content dashboard-content">
-                                <div class="tab-pane fade active show" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+
+                                <div class="tab-pane fade active show" id="account-detail" role="tabpanel" aria-labelledby="account-detail-tab">
                                     <div class="card">
                                         <div class="card-header">
-                                            <h5 class="mb-0">Hello <%=user.name%></h5>
+                                            <h5>Account Details</h5>
                                         </div>
                                         <div class="card-body">
-                                            <p>From your account dashboard. you can easily check &amp; view your recent orders , manage your shipping and billing addresses and edit your password and account details.</p>
-                                        </div>
+                                            <form id="editingForm">
+                                                <div class="row">
+                                                    <div class="form-group col-md-6">
+                                                        <label>Name <span class="required"></span></label>
+                                                        <input required="" class="form-control square" name="name" id="name" type="text" value="<%= user.name %>">
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label>Email Address <span class="required">*</span></label>
+                                                        <input required="" class="form-control square" name="email" id="email" type="email" value="<%= user.email %>">
+                                                    </div>
+                                                </div>
+                                
+                                                <div class="row mt-3 text-center">
+                                                    <div class="col-md-12">
+                                                        <button type="button" class="btn btn-fill-out submit" name="submit" value="Submit" style="background-color: #557775;" onclick="saveUser()">Save</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                
+                                            <!-- Reset Password Button -->
+                                            <div class="text-center mt-4">
+                                                <button type="button" class="btn btn-fill-out reset" style="background-color: #f74040; border-color:#FF6B6B;" onclick="resetPassword()">Reset Password</button>
+                                            </div>
+                                        </div>      
                                     </div>
                                 </div>
+                                
+                                
+                                
+
+
                                 <!-- <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
                                     <div class="card">
                                         <div class="card-header">
@@ -337,7 +560,6 @@
                                                             <th>Actions</th>
                                                         </tr>
                                                     </thead>
-
                                                     <tbody>
                                                         <% if (order && order.length > 0) { %>
                                                             <% order.forEach((orderItem, index) => { %>
@@ -380,36 +602,53 @@
                                                             </tr>
                                                         <% } %>
                                                     </tbody>
-
-                                                    <div class="pagination">
-                                                        <% if (currentPage > 1) { %>
-                                                          <a href="?page=<%= currentPage - 1 %>">Previous</a>
-                                                        <% } %>
-                                                      
-                                                        <% for (let i = 1; i <= totalPages; i++) { %>
-                                                          <a href="?page=<%= i %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
-                                                        <% } %>
-                                                      
-                                                        <% if (currentPage < totalPages) { %>
-                                                          <a href="?page=<%= currentPage + 1 %>">Next</a>
-                                                        <% } %>
-                                                      </div>
-
                                                 </table>
                                             </div>
+                                
+                                            
+
+                                            <div class="pagination mt-3">
+                                                <% if (currentPage > 1) { %>
+                                                    <a href="?page=<%= currentPage - 1 %>" class="btn btn-secondary">Previous</a>
+                                                <% } %>
+                                            
+                                                <% if (currentPage > 3) { %>
+                                                    <a href="?page=1" class="btn btn-light">1</a>
+                                                    <% if (currentPage > 4) { %>
+                                                        <span class="btn btn-light">...</span>
+                                                    <% } %>
+                                                <% } %>
+                                            
+                                                <% for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
+                                                    <a href="?page=<%= i %>" class="btn <%= currentPage === i ? 'btn-primary' : 'btn-light' %>"><%= i %></a>
+                                                <% } %>
+                                            
+                                                <% if (currentPage < totalPages - 2) { %>
+                                                    <% if (currentPage < totalPages - 3) { %>
+                                                        <span class="btn btn-light">...</span>
+                                                    <% } %>
+                                                    <a href="?page=<%= totalPages %>" class="btn btn-light"><%= totalPages %></a>
+                                                <% } %>
+                                            
+                                                <% if (currentPage < totalPages) { %>
+                                                    <a href="?page=<%= currentPage + 1 %>" class="btn btn-secondary">Next</a>
+                                                <% } %>
+                                            </div>
+                                            
+                                            
                                         </div>
                                     </div>
                                 </div> -->
                                 
                                 <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
-                                    <div class="card">
-                                        <div class="card-header">
+                                    <div class="card order-card">
+                                        <div class="card-header order-header">
                                             <h5 class="mb-0">Your Orders</h5>
                                         </div>
-                                        <div class="card-body">
+                                        <div class="card-body order-body">
                                             <div class="table-responsive">
-                                                <table class="table">
-                                                    <thead>
+                                                <table class="table order-table">
+                                                    <thead class="thead-dark">
                                                         <tr>
                                                             <th>Order</th>
                                                             <th>Date</th>
@@ -422,7 +661,7 @@
                                                         <% if (order && order.length > 0) { %>
                                                             <% order.forEach((orderItem, index) => { %>
                                                                 <tr>
-                                                                    <td>
+                                                                    <td class="order-products">
                                                                         <% let imageCount = 0; %>
                                                                         <% let allItemsCancelled = true; %>
                                                                         <% orderItem.items.forEach((prod, prodIndex) => { %>
@@ -433,55 +672,66 @@
                                                                                 <% if (imageCount % 2 === 0 && imageCount !== 0) { %>
                                                                                     <br>
                                                                                 <% } %>
-                                                                                <img src="/userAssets/imgs/shop/<%= prod.productId.images[0] %>" alt="Product Image" style="max-width: 50px; display: inline-block; margin-right: 10px;">
+                                                                                <img src="/userAssets/imgs/shop/<%= prod.productId.images[0] %>" alt="Product Image" class="order-product-img">
                                                                                 <% imageCount++; %>
                                                                             <% } %>
                                                                         <% }) %>
                                                                     </td>
                                                                     <td><%= orderItem.orderDate ? orderItem.orderDate.toDateString() : 'N/A' %></td>
-                                                                    <td>
+                                                                    <td class="order-status">
                                                                         <% if (allItemsCancelled) { %>
-                                                                            Cancelled
+                                                                            <span class="badge badge-danger">Cancelled</span>
                                                                         <% } else { %>
-                                                                            <%= orderItem.orderStatus %>
+                                                                            <span class="badge badge-success"><%= orderItem.orderStatus %></span>
                                                                         <% } %>
                                                                     </td>
                                                                     <td>
-                                                                        <%= orderItem.billTotal ? orderItem.billTotal : 'N/A' %> for <%= orderItem.items.length %> item(s)
+                                                                        ₹<%= orderItem.billTotal ? orderItem.billTotal.toFixed(2) : 'N/A' %> for <%= orderItem.items.length %> item(s)
                                                                     </td>
                                                                     <td>
-                                                                        <a href="/viewOrder?id=<%= orderItem._id %>" class="btn-small d-block" style="color: #FF6B6B;">View</a>
+                                                                        <a href="/viewOrder?id=<%= orderItem._id %>" class="btn btn-outline-primary btn-sm">View</a>
                                                                     </td>
                                                                 </tr>
                                                             <% }); %>
                                                         <% } else { %>
                                                             <tr>
-                                                                <td colspan="5">No orders found</td>
+                                                                <td colspan="5" class="text-center">No orders found</td>
                                                             </tr>
                                                         <% } %>
                                                     </tbody>
                                                 </table>
                                             </div>
-                                
-                                            <!-- Pagination Controls -->
-                                            <div class="pagination mt-3">
+                                            
+                                            <div class="pagination mt-4">
                                                 <% if (currentPage > 1) { %>
                                                     <a href="?page=<%= currentPage - 1 %>" class="btn btn-secondary">Previous</a>
                                                 <% } %>
-                                                
-                                                <% for (let i = 1; i <= totalPages; i++) { %>
+                                
+                                                <% if (currentPage > 3) { %>
+                                                    <a href="?page=1" class="btn btn-light">1</a>
+                                                    <% if (currentPage > 4) { %>
+                                                        <span class="btn btn-light">...</span>
+                                                    <% } %>
+                                                <% } %>
+                                
+                                                <% for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
                                                     <a href="?page=<%= i %>" class="btn <%= currentPage === i ? 'btn-primary' : 'btn-light' %>"><%= i %></a>
                                                 <% } %>
-                                                
+                                
+                                                <% if (currentPage < totalPages - 2) { %>
+                                                    <% if (currentPage < totalPages - 3) { %>
+                                                        <span class="btn btn-light">...</span>
+                                                    <% } %>
+                                                    <a href="?page=<%= totalPages %>" class="btn btn-light"><%= totalPages %></a>
+                                                <% } %>
+                                
                                                 <% if (currentPage < totalPages) { %>
                                                     <a href="?page=<%= currentPage + 1 %>" class="btn btn-secondary">Next</a>
                                                 <% } %>
                                             </div>
-                                            
                                         </div>
                                     </div>
                                 </div>
-                                
                                 
                                 
 
@@ -518,7 +768,7 @@
 
 
                           
-                                  <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="address-tab">
+                                  <!-- <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
                                     <div class="wallet-container">
                                         <h2>Your Wallet</h2>
                                         <div class="wallet-balance">
@@ -565,11 +815,71 @@
                                             </table>
                                         </div>
                                     </div>
+                                </div> -->
+
+
+                                <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
+                                    <div class="wallet-container">
+                                        <h2 class="wallet-title">Your Wallet</h2>
+                                        <div class="wallet-balance">
+                                            <span class="balance-label">Wallet Balance:</span>
+                                            <% if (wallet) { %>
+                                                <% if (wallet.balance > 1000) { %>
+                                                    <span class="balance-amount high-balance">₹<%= wallet.balance.toFixed(2) %></span>
+                                                <% } else { %>
+                                                    <span class="balance-amount low-balance">₹<%= wallet.balance.toFixed(2) %></span>
+                                                <% } %>
+                                            <% } else { %>
+                                                <span class="balance-amount no-balance">Wallet not available</span>
+                                            <% } %>
+                                        </div>
+                                        <div class="transaction-history mt-4">
+                                            <h3 class="transaction-title">Transaction History</h3>
+                                            <table class="transaction-table table table-striped table-hover">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th>Order</th>
+                                                        <th>Description</th>
+                                                        <th>Type</th>
+                                                        <th>Date</th>
+                                                        <th>Amount</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="transactionTableBody">
+                                                    <% if (wallet && wallet.transactions && wallet.transactions.length > 0) { %>
+                                                        <% wallet.transactions.forEach((transaction, index) => { %>
+                                                            <tr>
+                                                                <td><%= index + 1 %></td>
+                                                                <td><%= transaction.description %></td>
+                                                                <td><%= transaction.type %></td>
+                                                                <td><%= new Date(transaction.date).toLocaleDateString() %></td>
+                                                                <td>₹<%= transaction.amount.toFixed(2) %></td>
+                                                            </tr>
+                                                        <% }); %>
+                                                    <% } else { %>
+                                                        <tr>
+                                                            <td colspan="5" class="text-center">No transactions found.</td>
+                                                        </tr>
+                                                    <% } %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
+                                
 
 
 
-                                <div class="tab-pane fade active show" id="account-detail" role="tabpanel" aria-labelledby="account-detail-tab">
+
+
+
+
+
+
+
+
+
+                                <!-- <div class="tab-pane fade active show" id="account-detail" role="tabpanel" aria-labelledby="account-detail-tab">
                                     <div class="card">
                                         <div class="card-header">
                                             <h5>Account Details</h5>
@@ -595,12 +905,12 @@
                                             
                                         </div>      
                             </div>
-                            <div class="text-center mt-3"> <!-- Center the button horizontally -->
-                                <div class="d-flex justify-content-center"> <!-- Center the button horizontally within its parent -->
+                            <div class="text-center mt-3"> 
+                                <div class="d-flex justify-content-center"> 
                                     <button type="button" class="btn btn-fill-out reset" style="background-color: #FF6B6B; border-color:#FF6B6B ;" onclick="resetPassword()">Reset Password</button>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
 
                              
@@ -614,7 +924,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 

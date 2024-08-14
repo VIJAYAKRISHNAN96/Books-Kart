@@ -637,17 +637,7 @@ editProduct: async (req, res) => {
 },
 
   
-//  deleteCategory : async (req, res) => {
-//   const { id } = req.params;
-//   console.log(req.params + "Delete category .................")
-//   try {
-//       await categoryModel.findByIdAndDelete(id);
-//       return res.status(200).redirect('/admin/category');
-//   } catch (error) {
-//       console.error(error.message);
-//       res.status(500).send('Internal Server Error');
-//   }
-// },
+
   deleteProduct: async (req, res) => {
     try {
       const { id } = req.params;
@@ -673,6 +663,51 @@ editProduct: async (req, res) => {
     // res.render("category");
 
   },
+
+  unlistProduct: async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const product = await productModel.findById(id);
+      
+      if (!product) {
+        return res.status(404).json({ success: false, message: 'Product not found' });
+      }
+      
+      // Toggle the isListed status
+      product.isListed = product.isListed === 'Active' ? 'Inactive' : 'Active';
+      
+      await product.save();
+      
+      const statusMessage = product.isListed === 'Active' ? 'listed' : 'unlisted';
+      return res.status(200).json({ 
+        success: true, 
+        message: `Product ${statusMessage} successfully`,
+        isListed: product.isListed 
+      });
+    } catch (error) {
+      console.error('Error in unlistProduct:', error.message);
+      return res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+  },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // loadOrder: async (req, res) => {
   //   res.render("order");
@@ -755,6 +790,63 @@ deleteCategory : async (req, res) => {
   }
 },
 
+// wrking
+// loadUserlist: async (req, res) => {
+//   try {
+//     const page = parseInt(req.query.page) || 1;
+//     const limit = parseInt(req.query.limit) || 5;
+//     const offset = (page - 1) * limit;
+
+//     const searchQuery = req.query.search || '';
+//     const statusFilter = req.query.status || '';
+
+//     const filter = { isAdmin: false };
+
+
+//     // if (searchQuery) {
+//     //   filter.name = { $regex: searchQuery, $options: 'i' }; // Case-insensitive search
+//     // }
+
+//     if (searchQuery) {
+//       filter.$or = [
+//         { name: { $regex: searchQuery, $options: 'i' } },
+//         { email: { $regex: searchQuery, $options: 'i' } }
+//       ];
+//     }
+
+//     if (statusFilter === 'Active') {
+//       filter.isBlocked = false;
+//     } else if (statusFilter === 'Disabled') {
+//       filter.isBlocked = true;
+//     }
+
+    
+
+
+//     const total = await userModel.countDocuments();
+//     const totalPages = Math.ceil(total / limit);
+//     const userList = await userModel.find(filter).skip(offset).limit(limit);
+
+//     // const userList = await userModel.find({ isAdmin: false }).skip(offset).limit(limit);
+//     console.log(userList);
+    
+//     return res.render("userlist", {
+//       userList: userList,
+//       currentPage: page,
+//       totalPages: totalPages,
+//       limit: limit,
+//       searchQuery: searchQuery,
+//       statusFilter: statusFilter,
+//       message: null,
+//       messageType: null
+//     });
+//   } catch (error) {
+//     console.log(error.message);
+//     return res.status(500).send("Internal server error");
+//   }
+// },
+
+
 loadUserlist: async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -765,11 +857,6 @@ loadUserlist: async (req, res) => {
     const statusFilter = req.query.status || '';
 
     const filter = { isAdmin: false };
-
-
-    // if (searchQuery) {
-    //   filter.name = { $regex: searchQuery, $options: 'i' }; // Case-insensitive search
-    // }
 
     if (searchQuery) {
       filter.$or = [
@@ -784,16 +871,17 @@ loadUserlist: async (req, res) => {
       filter.isBlocked = true;
     }
 
-    
-
-
     const total = await userModel.countDocuments();
     const totalPages = Math.ceil(total / limit);
-    const userList = await userModel.find(filter).skip(offset).limit(limit);
 
-    // const userList = await userModel.find({ isAdmin: false }).skip(offset).limit(limit);
+    // Fetch users with sorting by creation date (latest to oldest) and pagination
+    const userList = await userModel.find(filter)
+      .sort({ createdAt: -1 })  // Sort by creation date, latest first
+      .skip(offset)
+      .limit(limit);
+
     console.log(userList);
-    
+
     return res.render("userlist", {
       userList: userList,
       currentPage: page,
@@ -809,6 +897,15 @@ loadUserlist: async (req, res) => {
     return res.status(500).send("Internal server error");
   }
 },
+
+
+
+
+
+
+
+
+
 
 
   toggleBlockUser: async (req, res) => {

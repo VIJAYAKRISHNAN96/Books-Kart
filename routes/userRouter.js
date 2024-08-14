@@ -149,6 +149,10 @@ userRouter.get("/", userController.homePage);
 userRouter.get("/signup", auth.isLogOut, userController.loadSignup);
 userRouter.post("/signup", userController.processSignup);
 
+userRouter.get("/forgotPassword", auth.isLogOut, userController.loadForgotPassword);
+userRouter.post("/forgotPassword", userController.forgotPassword);
+userRouter.post("/resetPass", userController.resetPass);
+
 userRouter.get("/login", auth.isLogOut, userController.loadLogin);
 userRouter.post("/login", userController.processLogin);
 userRouter.get('/logout', auth.isLogin, userController.userLogout);

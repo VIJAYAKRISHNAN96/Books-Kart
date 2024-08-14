@@ -1,4 +1,20 @@
-<%-include("../partials/header.ejs")%>
+
+
+
+
+ <%- include("../partials/header.ejs") %>
+
+
+
+<style>
+    .error {
+        color: red;
+        font-size: 0.8em;
+        display: block;
+        margin-top: 5px;
+    }
+    </style>
+
 
 <main class="main">
     <div class="page-header breadcrumb-wrap">
@@ -9,42 +25,147 @@
             </div>
         </div>
     </div>
-    <section class="pt-150 pb-150">
+    <section class="pt-150 pb-150 d-flex align-items-center justify-content-center" style="min-height: 100vh;">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-10 m-auto">
-                    <div class="row">
-
-                        <div class="col-lg-5">
-                            <div class="login_wrap widget-taber-content p-30 background-white border-radius-10 mb-md-5 mb-lg-0 mb-sm-5">
-                                <div class="padding_eight_all bg-white">
-                                    <div class="heading_s1">
-                                        <h3 class="mb-30">Login</h3>
-                                    </div>
-                                    <form method="post" action="/login">
-                                        <div class="form-group">
-                                            <input type="text" required="" name="email" placeholder="Your Email">
-                                        </div>
-                                        <div class="form-group">
-                                            <input required="" type="password" name="password" placeholder="Password">
-                                        </div>
-                                        <div class="login_footer form-group">
-                                            <div class="chek-form">
-                                                <div class="custome-checkbox">
-                                                    <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox1" value="">
-                                                    <label class="form-check-label" for="exampleCheckbox1"><span>Remember me</span></label>
-                                                </div>
-                                            </div>
-                                            <a class="text-muted" href="/">Forgot password?</a>
-                                        </div>
-                                        <div class="form-group">
-                                            <button type="submit" class="btn btn-fill-out btn-block hover-up" name="login">Log in</button>
-                                        </div>
-                                        <div class="text-center">
-                                            <p class="mt-20">Create account? <a href="/signup" class="text-primary">Sign up</a></p>
-                                        </div>
-                                    </form>
-                                </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-5">
+                    <div class="login_wrap widget-taber-content p-30 background-white border-radius-10">
+                        <div class="padding_eight_all bg-white">
+                            <div class="heading_s1">
+                                <h3 class="mb-30" style="text-align: center;">Login</h3>
                             </div>
+                            <form method="post" action="/login" id="loginForm" onsubmit="return validateForm()">
+                                <div class="form-group">
+                                    <input type="email" required="" name="email" id="email" placeholder="Your Email">
+                                    <span id="emailError" class="error"></span>
+                                </div>
+                                <div class="form-group">
+                                    <input required="" type="password" name="password" id="password" placeholder="Password">
+                                    <span id="passwordError" class="error"></span>
+                                </div>
+                                <div class="login_footer form-group">
+                                    <div class="chek-form">
+                                        <!-- <div class="custome-checkbox">
+                                            <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox1" value="">
+                                            <label class="form-check-label" for="exampleCheckbox1"><span>Remember me</span></label>
+                                        </div> -->
+                                    </div>
+                                    <a class="text-muted" href="/forgotPassword">Forgot password?</a>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-fill-out btn-block hover-up" name="login">Log in</button>
+                                </div>
+
+                                <div class="text-center">
+                                    <p class="mt-20">Create account? <a href="/signup" class="text-primary">Sign up</a></p>
+                                </div>
+                            </form>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+function validateForm() {
+        let valid = true;
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+        const emailError = document.getElementById('emailError');
+        const passwordError = document.getElementById('passwordError');
+    
+        // Clear previous errors
+        emailError.textContent = '';
+        passwordError.textContent = '';
+    
+        // Email validation
+        if (!email.value) {
+            emailError.textContent = 'Email is required';
+            valid = false;
+        } else if (!/\S+@\S+\.\S+/.test(email.value)) {
+            emailError.textContent = 'Please enter a valid email address';
+            valid = false;
+        }
+    
+        // Password validation
+        if (!password.value) {
+            passwordError.textContent = 'Password is required';
+            valid = false;
+        }
+    
+        return valid;
+    }
+
+
+
+
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the form from submitting normally
+
+        // Get form values
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        // Perform form validation
+        if (!validateForm()) {
+            return; // Stop if validation fails
+        }
+
+        // Send AJAX request
+        fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success alert
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login Successful',
+                    text: 'You have successfully logged in.',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    // Redirect or reload the page
+                    window.location.href = '/'; // Adjust URL as needed
+                });
+            } else {
+                // Show error alert with detailed message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Login Failed',
+                    text: data.message || 'Invalid email or password.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred: ' + error.message,
+                confirmButtonText: 'OK'
+            });
+        });
+    });
+
+    
+</script>
+
+
+<%-include("../partials/footer.ejs")%>
+
+
+
 

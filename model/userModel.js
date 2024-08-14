@@ -121,7 +121,8 @@ const userSchema = mongoose.Schema({
         default: false
     },
     createdOn: {
-        type: Date
+        type: Date,
+        default: Date.now
     },
     address: [{
         houseName: { type: String },
