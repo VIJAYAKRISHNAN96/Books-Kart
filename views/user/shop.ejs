@@ -82,6 +82,73 @@
 }
 
  </style>
+
+<!-- <style>
+   .primary-sidebar {
+    padding: 15px;
+}
+
+.widget-category {
+    margin: 0;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.categories {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.categories li {
+    margin-bottom: 10px;
+}
+
+.categories a {
+    text-decoration: none;
+    color: #333;
+    font-size: 1rem;
+}
+
+.active-category a {
+    font-weight: bold;
+    color: #007bff; /* Highlight color for active category */
+}
+
+
+</style> -->
+
+<style>
+    .primary-sidebar {
+    background-color: #f1f8f7; /* Apply the desired background color */
+    padding: 15px;
+    border-radius: 8px; /* Optional: Adds rounded corners */
+}
+
+.widget-category h5 {
+    color: #ffffff; /* White color for the section title text */
+}
+
+.categories a {
+    color: #150303; /* White color for the category links */
+}
+
+.categories a:hover {
+    color: #088178; /* Background color of the sidebar as text color when hovered */
+    background-color: #e4e8e7; /* White background color on hover */
+}
+
+.active-category a {
+    font-weight: bold;
+    color: #abfaec; /* White color for the active category */
+}
+
+</style>
+
     <div class="mobile-header-active mobile-header-wrapper-style">
         <div class="mobile-header-wrapper-inner">
             <div class="mobile-header-top">
@@ -402,7 +469,7 @@
                     </div>
                     <div class="col-lg-3 primary-sidebar sticky-sidebar">
                         <div class="widget-category mb-30">
-                            <h5 class="section-title style-1 mb-30 wow fadeIn animated">Category</h5>                           
+                            <h5 class="section-title style-1 mb-30 wow fadeIn animated" style="color: #000605;">Category</h5>                           
                                 <ul class="categories">
                                     <li class="<%= category === 'Novel' ? 'active-category' : '' %>"><a href="/shop?category=Novel">Novel</a></li>
                                     <li class="<%= category === 'Biography' ? 'active-category' : '' %>"><a href="/shop?category=Biography">Biography</a></li>
@@ -410,27 +477,33 @@
                                     <li class="<%= category === 'Fiction' ? 'active-category' : '' %>"><a href="/shop?category=Fiction">Fiction</a></li>
                                     <li class="<%= category === 'Education' ? 'active-category' : '' %>"><a href="/shop?category=Education">Education</a></li>
                                   </ul>
-                              <!-- <li><a href="/shop?category=Novel">Novel</a></li> -->
-                              <!-- <li class="<%= category === 'Novel' ? 'active-category' : '' %>"><a href="/shop?category=Novel">Novel</a></li>
-
-                              <li><a href="/shop?category=Biography">Biography</a></li>
-                              <li><a href="/shop?category=Travel">Travel</a></li>
-                              <li><a href="/shop?category=Fiction">Fiction</a></li>
-                              <li><a href="/shop?category=Education">Education</a></li>
-                            </ul> -->
+                             
                           </div>
+
+                          
                         <!-- Fillter By Price -->
                        
                         <!-- Product sidebar Widget -->
                        
-                        <div class="banner-img wow fadeIn mb-45 animated d-lg-block d-none">
+                        <!-- <div class="banner-img wow fadeIn mb-45 animated d-lg-block d-none">
                             <img src="userAssets/imgs/banner/banner-11.jpg" alt="">
                             <div class="banner-text">
                                 <span>Women Zone</span>
                                 <h4>Save 17% on <br>Office Dress</h4>
                                 <a href="shop-grid-right.html">Shop Now <i class="fi-rs-arrow-right"></i></a>
                             </div>
+                        </div> -->
+
+                        <div class="banner-img wow fadeIn mb-45 animated d-lg-block d-none">
+                            <img src="userAssets/imgs/banner/banner-11.jpg" alt="Book Sale Banner">
+                            
+                            <div class="banner-text">
+                                <span>Book Lovers' Corner</span>
+                                <h4>Save 20% on <br>Bestselling Novels</h4>
+                                <a href="/shop">Shop Now <i class="fi-rs-arrow-right"></i></a>
+                            </div>
                         </div>
+                        
                     </div>
                 </div>
             </div>

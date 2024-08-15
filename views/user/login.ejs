@@ -136,8 +136,9 @@ function validateForm() {
                     text: 'You have successfully logged in.',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    // Redirect or reload the page
-                    window.location.href = '/'; // Adjust URL as needed
+                    setTimeout(() => {
+                        window.location.href = '/'; 
+                    }, 300); 
                 });
             } else {
                 // Show error alert with detailed message

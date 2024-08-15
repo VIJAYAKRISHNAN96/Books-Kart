@@ -455,7 +455,7 @@
         <div class="container">
             <div class="breadcrumb">
                 <a href="/" rel="nofollow">Home</a>
-                <span></span> Pages
+                    
                 <span></span> Account
             </div>
         </div>
@@ -650,9 +650,9 @@
                                                 <table class="table order-table">
                                                     <thead class="thead-dark">
                                                         <tr>
-                                                            <th>Order</th>
-                                                            <th>Date</th>
-                                                            <th>Status</th>
+                                                            <!-- <th>Order</th> -->
+                                                            <th>Order Date</th>
+                                                            <th>Order Status</th>
                                                             <th>Total</th>
                                                             <th>Actions</th>
                                                         </tr>
@@ -661,7 +661,7 @@
                                                         <% if (order && order.length > 0) { %>
                                                             <% order.forEach((orderItem, index) => { %>
                                                                 <tr>
-                                                                    <td class="order-products">
+                                                                    <!-- <td class="order-products">
                                                                         <% let imageCount = 0; %>
                                                                         <% let allItemsCancelled = true; %>
                                                                         <% orderItem.items.forEach((prod, prodIndex) => { %>
@@ -676,7 +676,7 @@
                                                                                 <% imageCount++; %>
                                                                             <% } %>
                                                                         <% }) %>
-                                                                    </td>
+                                                                    </td> -->
                                                                     <td><%= new Date(orderItem.orderDate).toDateString() %></td>
 
                                                                     <!-- <td><%= orderItem.orderDate.toDateString() %></td> -->
@@ -735,15 +735,11 @@
                                     </div>
                                 </div>
                                 
-                                
-
-
-
 
                                 <div class="tab-pane fade " id="address" role="tabpanel" aria-labelledby="address-tab">
                                     <!-- Add Address button -->
                                     <div class="text-end mb-3">
-                                        <button type="button" class="btn " data-bs-toggle="modal" style="background-color: #FF6B6B; border-color: #FF6B6B;" data-bs-target="#addAddressModal">Add Address <i class="fa-solid fa-plus" style="color: #ffffff;"></i></button>
+                                        <button type="button" class="btn " data-bs-toggle="modal" style="background-color: #FF6B6B; border-color: #FF6B6B;" data-bs-target="#addAddressModal">Add Address <i class="" style="color: #ffffff;"></i></button>
                                     </div>
                                     
                                     <div class="row">
@@ -756,11 +752,19 @@
                                                 <div class="card-body">
                                                     <address><%=add.houseName%><br> <%=add.street %>,<br> <%=add.city%>,<%=add.postalCode%> <br><%=add.phoneNumber%><br><%=add.state%></address>
                                                     <p><%=add.country %></p>
-                                                    <!-- Edit button in address card -->
-                                                    <a type="button" class="btn-small" data-bs-toggle="modal" data-bs-target="#editAddressModal" onclick="populateEditForm('<%=add._id%>', '<%=add.houseName%>', '<%=add.street%>', '<%=add.city%>', '<%=add.state%>', '<%=add.country%>', '<%=add.postalCode%>', '<%=add.phoneNumber%>', '<%=add.type%>')">Edit</a>
+                                                    
+
+                                                    <a type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editAddressModal"
+
+                                                    onclick="populateEditForm('<%= add._id %>', '<%= add.houseName %>', '<%= add.street %>', '<%= add.city %>', '<%= add.state %>', '<%= add.country %>', '<%= add.postalCode %>', '<%= add.phoneNumber %>', '<%= add.type %>')">
+                                                        Edit
+                                                    </a>
+
+                                                    <a type="button" class="btn btn-sm btn-outline-danger ml-2" onclick="confirmDelete('<%= add._id %>')">
+                                                        Delete
+                                                    </a>
 
 
-                                                    <a type="button" class="btn-small ml-15" onclick="confirmDelete('<%=add._id%>')">Delete</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -769,55 +773,6 @@
                                 </div>
 
 
-                          
-                                  <!-- <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
-                                    <div class="wallet-container">
-                                        <h2>Your Wallet</h2>
-                                        <div class="wallet-balance">
-                                            <span class="balance-label">Wallet Balance:</span>
-                                            <% if (wallet) { %>
-                                                <% if (wallet.balance > 1000) { %>
-                                                    <span class="balance-amount high-balance">₹<%= wallet.balance.toFixed(2) %></span>
-                                                <% } else { %>
-                                                    <span class="balance-amount low-balance">₹<%= wallet.balance.toFixed(2) %></span>
-                                                <% } %>
-                                            <% } else { %>
-                                                <span class="balance-amount no-balance">Wallet not available</span>
-                                            <% } %>
-                                        </div>
-                                        <div class="transaction-history">
-                                            <h3>Transaction History</h3>
-                                            <table class="transaction-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Order</th>
-                                                        <th>Description</th>
-                                                        <th>Type</th>
-                                                        <th>Date</th>
-                                                        <th>Amount</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="transactionTableBody">
-                                                    <% if (wallet && wallet.transactions && wallet.transactions.length > 0) { %>
-                                                        <% wallet.transactions.forEach((transaction, index) => { %>
-                                                            <tr>
-                                                                <td><%= index + 1 %></td>
-                                                                <td><%= transaction.description %></td>
-                                                                <td><%= transaction.type %></td>
-                                                                <td><%= new Date(transaction.date).toLocaleDateString() %></td>
-                                                                <td>₹<%= transaction.amount.toFixed(2) %></td>
-                                                            </tr>
-                                                        <% }); %>
-                                                    <% } else { %>
-                                                        <tr>
-                                                            <td colspan="5">No transactions found.</td>
-                                                        </tr>
-                                                    <% } %>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div> -->
 
 
                                 <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
