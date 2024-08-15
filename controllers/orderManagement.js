@@ -1393,18 +1393,86 @@ onlineOrderPlacing: async (req, res) => {
 
 
 
+// wrking
+// cancelOrder: async (req, res) => {
+//   try {
+//     const userId = req.session.user.id;
+//     const { orderId } = req.body;
+
+//     console.log("Cancel order request for user:", userId, "orderId:", orderId);
+
+//     // Validate the orderId
+//     if (!mongoose.Types.ObjectId.isValid(orderId)) {
+//       console.log("Invalid orderId format:", orderId);
+//       return res.status(400).json({ success: false, message: "Invalid order ID format" });
+//     }
+
+//     // Find the order
+//     const order = await Order.findOne({ _id: orderId, user: userId });
+//     if (!order) {
+//       console.log("Order not found or does not belong to user");
+//       return res.status(404).json({ success: false, message: "Order not found" });
+//     }
+
+//     // Check if the order is already cancelled
+//     if (order.paymentStatus === "Cancelled") {
+//       console.log("Order is already cancelled");
+//       return res.status(400).json({ success: false, message: "Order is already cancelled" });
+//     }
+
+//     // Update the order status to 'Cancelled'
+//     order.paymentStatus = "Cancelled";
+//     await order.save();
+//     console.log("Order status updated to 'Cancelled'");
+
+//     // Update product stock
+//     for (const item of order.items) {
+//       await Product.findByIdAndUpdate(item.productId, {
+//         $inc: { stock: item.quantity }
+//       });
+//     }
+//     console.log("Product stock updated");
+
+//     // If payment was made through Razorpay, refund to wallet
+//     if (order.paymentMethod === "razorpay") {
+//       const user = await User.findById(userId);
+//       if (!user) {
+//         console.log("User not found for ID:", userId);
+//         return res.status(404).json({ success: false, message: "User not found" });
+//       }
+
+//       // Update the user's wallet
+//       user.wallet.balance += order.billTotal;
+//       user.wallet.transactions.push({
+//         amount: order.billTotal,
+//         description: `Refund for cancelled order ${orderId}`,
+//         type: 'Refund'
+//       });
+//       await user.save();
+//       console.log("Amount refunded to wallet:", order.billTotal);
+//     }
+
+//     res.status(200).json({ success: true, message: "Order cancelled and amount refunded to wallet" });
+//   } catch (error) {
+//     console.error("Error cancelling order:", error);
+//     res.status(500).json({ success: false, message: "Internal Server Error" });
+//   }
+// },
+
+
+
 
 cancelOrder: async (req, res) => {
   try {
     const userId = req.session.user.id;
-    const { orderId } = req.body;
+    const { orderId, itemId, cancellationReason } = req.body;
 
-    console.log("Cancel order request for user:", userId, "orderId:", orderId);
+    console.log("Cancel order item request for user:", userId, "orderId:", orderId, "itemId:", itemId);
 
-    // Validate the orderId
-    if (!mongoose.Types.ObjectId.isValid(orderId)) {
-      console.log("Invalid orderId format:", orderId);
-      return res.status(400).json({ success: false, message: "Invalid order ID format" });
+    // Validate the orderId and itemId
+    if (!mongoose.Types.ObjectId.isValid(orderId) || !mongoose.Types.ObjectId.isValid(itemId)) {
+      console.log("Invalid orderId or itemId format:", orderId, itemId);
+      return res.status(400).json({ success: false, message: "Invalid order ID or item ID format" });
     }
 
     // Find the order
@@ -1414,24 +1482,33 @@ cancelOrder: async (req, res) => {
       return res.status(404).json({ success: false, message: "Order not found" });
     }
 
-    // Check if the order is already cancelled
-    if (order.paymentStatus === "Cancelled") {
-      console.log("Order is already cancelled");
-      return res.status(400).json({ success: false, message: "Order is already cancelled" });
+    // Find the specific item in the order
+    const item = order.items.id(itemId);
+    if (!item) {
+      console.log("Item not found in the order");
+      return res.status(404).json({ success: false, message: "Item not found in the order" });
     }
 
-    // Update the order status to 'Cancelled'
-    order.paymentStatus = "Cancelled";
+    // Check if the item is already cancelled
+    if (item.status === "Cancelled") {
+      console.log("Item is already cancelled");
+      return res.status(400).json({ success: false, message: "Item is already cancelled" });
+    }
+
+    // Update the item status to 'Cancelled'
+    item.status = "Cancelled";
+    item.cancellationReason = cancellationReason;
     await order.save();
-    console.log("Order status updated to 'Cancelled'");
+    console.log("Item status updated to 'Cancelled'");
 
     // Update product stock
-    for (const item of order.items) {
-      await Product.findByIdAndUpdate(item.productId, {
-        $inc: { stock: item.quantity }
-      });
-    }
+    await Product.findByIdAndUpdate(item.productId, {
+      $inc: { stock: item.quantity }
+    });
     console.log("Product stock updated");
+
+    // Calculate refund amount
+    const refundAmount = item.productPrice * item.quantity;
 
     // If payment was made through Razorpay, refund to wallet
     if (order.paymentMethod === "razorpay") {
@@ -1442,19 +1519,23 @@ cancelOrder: async (req, res) => {
       }
 
       // Update the user's wallet
-      user.wallet.balance += order.billTotal;
+      user.wallet.balance += refundAmount;
       user.wallet.transactions.push({
-        amount: order.billTotal,
-        description: `Refund for cancelled order ${orderId}`,
+        amount: refundAmount,
+        description: `Refund for cancelled item in order ${orderId}`,
         type: 'Refund'
       });
       await user.save();
-      console.log("Amount refunded to wallet:", order.billTotal);
+      console.log("Amount refunded to wallet:", refundAmount);
     }
 
-    res.status(200).json({ success: true, message: "Order cancelled and amount refunded to wallet" });
+    // Update order total
+    order.billTotal -= refundAmount;
+    await order.save();
+
+    res.status(200).json({ success: true, message: "Item cancelled and amount refunded to wallet" });
   } catch (error) {
-    console.error("Error cancelling order:", error);
+    console.error("Error cancelling order item:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 },
@@ -1466,121 +1547,66 @@ cancelOrder: async (req, res) => {
 
 
 
-  // returnOrder: async (req, res) => {
-  //   try {
-  //     const { orderId, itemId, returnReason } = req.body;
-
-  //     const order = await Order.findById(orderId);
-  //     const userId = req.session.user.id;
-
-  //     if (!order) {
-  //       return res.status(404).json({ message: "Order not found" });
-  //     }
-
-  //     const item = order.items.find((item) => item._id == itemId);
-
-  //     if (!item) {
-  //       return res.status(404).json({ message: "Item not found in the order" });
-  //     }
-
-  //     item.status = "Returned";
-  //     item.returnReason = returnReason;
-
-  //     const refundAmount = item.productPrice * item.quantity;
-  //     order.billTotal -= refundAmount;
-
-  //     if (
-  //       order.paymentMethod === "razorpay" ||
-  //       order.paymentMethod === "wallet"
-  //     ) {
-  //       const wallet = await Wallet.findOne({ user: userId });
-  //       if (!wallet) {
-  //         throw new Error(`Wallet for user ${order.user._id} not found`);
-  //       }
-
-  //       const transaction = {
-  //         amount: refundAmount,
-  //         description: `Return refund for ${item.name} ${orderId}`,
-  //         type: "Refund",
-  //         transcationDate: new Date(),
-  //       };
-  //       wallet.transactions.push(transaction);
-
-  //       wallet.walletBalance += refundAmount;
-
-  //       order.paymentStatus = "Refunded";
-  //       await wallet.save();
-  //     }
-
-  //     const allItemsReturned = order.items.every(
-  //       (item) => item.status === "Returned"
-  //     );
-
-  //     if (allItemsReturned) {
-  //       order.orderStatus = "Returned";
-  //     }
-
-  //     await order.save();
-  //     res.status(201).json({message:"Item returned successfully"})
-  //   } catch (error) {
-  //     console.log(error.message);
-  //   }
-  // },
-
-
-
-  // checkWalletBalance: async (req, res) => {
-  //   try {
-  //     const userId = req.session.user.id;
-  //     const totalAmount = parseFloat(req.query.totalAmount);
-
-  //     const wallet = await Wallet.findOne({ user: userId });
-
-  //     if (!wallet) {
-  //       return res
-  //         .status(404)
-  //         .json({ success: false, message: "Wallet not found" });
-  //     }
-
-  //     if (wallet.walletBalance >= totalAmount) {
-  //       res.json({ success: true });
-  //     } else {
-  //       res.json({ success: false, message: "Insufficient wallet balance" });
-  //     }
-  //   } catch (error) {
-  //     console.log("Error checking wallet", error.message);
-  //     res.status(500).json({ success: false, message: "Internal server error" });
-  //   }
-  // },
 
 
 
 
-  // nw
-//   checkWalletBalance : async (req, res) => {
-//     try {
-//         const userId = req.session.user.id;
-//         const totalAmount = parseFloat(req.query.totalAmount);
+// wrking code
+// returnOrder: async (req, res) => {
+//   try {
+//     const { orderId, itemId, returnReason } = req.body;
+//     const userId = req.session.user.id;
 
-//         if (isNaN(totalAmount)) {
-//             return res.status(400).json({ success: false, message: "Invalid total amount" });
-//         }
-
-//         const wallet = await Wallet.findOne({ user: userId });
-
-//         if (!wallet) {
-//             return res.status(404).json({ success: false, message: "Wallet not found" });
-//         }
-
-//         res.json({
-//             success: true,
-//             walletBalance: wallet.walletBalance
-//         });
-//     } catch (error) {
-//         console.error("Error checking wallet balance:", error.message);
-//         res.status(500).json({ success: false, message: "Internal server error" });
+//     const order = await Order.findById(orderId);
+//     if (!order) {
+//       return res.status(404).json({ message: "Order not found" });
 //     }
+
+//     const item = order.items.find((item) => item._id.toString() === itemId);
+//     if (!item) {
+//       return res.status(404).json({ message: "Item not found in the order" });
+//     }
+
+//     item.status = "Returned";
+//     item.returnReason = returnReason;
+
+//     const refundAmount = item.productPrice * item.quantity;
+//     order.billTotal -= refundAmount;
+
+//     if (order.paymentMethod === "razorpay" || order.paymentMethod === "wallet") {
+//       const wallet = await Wallet.findOne({ user: userId });
+//       if (!wallet) {
+//         throw new Error(`Wallet for user ${userId} not found`);
+//       }
+
+//       const transaction = {
+//         amount: refundAmount,
+//         description: `Return refund for ${item.name} in Order ${orderId}`,
+//         type: "Refund",
+//         transactionDate: new Date(),
+//       };
+//       wallet.transactions.push(transaction);
+//       wallet.walletBalance += refundAmount;
+
+//       order.paymentStatus = "Refunded";
+//       await wallet.save();
+//     }
+
+//     const allItemsReturned = order.items.every((item) => item.status === "Returned");
+//     if (allItemsReturned) {
+//       order.orderStatus = "Returned";
+//     }
+
+//     await order.save();
+//     res.status(201).json({ message: "Item returned successfully" });
+//   } catch (error) {
+//     console.error("Error:", error);
+//     res.status(500).json({ message: "An error occurred while returning the item" });
+//   }
 // },
+
+
+
 
 
 returnOrder: async (req, res) => {
@@ -1588,46 +1614,56 @@ returnOrder: async (req, res) => {
     const { orderId, itemId, returnReason } = req.body;
     const userId = req.session.user.id;
 
+    // Find the order by ID
     const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
+    // Find the specific item in the order
     const item = order.items.find((item) => item._id.toString() === itemId);
     if (!item) {
       return res.status(404).json({ message: "Item not found in the order" });
     }
 
+    // Update item status and reason for return
     item.status = "Returned";
     item.returnReason = returnReason;
 
+    // Calculate the refund amount and update the order total
     const refundAmount = item.productPrice * item.quantity;
     order.billTotal -= refundAmount;
 
+    // Process the refund if the payment method is razorpay or wallet
     if (order.paymentMethod === "razorpay" || order.paymentMethod === "wallet") {
-      const wallet = await Wallet.findOne({ user: userId });
-      if (!wallet) {
-        throw new Error(`Wallet for user ${userId} not found`);
+      // Retrieve the user with the wallet
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
       }
 
+      // Record the refund transaction in the user's wallet
       const transaction = {
         amount: refundAmount,
         description: `Return refund for ${item.name} in Order ${orderId}`,
         type: "Refund",
         transactionDate: new Date(),
       };
-      wallet.transactions.push(transaction);
-      wallet.walletBalance += refundAmount;
+      user.wallet.transactions.push(transaction);
+      user.wallet.balance += refundAmount;
 
+      // Update payment status in the order
       order.paymentStatus = "Refunded";
-      await wallet.save();
+      await user.save();
     }
 
+    // Check if all items are returned, and update the order status if necessary
     const allItemsReturned = order.items.every((item) => item.status === "Returned");
     if (allItemsReturned) {
       order.orderStatus = "Returned";
     }
 
+    // Save the updated order
     await order.save();
     res.status(201).json({ message: "Item returned successfully" });
   } catch (error) {
@@ -1635,6 +1671,22 @@ returnOrder: async (req, res) => {
     res.status(500).json({ message: "An error occurred while returning the item" });
   }
 },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

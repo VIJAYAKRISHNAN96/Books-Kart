@@ -1,0 +1,301 @@
+
+
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Evara Dashboard</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/adminAssets/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link href="/adminAssets/css/main.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 30px;
+            color: #343a40;
+            font-size: 2.5rem;
+        }
+
+        .navbar-aside {
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: #f8f9fa; /* Change this to your sidebar background color */
+            z-index: 1000; /* Ensure the sidebar stays on top */
+        }
+
+        .main-content {
+            margin-left: 250px; /* This should be equal to the width of the sidebar */
+            padding: 20px; /* Add some padding for better presentation */
+        }
+
+        table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #ffffff;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        td {
+            color: #495057;
+        }
+
+        td:last-child {
+            text-align: center;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease, text-decoration 0.3s ease;
+        }
+
+        a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .product-image {
+            width: 120px;
+            height: auto;
+            max-height: 150px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .address {
+            text-align: center;
+            font-style: italic;
+            color: #6c757d;
+        }
+
+        .price {
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
+      
+
+
+
+
+
+    <!-- <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .main-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .table thead {
+            background-color: #343a40;
+            color: #fff;
+        }
+
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .table th {
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .table tbody tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+
+        .table tbody tr:hover {
+            background-color: #e9ecef;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .price {
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .address {
+            font-size: 0.9em;
+            line-height: 1.5;
+            color: #6c757d;
+        }
+    </style> -->
+    
+
+
+
+</head>
+
+<body>
+    <div class="screen-overlay"></div>
+    <aside class="navbar-aside" id="offcanvas_aside">
+        <div class="aside-top">
+            <a href="/admin/dashboard" class="brand-wrap">
+                <img src="/userAssets/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
+            </a>
+            <div>
+                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
+            </div>
+        </div>
+        <nav>
+            <ul class="menu-aside">
+                <li class="menu-item ">
+                    <a class="menu-link" href="/admin/dashboard"> <i class="icon material-icons md-home"></i>
+                        <span class="text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link"  href="/admin/category"> <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Catagory</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/order"> <i class="icon material-icons md-shopping_cart"></i>
+                        <span class="text">Orders</span>
+                    </a>
+                    
+                </li>
+                <li class="menu-item ">
+                    <a class="menu-link" href="/admin/userlist"> <i class="icon material-icons md-person"></i>
+                        <span class="text">Users</span>
+                    </a>
+                 
+                    </div>
+                </li>
+                <li class="menu-item active">
+                    <a class="menu-link" href="/admin/products"> <i class="icon material-icons md-store"></i>
+                        <span class="text">Products</span>
+                    </a>
+                   
+                </li>
+                <li class="menu-item ">
+                    <a class="menu-link" href="/admin/coupon"> <i class="icon material-icons md-add_box"></i>
+                        <span class="text">Coupons</span>
+                    </a>
+                    
+                </li>
+                <li class="menu-item ">
+                    <a class="menu-link" href="/admin/salesReport"> <i class="icon material-icons md-monetization_on"></i>
+                        <span class="text">Sales Report</span>
+                    </a>
+                <li class="menu-item ">
+                    <a class="menu-link" href="/admin/logout"> <i class="icon material-icons md-person"></i>
+                        <span class="text">Logout</span>
+                    </a> 
+
+               
+            </ul>
+        </nav>
+    </aside>
+
+
+    <div class="main-content">
+        <h1>Order Details</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Order Id</th>
+                    <th>Order Date</th>
+                    <th>Payment Method</th>
+                    <th>Payment Status</th>
+                    <th>Shipping Address</th>
+                    <th>Product Price</th>
+                    <th>Quantity</th>
+                    <th>Order Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% order.items.forEach(item => { %>
+                    <tr>
+                        <td class="center"><%= order.orderId %></td>
+                        <td class="center"><%= new Date(order.orderDate).toDateString() %></td>
+                        <td class="center"><%= order.paymentMethod %></td>
+                        <td class="center"><%= order.paymentStatus %></td>
+                        <td class="center address">
+                            <% let shippingAddress = order.shippingAddress; %>
+                            <%= shippingAddress.houseName %>, <%= shippingAddress.street %>, <%= shippingAddress.city %>, <%= shippingAddress.state %>, <%= shippingAddress.country %>, <%= shippingAddress.postalCode %>
+                        </td>
+                        <td class="center price">$<%= item.productPrice.toFixed(2) %></td>
+                        <td class="center"><%= item.quantity %></td>
+                        <td class="center" data-input-id="<%= item._id %>"><%= item.status %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+
+    
+</footer>
+</main>
+
+</body>
+</html>
+

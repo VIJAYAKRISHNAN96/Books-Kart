@@ -677,7 +677,9 @@
                                                                             <% } %>
                                                                         <% }) %>
                                                                     </td>
-                                                                    <td><%= orderItem.orderDate ? orderItem.orderDate.toDateString() : 'N/A' %></td>
+                                                                    <td><%= new Date(orderItem.orderDate).toDateString() %></td>
+
+                                                                    <!-- <td><%= orderItem.orderDate.toDateString() %></td> -->
                                                                     <td class="order-status">
                                                                         <% if (allItemsCancelled) { %>
                                                                             <span class="badge badge-danger">Cancelled</span>
