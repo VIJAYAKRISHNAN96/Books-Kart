@@ -6,12 +6,8 @@ const sharp = require("sharp");
 const fs = require("fs");
 const path = require('path');
 const moment = require("moment");
-
-
-// const User = require("../model/userModel");
 const bcrypt = require("bcryptjs");
 
-// Admin controller object
 const adminController = {
   loadAdminLogin: (req, res) => {
     res.render("adminLogin");
@@ -51,144 +47,20 @@ const adminController = {
 
 
 
-// separating
 
-// loadDashboard : async (req, res) => {
-//   try {
-//     console.log("Starting loadDashboard");
-
-//     const products = await productModel.find();
-//     console.log("Products fetched:", products.length);
-
-//     const categories = await categoryModel.find();
-
-//     const orders = await Order.find({ orderStatus: "Delivered" });
-//     console.log("Total delivered orders:", orders.length);
-
-//     const oneYearAgo = new Date();
-//     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-//     const recentOrders = await Order.find({ 
-//       orderStatus: "Delivered",
-//       orderDate: { $gte: oneYearAgo }
-//     });
-//     console.log("Delivered orders in the last year:", recentOrders.length);
-
-
-
-
-//     // Calculate total and monthly revenue
-//     const totalRevenue = orders.reduce((acc, order) => acc + order.billTotal, 0);
-//     const currentMonth = moment().month() + 1;
-//     const currentYear = moment().year();
-//     const monthlyOrders = orders.filter(order =>
-//       moment(order.createdOn).month() + 1 === currentMonth &&
-//       moment(order.createdOn).year() === currentYear
-//     );
-//     const monthlyRevenue = monthlyOrders.reduce((acc, order) => acc + order.billTotal, 0);
-
-//     // Aggregate Top 10 Best-Selling Products
-//     const topSellingProducts = await Order.aggregate([
-//       { $unwind: "$items" },
-//       { $group: { 
-//         _id: "$items.productId", 
-//         name: { $first: "$items.name" },
-//         totalSold: { $sum: "$items.quantity" } 
-//       }},
-//       { $sort: { totalSold: -1 } },
-//       { $limit: 10 }
-//     ]);
-
-//     // Aggregate Top 10 Best-Selling Categories
-//     const topSellingCategories = await Order.aggregate([
-//       { $unwind: "$items" },
-//       {
-//         $lookup: {
-//           from: "products",
-//           localField: "items.productId",
-//           foreignField: "_id",
-//           as: "productDetails"
-//         }
-//       },
-//       { $unwind: { path: "$productDetails", preserveNullAndEmptyArrays: true } },
-//       { $group: { 
-//         _id: "$productDetails.category", 
-//         totalSold: { $sum: "$items.quantity" } 
-//       }},
-//       { $sort: { totalSold: -1 } },
-//       { $limit: 10 },
-//       {
-//         $lookup: {
-//           from: "categories",
-//           localField: "_id",
-//           foreignField: "_id",
-//           as: "categoryDetails"
-//         }
-//       },
-//       { $unwind: { path: "$categoryDetails", preserveNullAndEmptyArrays: true } },
-//       { $project: {
-//         _id: 1,
-//         totalSold: 1,
-//         categoryName: { $ifNull: ["$categoryDetails.name", "Unknown Category"] }
-//       }}
-//     ]);
-
-//     // Aggregate sales data
-
-//     const salesData = await adminController.aggregateSalesData();
-//     console.log("Sales data aggregated:", salesData.length);
-
-
-//     // Process the data for different intervals
-//     const dailySalesData = adminController.processDailySalesData(salesData);
-//     const weeklySalesData = adminController.processWeeklySalesData(salesData);
-//     const monthlySalesData = adminController.processMonthlySalesData(salesData);
-//     const yearlySalesData = adminController.processYearlySalesData(salesData);
-
-//   console.log('Daily Sales Data:', dailySalesData);
-//   console.log('Weekly Sales Data:', weeklySalesData);
-//   console.log('Monthly Sales Data:', monthlySalesData);
-//   console.log('Yearly Sales Data:', yearlySalesData);
-
-//     res.render("dashboard", {
-//       orders,
-//       products,
-//       categories,
-//       totalRevenue,
-//       monthlyRevenue,
-//       topSellingProducts,
-//       topSellingCategories,
-//       salesData,
-//       dailySalesData,
-//       weeklySalesData,
-//       monthlySalesData,
-//       yearlySalesData
-//     });
-//   } catch (error) {
-//     console.error("Error loading dashboard:", error);
-//     res.status(500).send("Error loading dashboard: " + error.message);
-//   }
-// },
 
 loadDashboard: async (req, res) => {
   try {
     console.log("Starting loadDashboard");
 
-    const perPage = 10; // Number of items per page
-    const currentPage = parseInt(req.query.page) || 1;
-
-    // Fetch total counts for pagination
-    const totalProducts = await productModel.countDocuments();
-    const totalOrders = await Order.countDocuments({ orderStatus: "Delivered" });
-
-    const products = await productModel
-      .find()
-      .skip((currentPage - 1) * perPage)
-      .limit(perPage);
+    // Fetch all products and orders without pagination
+    const products = await productModel.find();
 
     const orders = await Order.find({ orderStatus: "Delivered" })
-    .sort({ createdOn: -1 }) 
-    .skip((currentPage - 1) * perPage)
-      .limit(perPage);
+      .sort({ orderDate: -1 })
+      .populate('user', 'name email')// Populate user details
+      .exec();
+
 
     console.log("Products fetched:", products.length);
     console.log("Total delivered orders:", orders.length);
@@ -269,12 +141,7 @@ loadDashboard: async (req, res) => {
     const monthlySalesData = adminController.processMonthlySalesData(salesData);
     const yearlySalesData = adminController.processYearlySalesData(salesData);
 
-    console.log('Daily Sales Data:', dailySalesData);
-    console.log('Weekly Sales Data:', weeklySalesData);
-    console.log('Monthly Sales Data:', monthlySalesData);
-    console.log('Yearly Sales Data:', yearlySalesData);
-
-    const totalPages = Math.ceil(totalOrders / perPage);
+   
 
     res.render("dashboard", {
       orders,
@@ -288,15 +155,26 @@ loadDashboard: async (req, res) => {
       dailySalesData,
       weeklySalesData,
       monthlySalesData,
-      yearlySalesData,
-      currentPage,
-      totalPages
+      yearlySalesData
     });
   } catch (error) {
     console.error("Error loading dashboard:", error);
     res.status(500).send("Error loading dashboard: " + error.message);
   }
 },
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 aggregateSalesData: async () => {
@@ -508,90 +386,7 @@ processYearlySalesData(salesData) {
     }
 
   },
-  // editProduct: async (req, res) => {
-  //   try {
-  //     const { name, description, author, price, category,stock,discountPrice } = req.body;
-      
-  //     const product = await productModel.findById(req.params.id);
 
-  //     if (req.files.length > 0) {
-  //       const images = [];
-
-  //       for (const file of req.files) {
-  //         const filename = Date.now() + path.extname(file.originalname);
-  //         const outputPath = path.join(__dirname, '../public/userAssets/imgs/shop', filename);
-
-  //         await sharp(file.path)
-  //           .resize(500, 500)
-  //           .toFile(outputPath);
-
-  //         images.push(filename);
-
-  //         // Delete the original file uploaded by multer
-  //         // fs.unlinkSync(file.path);
-  //       }
-
-  //       product.images = images;
-  //     }
-
-  //     product.name = name;
-  //     product.description = description;
-  //     product.price = parseFloat(price);
-  //     product.author = author;
-  //     product.category = category;
-  //     product.stock = parseFloat(stock);
-  //     product.discountPrice = discountPrice;
-
-  //     await product.save();
-  //     return res.status(201).redirect('/admin/products');
-  //   } catch (error) {
-  //     console.error(error.message);
-  //     res.status(500).send('Internal Server Error');
-  //   }
-  // },
-//   editProduct: async (req, res) => {
-//     try {
-//         const { name, description, author, price, category, stock, discountPrice } = req.body;
-        
-//         const product = await productModel.findById(req.params.id);
-//         if (!product) {
-//             return res.status(404).send('Product not found');
-//         }
-
-//         // Keep existing images
-//         const images = req.body.existingImages ? req.body.existingImages : [];
-        
-//         // Process new images if any
-//         if (req.files && req.files.length > 0) {
-//             for (const file of req.files) {
-//                 const filename = Date.now() + path.extname(file.originalname);
-//                 const outputPath = path.join(__dirname, '../public/userAssets/imgs/shop', filename);
-
-//                 await sharp(file.path)
-//                     .resize(500, 500)
-//                     .toFile(outputPath);
-
-//                 images.push(filename);
-//             }
-//         }
-
-//         // Update product details
-//         product.name = name;
-//         product.description = description;
-//         product.price = parseFloat(price);
-//         product.author = author;
-//         product.category = category;
-//         product.stock = parseFloat(stock);
-//         product.discountPrice = discountPrice;
-//         product.images = images; // Save the combined images array
-
-//         await product.save();
-//         return res.status(201).redirect('/admin/products');
-//     } catch (error) {
-//         console.error(error.message);
-//         res.status(500).send('Internal Server Error');
-//     }
-// },
 editProduct: async (req, res) => {
   try {
       const { name, description, author, price, category, stock, discountPrice, existingImages } = req.body;
@@ -660,7 +455,6 @@ editProduct: async (req, res) => {
       console.error(error.message);
       res.status(500).send('Internal Server Error');
   }
-    // res.render("category");
 
   },
 
@@ -694,39 +488,7 @@ editProduct: async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // loadOrder: async (req, res) => {
-  //   res.render("order");
-  // },
-
- 
   
-  //   addCategory : async (req, res) => {
-  //     const { name, description,discount } = req.body;
-  //     console.log("dssdsdsdfsdfsdfsdf", req.body);
-  //     try {
-  //         const newCategory = new categoryModel ({ name, description,discount });
-  //         await newCategory.save();
-  //         return res.status(200).redirect("/admin/category")
-  //     } catch (error) {
-  //         console.error(error.message);
-  //         res.status(500).send('Internal Server Error rrrr');
-  //     }
-  // },
   addCategory: async (req, res) => {
     const { name, description, discount } = req.body;
     console.log("Adding category:", req.body);
@@ -746,18 +508,7 @@ editProduct: async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 },
-  // editCategory : async (req, res) => {
-  //   const _id = req.params.id;
-  //   const { name, description,discount } = req.body;
-  //   console.log("dssdsdsdfsdfsdfsdf", req.body);
-  //   try {
-  //       await categoryModel.findByIdAndUpdate(_id, { name, description,discount });
-  //       return res.status(201).redirect('/admin/category');
-  //   } catch (error) {
-  //       console.error(error.message);
-  //       res.status(500).send('Internal Server Error');
-  //   }
-  // },
+  
   editCategory: async (req, res) => {
     const _id = req.params.id;
     const { name, description, discount } = req.body;
@@ -790,61 +541,7 @@ deleteCategory : async (req, res) => {
   }
 },
 
-// wrking
-// loadUserlist: async (req, res) => {
-//   try {
-//     const page = parseInt(req.query.page) || 1;
-//     const limit = parseInt(req.query.limit) || 5;
-//     const offset = (page - 1) * limit;
 
-//     const searchQuery = req.query.search || '';
-//     const statusFilter = req.query.status || '';
-
-//     const filter = { isAdmin: false };
-
-
-//     // if (searchQuery) {
-//     //   filter.name = { $regex: searchQuery, $options: 'i' }; // Case-insensitive search
-//     // }
-
-//     if (searchQuery) {
-//       filter.$or = [
-//         { name: { $regex: searchQuery, $options: 'i' } },
-//         { email: { $regex: searchQuery, $options: 'i' } }
-//       ];
-//     }
-
-//     if (statusFilter === 'Active') {
-//       filter.isBlocked = false;
-//     } else if (statusFilter === 'Disabled') {
-//       filter.isBlocked = true;
-//     }
-
-    
-
-
-//     const total = await userModel.countDocuments();
-//     const totalPages = Math.ceil(total / limit);
-//     const userList = await userModel.find(filter).skip(offset).limit(limit);
-
-//     // const userList = await userModel.find({ isAdmin: false }).skip(offset).limit(limit);
-//     console.log(userList);
-    
-//     return res.render("userlist", {
-//       userList: userList,
-//       currentPage: page,
-//       totalPages: totalPages,
-//       limit: limit,
-//       searchQuery: searchQuery,
-//       statusFilter: statusFilter,
-//       message: null,
-//       messageType: null
-//     });
-//   } catch (error) {
-//     console.log(error.message);
-//     return res.status(500).send("Internal server error");
-//   }
-// },
 
 
 loadUserlist: async (req, res) => {
@@ -897,14 +594,6 @@ loadUserlist: async (req, res) => {
     return res.status(500).send("Internal server error");
   }
 },
-
-
-
-
-
-
-
-
 
 
 

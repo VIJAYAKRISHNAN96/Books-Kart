@@ -1,6 +1,8 @@
 
 mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+// const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
+
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 const passport = require("passport");
@@ -37,10 +39,7 @@ const securePassword = async (password) => {
 
 // User controller object
 const userController = {
-  // homePage: (req, res) => {
-  //   res.render('home');
-  // },
-
+  
 
   homePage: async (req, res) => {
     try {
@@ -199,43 +198,7 @@ processLogin: async (req, res) => {
     }
 },
 
-  
-  // verifyOTP: async (req, res) => {
-  //   try {
 
-  //     console.log(req.body,'incomming otp')
-  //     if (!req.session.details) {
-  //       return res.json({ message: "Session expired. Please start over." });
-  //     }
-
-  //     if (req.session.details.otp === parseInt(req.body.otp)) {
-  //       if (req.session.details.otpExpiration < Date.now()) {
-  //         return res.json({ expired: true });
-  //       } else {
-  //         console.log(req.session.details,'session is comming')
-  //         const hashedPassword = await securePassword(req.session.details.password);
-  //         console.log(hashedPassword,'hello password')
-
-  //         const user = new User({
-  //           name: req.session.details.name,
-  //           email: req.session.details.email,
-  //           password: hashedPassword,
-  //           isAdmin: 0,
-  //           isBlocked: false,
-  //         });
-               
-  //         await user.save();
-  //       //   req.session.destroy();
-  //         res. redirect("/login");
-  //       }
-  //     } else {
-  //       return res.json({ message: "Invalid OTP" });
-  //     }
-  //   } catch (error) {
-  //     console.log("Error in verifyOTP:", error.message);
-  //     res.status(500).json({ message: "Internal server error" });
-  //   }
-  // },
   resendOTP: async (req, res) => {
     try {
       if (!req.session.details) {
@@ -404,51 +367,102 @@ resetPass: async (req, res) => {
 
 
 
+// loadUser: async (req, res) => {
+//   try {
+//       const userId = req.session.user.id;
 
+//       // Fetch user data, including wallet
+//       const user = await User.findById(userId).populate('wallet.transactions');
 
+      
 
+//       if (!user) {
+//           return res.status(404).send('User not found');
+//       }
 
+//       // Fetch user orders with pagination
+//       const page = parseInt(req.query.page) || 1;
+//       const perPage = 10;
+//       const totalOrderCount = await Order.countDocuments({ user: userId });
+//       const totalPages = Math.ceil(totalOrderCount / perPage);
+//       const skip = (page - 1) * perPage;
 
+//       const order = await Order.find({ user: userId }).skip(skip).limit(perPage).sort({ orderDate: -1 });
+
+//       // Calculate cart count
+//       const cart = await Cart.findOne({ userId });
+//       let cartCount = 0;
+//       if (cart) {
+//           cartCount = cart.product.length;
+//       }
+
+//       // Check if wallet exists and is populated
+//       const wallet = user.wallet ? user.wallet : null;
+      
+
+//       console.log('Wallet:', wallet); // Debugging log
+
+//       // Render user account page with order pagination and wallet data
+//       res.render("userAccount", { user, order, cartCount, wallet, currentPage: page, totalPages });
+//   } catch (error) {
+//       console.error('Error loading user data:', error.message);
+//       res.status(500).send("Internal Server Error");
+//   }
+// },
 
 
 loadUser: async (req, res) => {
   try {
-      const userId = req.session.user.id;
+    const userId = req.session.user.id;
 
-      // Fetch user data, including wallet
-      const user = await User.findById(userId).populate('wallet.transactions');
-      if (!user) {
-          return res.status(404).send('User not found');
-      }
+    // Fetch user data, including wallet
+    const user = await User.findById(userId).populate({
+      path: 'wallet.transactions',
+      options: { sort: { date: -1 } } // Sort by orderDate in descending order
+    });
 
-      // Fetch user orders with pagination
-      const page = parseInt(req.query.page) || 1;
-      const perPage = 10;
-      const totalOrderCount = await Order.countDocuments({ user: userId });
-      const totalPages = Math.ceil(totalOrderCount / perPage);
-      const skip = (page - 1) * perPage;
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
 
-      const order = await Order.find({ user: userId }).skip(skip).limit(perPage).sort({ orderDate: -1 });
+    // Fetch user orders with pagination
+    const page = parseInt(req.query.page) || 1;
+    const perPage = 10;
+    const totalOrderCount = await Order.countDocuments({ user: userId });
+    const totalPages = Math.ceil(totalOrderCount / perPage);
+    const skip = (page - 1) * perPage;
 
-      // Calculate cart count
-      const cart = await Cart.findOne({ userId });
-      let cartCount = 0;
-      if (cart) {
-          cartCount = cart.product.length;
-      }
+    const order = await Order.find({ user: userId }).skip(skip).limit(perPage).sort({ orderDate: -1 });
 
-      // Check if wallet exists and is populated
-      const wallet = user.wallet ? user.wallet : null;
+    // Calculate cart count
+    const cart = await Cart.findOne({ userId });
+    let cartCount = 0;
+    if (cart) {
+      cartCount = cart.product.length;
+    }
 
-      console.log('Wallet:', wallet); // Debugging log
+    // Check if wallet exists and is populated
+    let wallet = null;
+    if (user.wallet) {
+      wallet = {
+        ...user.wallet.toObject(),
+        transactions: user.wallet.transactions.sort((a, b) => new Date(b.date) - new Date(a.date))
+      };
+    }
 
-      // Render user account page with order pagination and wallet data
-      res.render("userAccount", { user, order, cartCount, wallet, currentPage: page, totalPages });
+    console.log('Wallet:', wallet); // Debugging log
+
+    // Render user account page with order pagination and wallet data
+    res.render("userAccount", { user, order, cartCount, wallet, currentPage: page, totalPages });
   } catch (error) {
-      console.error('Error loading user data:', error.message);
-      res.status(500).send("Internal Server Error");
+    console.error('Error loading user data:', error.message);
+    res.status(500).send("Internal Server Error");
   }
 },
+
+
+
+
 
 
 
@@ -599,91 +613,6 @@ loadUser: async (req, res) => {
   
 
 
-
-  // loadShop: async (req, res) => {
-  //   try {
-  //     const page = parseInt(req.query.page) || 1;
-  //     const limit = parseInt(req.query.limit) || 5;
-  //     const category = req.query.category;
-  //     const sortBy = req.query.sortBy;
-  //     const offset = (page - 1) * limit;
-  
-  //     let query = {};
-  //     if (category) {
-  //       query.category = category;
-  //     }
-  //     let sort = {};
-  //       if (sortBy === 'priceAsc') {
-  //           sort = { price: 1 }; // Sort by price ascending
-  //       } else if (sortBy === 'priceDesc') {
-  //           sort = { price: -1 }; // Sort by price descending
-  //       }
-  
-  //     const total = await Product.countDocuments(query);
-  //     const totalPages = Math.ceil(total / limit);
-  //     const products = await Product.find(query).sort(sort).skip(offset).limit(limit);
-
-  //     // const products = await Product.find(query).skip(offset).limit(limit);
-       
-  
-  //     res.render('shop', { 
-  //       products: products,
-  //       currentPage: page,
-  //       totalPages: totalPages,
-  //       limit: limit,
-  //       category: category,
-  //       sortBy: sortBy
-        
-  //     });
-  //   } catch (error) {
-  //     console.log(error.message);
-  //     res.status(500).send('Internal Server Error');
-  //   }
-  // },
-  
-
-  // last
-//   loadShop: async (req, res) => {
-//     try {
-//         const page = parseInt(req.query.page) || 1;
-//         const limit = parseInt(req.query.limit) || 5;
-//         const category = req.query.category;
-//         const sortBy = req.query.sortBy;
-//         const offset = (page - 1) * limit;
-
-//         let query = { isListed: 'Active' };  // Add this line to only fetch active products
-//         if (category) {
-//             query.category = category;
-//         }
-
-//         let sort = {};
-//         if (sortBy === 'priceAsc') {
-//             sort = { price: 1 };
-//         } else if (sortBy === 'priceDesc') {
-//             sort = { price: -1 };
-//         }
-
-//         const total = await Product.countDocuments(query);
-//         const totalPages = Math.ceil(total / limit);
-//         const products = await Product.find(query).sort(sort).skip(offset).limit(limit);
-
-//         console.log("Fetched products:", products.map(p => ({ id: p._id, name: p.name, isListed: p.isListed }))); // Add this line for debugging
-
-//         res.render('shop', { 
-//             products: products,
-//             currentPage: page,
-//             totalPages: totalPages,
-//             limit: limit,
-//             category: category,
-//             sortBy: sortBy
-//         });
-//     } catch (error) {
-//         console.log(error.message);
-//         res.status(500).send('Internal Server Error');
-//     }
-// },
-
-
 // last working
 loadShop: async (req, res) => {
   try {
@@ -761,129 +690,7 @@ loadProductDetails : async (req, res) => {
 },
  
 
-// working code
-// addToCart : async (req, res) => {
-//   try {
-//     console.log("Received request body:", req.body);
 
-//     if (!req.session?.user?.id) {
-//       console.log("User not authenticated");
-//       return res.status(401).json({ success: false, error: 'User not authenticated' });
-//     }
-
-//     const userId = req.session.user.id;
-//     const {productId, quantity = 1 } = req.body;
-
-//     console.log(`Adding product ${productId} with quantity ${quantity} for user ${userId}`);
-
-//     const product = await Product.findById(productId);
-//     if (!product) {
-//       console.log("Product not found");
-//       return res.status(404).json({ success: false, error: 'Product not found' });
-//     }
-
-//     let cart = await Cart.findOne({ userId });
-//     if (!cart) {
-//       console.log("Cart not found, creating new cart");
-//       cart = new Cart({ userId, products: [] });
-//     } else {
-//       console.log("Existing cart found:", cart);
-//     }
-
-//     const existingProductIndex = cart.product.findIndex(p => p.productId.toString() === productId);
-    
-//     if (existingProductIndex > -1) {
-//       console.log("Product exists in cart, updating quantity");
-//       cart.product[existingProductIndex].quantity += parseInt(quantity);
-//     } else {
-//       console.log("Product does not exist in cart, adding new product");
-//       cart.product.push({ productId, quantity: parseInt(quantity) });
-//     }
-
-//     console.log("Updated cart:", JSON.stringify(cart, null, 2));
-
-//     await cart.save();
-
-//     console.log("Cart saved successfully");
-
-//     res.json({ 
-//       success: true, 
-//       message: 'Product added to cart successfully',
-//       cartItemCount: cart.product.length,
-//       productName: product.name
-//     });
-//   } catch (error) {
-//     console.error("Error in addToCart:", error);
-//     res.status(500).json({ success: false, error: 'Internal Server Error', details: error.message });
-//   }
-// },
-
-
-
-// new last used
-// addToCart: async (req, res) => {
-//   try {
-//     console.log("Received request body:", req.body);
-
-//     if (!req.session?.user?.id) {
-//       console.log("User not authenticated");
-//       return res.status(401).json({ success: false, error: 'User not authenticated' });
-//     }
-
-//     const userId = req.session.user.id;
-//     const { productId, quantity = 1 } = req.body;
-
-//     console.log(`Adding product ${productId} with quantity ${quantity} for user ${userId}`);
-
-//     const product = await Product.findById(productId);
-//     if (!product) {
-//       console.log("Product not found");
-//       return res.status(404).json({ success: false, error: 'Product not found' });
-//     }
-
-//     // Determine the price to use (discounted price if available, otherwise original price)
-//     const priceToUse = product.discountPrice > 0 ? product.discountPrice : product.price;
-
-//     let cart = await Cart.findOne({ userId });
-//     if (!cart) {
-//       console.log("Cart not found, creating new cart");
-//       cart = new Cart({ userId, products: [] });
-//     } else {
-//       console.log("Existing cart found:", cart);
-//     }
-
-//     const existingProductIndex = cart.product.findIndex(p => p.productId.toString() === productId);
-    
-//     if (existingProductIndex > -1) {
-//       console.log("Product exists in cart, updating quantity");
-//       cart.product[existingProductIndex].quantity += parseInt(quantity);
-//       cart.product[existingProductIndex].price = priceToUse; // Update price if necessary
-//     } else {
-//       console.log("Product does not exist in cart, adding new product");
-//       cart.product.push({ 
-//         productId, 
-//         quantity: parseInt(quantity), 
-//         price: priceToUse // Store the price in the cart
-//       });
-//     }
-
-//     console.log("Updated cart:", JSON.stringify(cart, null, 2));
-
-//     await cart.save();
-
-//     console.log("Cart saved successfully");
-
-//     res.json({ 
-//       success: true, 
-//       message: 'Product added to cart successfully',
-//       cartItemCount: cart.product.length,
-//       productName: product.name
-//     });
-//   } catch (error) {
-//     console.error("Error in addToCart:", error);
-//     res.status(500).json({ success: false, error: 'Internal Server Error', details: error.message });
-//   }
-// },
 
 
 addToCart: async (req, res) => {
@@ -962,74 +769,6 @@ addToCart: async (req, res) => {
 
 
 
-
-
-
-
-
-// wrking
-
-//  loadCart : async (req, res) => {
-//   try {
-//     console.log("Session object:", req.session);
-
-//     const userId = req.session.user ? req.session.user.id : null;
-//     if (!userId) {
-//       return res.render('cart', { cart: { products: [], totalPrice: 0 } });
-//     }
-
-//     const cart = await Cart.findOne({ userId }).populate('product.productId');
-//     console.log("Cart object after fetching and populating:", JSON.stringify(cart, null, 2));
-
-//     if (!cart || !cart.product || cart.product.length === 0) {
-//       return res.render('cart', { cart: { products: [], totalPrice: 0 } });
-//     }
-
-
-//     cart.totalPrice = cart.product.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
-//     console.log("Cart object after calculating totalPrice:", JSON.stringify(cart, null, 2));
-
-//     res.render('cart', { cart });
-//   } catch (error) {
-//     console.log('Error Occurred: ', error);
-//     res.status(500).send('Internal Server Error');
-//   }
-// },
-
-
-// last used
-// loadCart : async (req, res) => {
-//   try {
-//     console.log("Session object:", req.session);
-
-//     const userId = req.session.user ? req.session.user.id : null;
-//     if (!userId) {
-//       return res.render('cart', { cart: { products: [], totalPrice: 0 } });
-//     }
-
-//     const cart = await Cart.findOne({ userId }).populate('product.productId');
-//     console.log("Cart object after fetching and populating:", JSON.stringify(cart, null, 2));
-
-//     if (!cart || !cart.product || cart.product.length === 0) {
-//       return res.render('cart', { cart: { products: [], totalPrice: 0 } });
-//     }
-
-//     // Calculate totalPrice using discountPrice if available, otherwise use the original price
-//     cart.totalPrice = cart.product.reduce((total, item) => {
-//       const price = item.productId.discountPrice > 0 ? item.productId.discountPrice : item.productId.price;
-//       return total + (price * item.quantity);
-//     }, 0);
-
-//     console.log("Cart object after calculating totalPrice:", JSON.stringify(cart, null, 2));
-
-//     res.render('cart', { cart });
-//   } catch (error) {
-//     console.log('Error Occurred: ', error);
-//     res.status(500).send('Internal Server Error');
-//   }
-// },
-
-
 // wrking last updated
 loadCart: async (req, res) => {
   try {
@@ -1075,71 +814,6 @@ loadCart: async (req, res) => {
 
 
 
-
-
-
-
-
-
-// wrking
-//  updateCart : async (req, res) => {
-//   try {
-//     const { updates } = req.body;
-//     const userId = req.session.user.id;
-
-//     const cart = await Cart.findOne({ userId });
-
-//     if (!cart) {
-//       return res.status(400).json({ success: false, message: 'Cart not found' });
-//     }
-
-//     updates.forEach(update => {
-//       const product = cart.product.find(p => p.productId.toString() === update.productId);
-//       if (product) {
-//         product.quantity = update.quantity;
-//       }
-//     });
-
-//     await cart.save();
-
-//     res.json({ success: true, message: 'Cart updated successfully' });
-//   } catch (error) {
-//     console.error('Error:', error);
-//     res.status(500).json({ success: false, message: 'Internal Server Error' });
-//   }
-// },
-
-// updated
-// updateCart: async (req, res) => {
-//   try {
-//     const { updates } = req.body;
-//     const userId = req.session.user.id;
-
-//     const cart = await Cart.findOne({ userId });
-
-//     if (!cart) {
-//       return res.status(400).json({ success: false, message: 'Cart not found' });
-//     }
-
-//     updates.forEach(update => {
-//       const product = cart.product.find(p => p.productId.toString() === update.productId);
-//       if (product) {
-//         if (update.quantity > 3) {
-//           return res.status(400).json({ success: false, message: 'Maximum 3 quantities of a book can be purchased' });
-//         }
-//         product.quantity = update.quantity;
-//       }
-//     });
-
-//     await cart.save();
-
-//     res.json({ success: true, message: 'Cart updated successfully' });
-//   } catch (error) {
-//     console.error('Error:', error);
-//     res.status(500).json({ success: false, message: 'Internal Server Error' });
-//   }
-// },
-
 updateCart: async (req, res) => {
   try {
     const { updates } = req.body;
@@ -1174,68 +848,6 @@ updateCart: async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-// updateCart : async (req, res) => {
-//   try {
-//     const { updates } = req.body;
-//     const userId = req.session.user.id;
-
-//     // Find the cart for the user
-//     const cart = await Cart.findOne({ userId }).populate('product.productId');
-
-//     if (!cart) {
-//       return res.status(400).json({ success: false, message: 'Cart not found' });
-//     }
-
-//     // Update the quantities for each product
-//     updates.forEach(update => {
-//       const product = cart.product.find(p => p.productId.toString() === update.productId);
-//       if (product) {
-//         product.quantity = update.quantity;
-//       }
-//     });
-
-//     // Recalculate the subtotal
-//     const totalPrice = cart.product.reduce((total, item) => {
-//       const price = item.productId.discountPrice > 0 ? item.productId.discountPrice : item.productId.price;
-//       return total + price * item.quantity;
-//     }, 0);
-
-//     // Update the cart with the new totalPrice
-//     cart.totalPrice = totalPrice;
-
-//     // Save the cart
-//     await cart.save();
-
-//     // Respond with success and updated cart info
-//     res.json({ 
-//       success: true, 
-//       message: 'Cart updated successfully',
-//       totalPrice: totalPrice.toFixed(2) // Send the updated total price
-//     });
-//   } catch (error) {
-//     console.error('Error:', error);
-//     res.status(500).json({ success: false, message: 'Internal Server Error' });
-//   }
-// },
-
-
-
-
-
-
-
-
-
-
-
 deleteCart : async (req, res) => {
   try {
     const userId = req.session.user.id; // Assuming you have the user ID in session
@@ -1261,89 +873,7 @@ deleteCart : async (req, res) => {
 
 
 
-// loadCheckout : async (req, res) => {
-//   try {
-//       const userId = req.session.user.id;
-//       const user = await User.findById(userId);
-//       const cart = await Cart.findOne({ userId: userId }).populate("product.productId");
-//       const coupon = await Coupon.find({ status: "active" });
-//       const wallet= await Wallet.findOne({user:userId});
 
-
-//       let cartCount = 0;
-//       if (cart) {
-//           cartCount = cart.product.length;
-//       }
-
-//       // Ensure user.address is defined and is an array
-//       user.address = user.address || [];
-
-//       res.render("checkout", { user, cart, cartCount,coupon,wallet });
-
-//   } catch (error) {
-//       console.log(error.message);
-//   }
-// },
-
-
-// loadCheckout : async (req, res) => {
-//   try {
-//     const userId = req.session.user.id;
-//     const user = await User.findById(userId);
-//     const cart = await Cart.findOne({ userId: userId }).populate("product.productId");
-//     const coupon = await Coupon.find({ status: "active" });
-//     const wallet = await Wallet.findOne({ user: userId });
-
-//     let cartCount = 0;
-//     if (cart) {
-//       cartCount = cart.product.length;
-//     }
-
-//     // Ensure user.address is defined and is an array
-//     user.address = user.address || [];
-
-//     // Ensure wallet balance is defined and has a default value
-//     const walletBalance = wallet ? wallet.balance : 0;
-
-//     res.render("checkout", { user, cart, cartCount, coupon, walletBalance });
-
-//   } catch (error) {
-//     console.log(error.message);
-//   }
-// }
-
-// loadCheckout : async (req, res) => {
-//   try {
-//     const userId = req.session.user.id;
-//     const user = await User.findById(userId);
-//     const cart = await Cart.findOne({ userId: userId }).populate("product.productId");
-//     const coupon = await Coupon.find({ status: "active" });
-//     const wallet = await Wallet.findOne({ user: userId });
-
-//     let cartCount = 0;
-//     if (cart) {
-//       cartCount = cart.product.length;
-//     }
-
-//     // Ensure user.address is defined and is an array
-//     user.address = user.address || [];
-
-//     // Ensure wallet is defined and has a default value for balance
-//     const walletData = wallet || { balance: 0 };
-
-//     // Logging to verify data being passed
-//     console.log('User:', user);
-//     console.log('Cart:', cart);
-//     console.log('Coupon:', coupon);
-//     console.log('Wallet:', walletData);
-
-//     res.render("checkout", { user, cart, cartCount, coupon, wallet: walletData });
-
-//   } catch (error) {
-//     console.log(error.message);
-//     res.status(500).send('Server Error');
-//   }
-// },
 
 loadCheckout: async (req, res) => {
   try {
@@ -1376,14 +906,6 @@ loadCheckout: async (req, res) => {
     res.status(500).send('Server Error');
   }
 },
-
-
-
-
-
-
-
-
 
 
 
@@ -1508,39 +1030,6 @@ addToWishList : async (req, res) => {
 },
 
 
-// wrking
-// deleteWishList: async (req, res) => {
-//   try {
-//     const userId = req.session.user.id;
-//     const productId = req.body.productId;
-
-//     console.log('Attempting to delete product from wishlist:', { userId, productId });
-
-//     if (!userId || !productId) {
-//       console.log('User ID or Product ID is missing:', { userId, productId });
-//       return res.status(400).json({ success: false, message: 'User ID or Product ID is missing' });
-//     }
-
-//     const result = await User.findByIdAndUpdate(
-//       userId,
-//       { $pull: { Wishlist: { productId } } },
-//       { new: true }
-//     );
-
-//     if (!result) {
-//       console.log('User not found or product not in wishlist');
-//       return res.status(404).json({ success: false, message: 'User not found or product not in wishlist' });
-//     }
-
-//     console.log('Product removed from wishlist successfully');
-//     res.json({ success: true, message: 'Product removed from wishlist successfully' });
-//   } catch (error) {
-//     console.error('Error in deleteWishList:', error);
-//     res.status(500).json({ success: false, message: 'Internal Server Error', details: error.message });
-//   }
-// },
-
-
 
 
 deleteWishList: async (req, res) => {
@@ -1572,13 +1061,6 @@ deleteWishList: async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal Server Error', details: error.message });
   }
 },
-
-
-
-
-
-
-
 
 
 addToCartFromWishlist: async (req, res) => {
@@ -1646,30 +1128,6 @@ addToCartFromWishlist: async (req, res) => {
 },
 
 
-// searchProduct: async (req, res) => {
-//   try {
-//     const query = req.query.q;
-    
-//     // Search the products collection based on name, description, etc.
-//     const products = await Product.find({
-//       $or: [
-//         { name: { $regex: query, $options: 'i' } },
-//         { description: { $regex: query, $options: 'i' } },
-//         // Add other fields as needed
-//       ]
-//     });
-
-//     res.render('searchResult', { products, query }); // Render the search results view
-//   } catch (error) {
-//     console.error('Search error:', error);
-//     res.status(500).send('Internal Server Error');
-//   }
-
-
-
-
-// }
-
 searchProduct : async (req, res) => {
   try {
     const query = req.query.q;
@@ -1693,9 +1151,8 @@ searchProduct : async (req, res) => {
     res.status(500).send('Server Error');
 }
 
-
-
 }
+
 }
 
 

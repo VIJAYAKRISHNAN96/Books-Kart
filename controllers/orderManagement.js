@@ -1340,133 +1340,10 @@ onlineOrderPlacing: async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// wrking
-// cancelOrder: async (req, res) => {
-//   try {
-//     const userId = req.session.user.id;
-//     const { orderId } = req.body;
-
-//     console.log("Cancel order request for user:", userId, "orderId:", orderId);
-
-//     // Validate the orderId
-//     if (!mongoose.Types.ObjectId.isValid(orderId)) {
-//       console.log("Invalid orderId format:", orderId);
-//       return res.status(400).json({ success: false, message: "Invalid order ID format" });
-//     }
-
-//     // Find the order
-//     const order = await Order.findOne({ _id: orderId, user: userId });
-//     if (!order) {
-//       console.log("Order not found or does not belong to user");
-//       return res.status(404).json({ success: false, message: "Order not found" });
-//     }
-
-//     // Check if the order is already cancelled
-//     if (order.paymentStatus === "Cancelled") {
-//       console.log("Order is already cancelled");
-//       return res.status(400).json({ success: false, message: "Order is already cancelled" });
-//     }
-
-//     // Update the order status to 'Cancelled'
-//     order.paymentStatus = "Cancelled";
-//     await order.save();
-//     console.log("Order status updated to 'Cancelled'");
-
-//     // Update product stock
-//     for (const item of order.items) {
-//       await Product.findByIdAndUpdate(item.productId, {
-//         $inc: { stock: item.quantity }
-//       });
-//     }
-//     console.log("Product stock updated");
-
-//     // If payment was made through Razorpay, refund to wallet
-//     if (order.paymentMethod === "razorpay") {
-//       const user = await User.findById(userId);
-//       if (!user) {
-//         console.log("User not found for ID:", userId);
-//         return res.status(404).json({ success: false, message: "User not found" });
-//       }
-
-//       // Update the user's wallet
-//       user.wallet.balance += order.billTotal;
-//       user.wallet.transactions.push({
-//         amount: order.billTotal,
-//         description: `Refund for cancelled order ${orderId}`,
-//         type: 'Refund'
-//       });
-//       await user.save();
-//       console.log("Amount refunded to wallet:", order.billTotal);
-//     }
-
-//     res.status(200).json({ success: true, message: "Order cancelled and amount refunded to wallet" });
-//   } catch (error) {
-//     console.error("Error cancelling order:", error);
-//     res.status(500).json({ success: false, message: "Internal Server Error" });
-//   }
-// },
-
-
-
-
 cancelOrder: async (req, res) => {
   try {
     const userId = req.session.user.id;
     const { orderId, itemId, cancellationReason } = req.body;
-
     console.log("Cancel order item request for user:", userId, "orderId:", orderId, "itemId:", itemId);
 
     // Validate the orderId and itemId
@@ -1507,8 +1384,16 @@ cancelOrder: async (req, res) => {
     });
     console.log("Product stock updated");
 
-    // Calculate refund amount
-    const refundAmount = item.productPrice * item.quantity;
+    // Calculate the actual price paid for this item after coupon
+    const couponAmount = order.couponAmount || 0;
+    const itemTotalPrice = item.productPrice * item.quantity;
+    const orderSubtotal = order.items.reduce((total, item) => total + item.productPrice * item.quantity, 0);
+    const itemDiscountRatio = itemTotalPrice / orderSubtotal;
+    const itemCouponDiscount = couponAmount * itemDiscountRatio;
+    const actualItemPrice = itemTotalPrice - itemCouponDiscount;
+
+    // Calculate refund amount based on the actual price paid
+    const refundAmount = actualItemPrice;
 
     // If payment was made through Razorpay, refund to wallet
     if (order.paymentMethod === "razorpay") {
@@ -1529,8 +1414,9 @@ cancelOrder: async (req, res) => {
       console.log("Amount refunded to wallet:", refundAmount);
     }
 
-    // Update order total
+    // Update order total and coupon amount
     order.billTotal -= refundAmount;
+    order.couponAmount -= itemCouponDiscount;
     await order.save();
 
     res.status(200).json({ success: true, message: "Item cancelled and amount refunded to wallet" });
@@ -1543,119 +1429,75 @@ cancelOrder: async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-// wrking code
-// returnOrder: async (req, res) => {
-//   try {
-//     const { orderId, itemId, returnReason } = req.body;
-//     const userId = req.session.user.id;
-
-//     const order = await Order.findById(orderId);
-//     if (!order) {
-//       return res.status(404).json({ message: "Order not found" });
-//     }
-
-//     const item = order.items.find((item) => item._id.toString() === itemId);
-//     if (!item) {
-//       return res.status(404).json({ message: "Item not found in the order" });
-//     }
-
-//     item.status = "Returned";
-//     item.returnReason = returnReason;
-
-//     const refundAmount = item.productPrice * item.quantity;
-//     order.billTotal -= refundAmount;
-
-//     if (order.paymentMethod === "razorpay" || order.paymentMethod === "wallet") {
-//       const wallet = await Wallet.findOne({ user: userId });
-//       if (!wallet) {
-//         throw new Error(`Wallet for user ${userId} not found`);
-//       }
-
-//       const transaction = {
-//         amount: refundAmount,
-//         description: `Return refund for ${item.name} in Order ${orderId}`,
-//         type: "Refund",
-//         transactionDate: new Date(),
-//       };
-//       wallet.transactions.push(transaction);
-//       wallet.walletBalance += refundAmount;
-
-//       order.paymentStatus = "Refunded";
-//       await wallet.save();
-//     }
-
-//     const allItemsReturned = order.items.every((item) => item.status === "Returned");
-//     if (allItemsReturned) {
-//       order.orderStatus = "Returned";
-//     }
-
-//     await order.save();
-//     res.status(201).json({ message: "Item returned successfully" });
-//   } catch (error) {
-//     console.error("Error:", error);
-//     res.status(500).json({ message: "An error occurred while returning the item" });
-//   }
-// },
-
-
-
-
-
 returnOrder: async (req, res) => {
   try {
     const { orderId, itemId, returnReason } = req.body;
     const userId = req.session.user.id;
 
+    // Validate the orderId and itemId
+    if (!mongoose.Types.ObjectId.isValid(orderId) || !mongoose.Types.ObjectId.isValid(itemId)) {
+      console.log("Invalid orderId or itemId format:", orderId, itemId);
+      return res.status(400).json({ success: false, message: "Invalid order ID or item ID format" });
+    }
+
     // Find the order by ID
-    const order = await Order.findById(orderId);
+    const order = await Order.findOne({ _id: orderId, user: userId });
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      return res.status(404).json({ success: false, message: "Order not found" });
     }
 
     // Find the specific item in the order
-    const item = order.items.find((item) => item._id.toString() === itemId);
+    const item = order.items.id(itemId);
     if (!item) {
-      return res.status(404).json({ message: "Item not found in the order" });
+      return res.status(404).json({ success: false, message: "Item not found in the order" });
+    }
+
+    // Check if the item is already returned
+    if (item.status === "Returned") {
+      console.log("Item is already returned");
+      return res.status(400).json({ success: false, message: "Item is already returned" });
     }
 
     // Update item status and reason for return
     item.status = "Returned";
     item.returnReason = returnReason;
 
-    // Calculate the refund amount and update the order total
-    const refundAmount = item.productPrice * item.quantity;
-    order.billTotal -= refundAmount;
+    // Calculate the actual price paid for this item after coupon
+    const couponAmount = order.couponAmount || 0;
+    const itemTotalPrice = item.productPrice * item.quantity;
+    const orderSubtotal = order.items.reduce((total, item) => total + item.productPrice * item.quantity, 0);
+    const itemDiscountRatio = itemTotalPrice / orderSubtotal;
+    const itemCouponDiscount = couponAmount * itemDiscountRatio;
+    const actualItemPrice = itemTotalPrice - itemCouponDiscount;
 
-    // Process the refund if the payment method is razorpay or wallet
+    // Calculate refund amount based on the actual price paid
+    const refundAmount = actualItemPrice;
+
+    // Process the refund if the payment method is Razorpay or Wallet
     if (order.paymentMethod === "razorpay" || order.paymentMethod === "wallet") {
-      // Retrieve the user with the wallet
       const user = await User.findById(userId);
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ success: false, message: "User not found" });
       }
 
       // Record the refund transaction in the user's wallet
-      const transaction = {
+      user.wallet.balance += refundAmount;
+      user.wallet.transactions.push({
         amount: refundAmount,
         description: `Return refund for ${item.name} in Order ${orderId}`,
         type: "Refund",
         transactionDate: new Date(),
-      };
-      user.wallet.transactions.push(transaction);
-      user.wallet.balance += refundAmount;
+      });
 
       // Update payment status in the order
       order.paymentStatus = "Refunded";
       await user.save();
+      console.log("Amount refunded to wallet:", refundAmount);
     }
+
+    // Update order total and coupon amount
+    order.billTotal -= refundAmount;
+    order.couponAmount -= itemCouponDiscount;
 
     // Check if all items are returned, and update the order status if necessary
     const allItemsReturned = order.items.every((item) => item.status === "Returned");
@@ -1665,10 +1507,11 @@ returnOrder: async (req, res) => {
 
     // Save the updated order
     await order.save();
-    res.status(201).json({ message: "Item returned successfully" });
+
+    res.status(201).json({ success: true, message: "Item returned successfully and amount refunded to wallet" });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ message: "An error occurred while returning the item" });
+    res.status(500).json({ success: false, message: "An error occurred while returning the item" });
   }
 },
 
@@ -1679,135 +1522,6 @@ returnOrder: async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// checkWalletBalance: async (req, res) => {
-//   try {
-//       const userId = req.session.user.id;
-//       console.log("User ID from session:", userId); // Debug log
-
-//       // Parse totalAmount from query string
-//       const totalAmount = parseFloat(req.query.totalAmount);
-//       console.log("Total amount:", totalAmount); // Debug log
-
-//       // Validate totalAmount
-//       if (isNaN(totalAmount)) {
-//           return res.status(400).json({ success: false, message: "Invalid total amount" });
-//       }
-
-//       // Fetch wallet information
-//       const wallet = await Wallet.findOne({ user: userId });
-//       console.log("Wallet retrieved:", wallet); // Debug log
-
-//       // Handle case where wallet is not found
-//       if (!wallet) {
-//           return res.status(404).json({ success: false, message: "Wallet not found" });
-//       }
-
-//       // Respond with wallet balance
-//       res.json({
-//           success: true,
-//           walletBalance: wallet.walletBalance
-//       });
-//   } catch (error) {
-//       console.error("Error checking wallet balance:", error.message);
-//       res.status(500).json({ success: false, message: "Internal server error" });
-//   }
-// },
-
-// last
-// checkWalletBalance: async (req, res) => {
-//   try {
-//     const userId = req.session.user.id;
-//     console.log("User ID from session:", userId); // Debug log
-
-//     // Parse totalAmount from query string
-//     const totalAmount = parseFloat(req.query.totalAmount);
-//     console.log("Total amount:", totalAmount); // Debug log
-
-//     // Validate totalAmount
-//     if (isNaN(totalAmount)) {
-//       return res.status(400).json({ success: false, message: "Invalid total amount" });
-//     }
-
-//     // Fetch user information
-//     const user = await User.findById(userId);
-//     console.log("User retrieved:", user); // Debug log
-
-//     // Handle case where user is not found
-//     if (!user) {
-//       return res.status(404).json({ success: false, message: "User not found" });
-//     }
-
-//     // Retrieve wallet balance from user
-//     const walletBalance = user.wallet ? user.wallet.balance : 0;
-//     console.log("Wallet balance:", walletBalance); // Debug log
-
-//     // Respond with wallet balance
-//     res.json({
-//       success: true,
-//       walletBalance: walletBalance
-//     });
-//   } catch (error) {
-//     console.error("Error checking wallet balance:", error.message);
-//     res.status(500).json({ success: false, message: "Internal server error" });
-//   }
-// },
-
-// checkWalletBalance : async (req, res) => {
-//   try {
-//     const userId = req.session.user.id;
-//     console.log("User ID from session:", userId); // Debug log
-
-//     // Parse totalAmount from query string
-//     const totalAmount = parseFloat(req.query.totalAmount);
-//     console.log("Total amount:", totalAmount); // Debug log
-
-//     // Validate totalAmount
-//     if (isNaN(totalAmount)) {
-//       return res.status(400).json({ success: false, message: "Invalid total amount" });
-//     }
-
-//     // Fetch user information
-//     const user = await User.findById(userId).select('wallet'); // Ensure the wallet field is included
-//     console.log("User retrieved:", user); // Debug log
-
-//     // Handle case where user is not found
-//     if (!user) {
-//       return res.status(404).json({ success: false, message: "User not found" });
-//     }
-
-//     // Retrieve wallet balance from user
-//     const walletBalance = user.wallet ? user.wallet.balance : 0;
-//     console.log("Wallet balance:", walletBalance); // Debug log
-
-//     // Respond with wallet balance
-//     res.json({
-//       success: true,
-//       walletBalance: walletBalance
-//     });
-//   } catch (error) {
-//     console.error("Error checking wallet balance:", error.message);
-//     res.status(500).json({ success: false, message: "Internal server error" });
-//   }
-// },
-
-
-// Controller function to check wallet balance
-// 
 
 
 
@@ -1949,64 +1663,6 @@ walletPlaceOrder: async (req, res) => {
 
 
 
-
-
-//  wrking 
- 
-  // loadOrderView: async (req, res) => {
-  //   try {
-  //     const userId = req.session.user.id;
-  //     const user = await User.findById(userId);
-  //     const { id } = req.query;
-  //     const order = await Order.findById(id);
-  //     const cart = await Cart.findOne({ userId });
-  //     let cartCount = 0;
-  //     if (cart) {
-  //       cartCount = cart.product.length;
-  //     }
-  //     res.render("viewOrder", { user, order, cartCount });
-  //   } catch (error) {
-  //     console.log(error.message);
-  //     res.status(500).json({ message: "Internal Server Error" });
-  //   }
-  // },
-
-
-
-// loadOrder: async (req, res) => {
-//   try {
-//       const page = parseInt(req.query.page) || 1;
-//       const perPage = 10;
-//       const totalOrderCount = await Order.countDocuments({});
-//       const totalPages = Math.ceil(totalOrderCount / perPage);
-//       const skip = (page - 1) * perPage;
-
-//       const orders = await Order.find({}).populate('user').skip(skip).limit(perPage).sort({ orderDate: -1 });
-//       res.render("order", { orders, currentPage: page, totalPages });
-//   } catch (error) {
-//       console.log(error.message);
-//   }
-// },
-
-// wrking
-// loadOrder: async (req, res) => {
-//   try {
-//       const page = parseInt(req.query.page) || 1; // Current page number
-//       const perPage = 10; // Number of orders per page
-//       const totalOrderCount = await Order.countDocuments({}); // Total number of orders
-//       const totalPages = Math.ceil(totalOrderCount / perPage); // Total pages based on the number of orders and perPage
-//       const skip = (page - 1) * perPage; // Number of orders to skip for pagination
-
-//       const orders = await Order.find({}).populate('user').skip(skip).limit(perPage).sort({ orderDate: -1 });
-
-//       // Render the 'order' page with orders, current page, and total pages
-//       res.render("order", { orders, currentPage: page, totalPages });
-//   } catch (error) {
-//       console.log(error.message); // Log any errors
-//       res.status(500).send("Internal Server Error");
-//   }
-// },
-
 loadOrderView: async (req, res) => {
   try {
     const userId = req.session.user.id;
@@ -2031,23 +1687,6 @@ loadOrderView: async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -2077,16 +1716,6 @@ loadOrder: async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 },
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -2149,260 +1778,7 @@ loadOrderDetails: async (req, res) => {
 },
 
 
-// downloadInvoice : async (req, res) => {
-//   try {
-//     const { orderId } = req.query;
 
-//     const order = await Order.findById(orderId).populate("user");
-
-//     if (!order) {
-//       return res.status(404).json({ message: "Order not found" });
-//     }
-
-//     generateInvoicePDF(order, res);
-//   } catch (error) {
-//     console.log(error.message);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// },
-
-//  generateInvoicePDF : async function (order, res) {
-//   const doc = new PDFDocument();
-//   const filename = `invoice_${order._id}.pdf`;
-
-//   res.setHeader("Content-Type", "application/pdf");
-//   res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-
-//   doc.pipe(res);
-
-//   doc.fontSize(20).text("Invoice", { align: "center" });
-//   doc.moveDown();
-
-//   // Add order details
-//   doc.fontSize(12).text(`Order ID: ${order._id}`);
-//   doc.text(`Order Date: ${new Date(order.orderDate).toLocaleString("en-IN")}`);
-//   doc.text(`Payment Method: ${order.paymentMethod}`);
-//   doc.text(`Payment Status: ${order.paymentStatus}`);
-//   doc.text(
-//     `Shipping Address: ${order.shippingAddress.houseName}, ${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state}, ${order.shippingAddress.country}, ${order.shippingAddress.postalCode}`
-//   );
-//   doc.moveDown();
-
-//   // Create the table data
-//   const table = {
-//     headers: ["Product Name", "Quantity", "Price", "Total Price"],
-//     rows: order.items.map(item => [
-//       item.productName, // Assuming productName is the field for the product title
-//       item.quantity,
-//       `₹${item.productPrice.toFixed(2)}`,
-//       `₹${(item.productPrice * item.quantity).toFixed(2)}`
-//     ])
-//   };
-
-//   // Draw the table with styling
-//   doc.table(table, {
-//     prepareHeader: () => doc.font("Helvetica-Bold").fontSize(12),
-//     prepareRow: (row, i) => doc.font("Helvetica").fontSize(10),
-//     width: 500, 
-//     align: "center", 
-//     padding: 5, 
-//     colors: ["#AE2424", "#AE2424", "#AE2424", "#AE2424"], 
-//     borderWidth: 1,
-//     headerBorderWidth: 1, 
-//     rowEvenBackground: "#AE2424" 
-//   });
-   
-//   doc.moveDown();
-
-//   // Add total amount and coupon details
-//   if (order.couponAmount > 0) {
-//     doc.text(`Coupon Amount: ₹${order.couponAmount.toFixed(2)}`);
-//   }
-//   doc.text(`Grand Total: ₹${order.billTotal.toFixed(2)}`);
-
-//   doc.end();
-// },
-
-
-
-// downloadInvoice : async (req, res) => {
-//   try {
-//     const { orderId } = req.query;
-
-//     const order = await Order.findById(orderId).populate("user");
-
-//     if (!order) {
-//       return res.status(404).json({ message: "Order not found" });
-//     }
-
-//     const doc = new PDFDocument();
-//     const filename = `invoice_${order._id}.pdf`;
-
-//     res.setHeader("Content-Type", "application/pdf");
-//     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-
-//     doc.pipe(res);
-
-//     // Add title and basic order details
-//     doc.fontSize(20).text("Invoice", { align: "center" });
-//     doc.moveDown();
-//     doc.fontSize(12).text(`Order ID: ${order._id}`);
-//     doc.text(`Order Date: ${new Date(order.orderDate).toLocaleString("en-IN")}`);
-//     doc.text(`Payment Method: ${order.paymentMethod}`);
-//     doc.text(`Payment Status: ${order.paymentStatus}`);
-//     doc.text(
-//       `Shipping Address: ${order.shippingAddress.houseName}, ${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state}, ${order.shippingAddress.country}, ${order.shippingAddress.postalCode}`
-//     );
-//     doc.moveDown();
-
-//     // Add table headers
-//     const tableTop = 200;
-//     const itemCodeX = 50;
-//     const descriptionX = 150;
-//     const quantityX = 300;
-//     const priceX = 350;
-//     const totalX = 400;
-
-//     doc.fontSize(12).text("Product Name", itemCodeX, tableTop, { bold: true });
-//     doc.text("Quantity", quantityX, tableTop, { bold: true });
-//     doc.text("Price", priceX, tableTop, { bold: true });
-//     doc.text("Total Price", totalX, tableTop, { bold: true });
-
-//     let yPos = tableTop + 20;
-
-//     // Add table rows
-//     order.items.forEach(item => {
-//       doc.text(item.name, itemCodeX, yPos);
-//       doc.text(item.quantity, quantityX, yPos);
-//       doc.text(`₹${item.productPrice.toFixed(2)}`, priceX, yPos);
-//       doc.text(`₹${(item.productPrice * item.quantity).toFixed(2)}`, totalX, yPos);
-//       yPos += 20;
-//     });
-
-//     doc.moveDown();
-
-//     // Add total amount and coupon details
-//     if (order.couponAmount > 0) {
-//       doc.text(`Coupon Amount: $${order.couponAmount.toFixed(2)}`, { align: "right" });
-//     }
-//     doc.text(`Grand Total: $${order.billTotal.toFixed(2)}`, { align: "right" });
-
-//     doc.end();
-
-//   } catch (error) {
-//     console.log(error.message);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// },
-
-
-// wrking now error
-// downloadInvoice : async (req, res) => {
-//   try {
-//     const { orderId } = req.query;
-
-//     const order = await Order.findById(orderId).populate('user');
-
-//     if (!order) {
-//       return res.status(404).json({ message: 'Order not found' });
-//     }
-
-//     const doc = new PDFDocument({ margin: 50 });
-//     const filename = `invoice_${order._id}.pdf`;
-
-//     res.setHeader('Content-Type', 'application/pdf');
-//     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-
-//     doc.pipe(res);
-
-//     // Header
-//     doc.fontSize(20).text('INVOICE', { align: 'center', underline: true });
-//     doc.moveDown(1.5);
-
-//     // Order Details
-//     doc.fontSize(12).text(`Order ID: ${order._id}`, { continued: true });
-//     doc.text(`Date: ${new Date(order.orderDate).toLocaleString('en-IN')}`, { align: 'right' });
-//     doc.moveDown(0.5);
-
-//     doc.text(`Payment Method: ${order.paymentMethod}`, { continued: true });
-//     doc.text(`Payment Status: ${order.paymentStatus}`, { align: 'right' });
-//     doc.moveDown(0.5);
-
-//     // Shipping Address
-//     doc.text(`Shipping Address:`, { underline: true });
-//     doc.text(`${order.shippingAddress.houseName}, ${order.shippingAddress.street}`);
-//     doc.text(`${order.shippingAddress.city}, ${order.shippingAddress.state}`);
-//     doc.text(`${order.shippingAddress.country} - ${order.shippingAddress.postalCode}`);
-//     doc.moveDown(1);
-
-//     // Table Headers
-//     const tableTop = 250;
-//     const itemX = 50;
-//     const quantityX = 250;
-//     const priceX = 320;
-//     const totalX = 400;
-
-//     doc
-//       .fontSize(12)
-//       .font('Helvetica-Bold')
-//       .text('Product Name', itemX, tableTop)
-//       .text('Quantity', quantityX, tableTop)
-//       .text('Price', priceX, tableTop)
-//       .text('Total', totalX, tableTop);
-
-//     // Draw a horizontal line after headers
-//     doc.moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
-
-//     let yPos = tableTop + 20;
-
-//     // Table Rows
-//     doc.font('Helvetica');
-//     order.items.forEach(item => {
-//       doc
-//         .text(item.name, itemX, yPos)
-//         .text(item.quantity, quantityX, yPos)
-//         .text(`₹${item.productPrice.toFixed(2)}`, priceX, yPos)
-//         .text(`₹${(item.productPrice * item.quantity).toFixed(2)}`, totalX, yPos);
-//       yPos += 20;
-//     });
-
-//     // Draw a horizontal line after the last row
-//     doc.moveTo(50, yPos).lineTo(550, yPos).stroke();
-
-//     // Total and Coupon Details
-//     yPos += 20;
-//     doc
-//       .font('Helvetica-Bold')
-//       .text('Subtotal:', totalX - 100, yPos, { continued: true })
-//       // .text(`₹${order.billTotal.toFixed(2)}`, { align: 'right' });
-//       .text(`₹${order.subtotal.toFixed(2)}`, { align: 'right' });
-
-      
-
-//     if (order.couponAmount > 0) {
-//       yPos += 20;
-//       doc
-//         .font('Helvetica-Bold')
-//         .text('Coupon Discount:', totalX - 100, yPos, { continued: true })
-//         .text(`-₹${order.couponAmount.toFixed(2)}`, { align: 'right' });
-//     }
-
-//     yPos += 20;
-//     doc
-//       .font('Helvetica-Bold')
-//       .text('Grand Total:', totalX - 100, yPos, { continued: true })
-//       .text(`₹${order.billTotal.toFixed(2)}`, { align: 'right' });
-
-//     // Footer
-//     doc.moveDown(2);
-//     doc.fontSize(10).text('Thank you for your purchase!', { align: 'center' });
-
-//     doc.end();
-//   } catch (error) {
-//     console.log(error.message);
-//     res.status(500).json({ message: 'Internal Server Error' });
-//   }
-// },
 
 
 
@@ -2537,18 +1913,6 @@ downloadInvoice: async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 retryOrder : async (req, res) => {
   try {
     const { orderId, totalAmount } = req.body;
@@ -2609,38 +1973,7 @@ retryPayment :async (req, res) => {
   }
 }
 
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -150,7 +150,7 @@ const userSchema = mongoose.Schema({
             amount: { type: Number, required: true },
             description: { type: String, required: true },
             type: { type: String, enum: ['Refund', 'Credit', 'Debit'], required: true },
-            date: { type: Date, default: Date.now }
+            date: { type: Date, default: Date.now , required: true}
         }]
     },
     wishlist: [{
