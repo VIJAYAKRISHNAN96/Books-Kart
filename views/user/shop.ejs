@@ -1,6 +1,5 @@
 <%-include("../partials/header.ejs")%>
 
-    <!-- Quick view -->
    <style>
     .active-category a {
   border-bottom: 1px solid #fbfefe; /* Underline */
@@ -8,7 +7,6 @@
   color: #000605; /* Change text color */
 }
 
-/* Optionally, you can add other styles to make it more visually distinct */
 .active-category a {
   background-color: #f0f0f0;
   padding: 5px;
@@ -83,44 +81,7 @@
 
  </style>
 
-<!-- <style>
-   .primary-sidebar {
-    padding: 15px;
-}
 
-.widget-category {
-    margin: 0;
-}
-
-.section-title {
-    font-size: 1.25rem;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.categories {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.categories li {
-    margin-bottom: 10px;
-}
-
-.categories a {
-    text-decoration: none;
-    color: #333;
-    font-size: 1rem;
-}
-
-.active-category a {
-    font-weight: bold;
-    color: #007bff; /* Highlight color for active category */
-}
-
-
-</style> -->
 
 <style>
     .primary-sidebar {
@@ -327,42 +288,24 @@
                                 <!-- <p> We found <strong class="text-brand">688</strong> items for you!</p> -->
                             </div>
                             <div class="sort-by-product-area">
-                                <div class="sort-by-cover mr-10">
-                                    <div class="sort-by-product-wrap">
-                                        <div class="sort-by">
-                                            <span><i class="fi-rs-apps"></i>Show:</span>
-                                        </div>
-                                        <!-- <div class="sort-by-dropdown-wrap">
-                                            <span> 50 <i class="fi-rs-angle-small-down"></i></span>
-                                        </div> -->
-                                    </div>
-                                    <div class="sort-by-dropdown">
-                                        <!-- <ul>
-                                            <li><a class="active" href="#">50</a></li>
-                                            <li><a href="#">100</a></li>
-                                            <li><a href="#">150</a></li>
-                                            <li><a href="#">200</a></li>
-                                            <li><a href="#">All</a></li>
-                                        </ul> -->
-                                    </div>
-                                </div>
+                                
                                 <div class="sort-by-cover">
-    <div class="sort-by-product-wrap">
-        <div class="sort-by">
-            <span><i class="fi-rs-apps-sort"></i>Sort by:</span>
-        </div>
-        <div class="sort-by-dropdown-wrap">
-            <span id="selected-sort"><%= sortBy === 'priceAsc' ? 'Price: Low to High' : sortBy === 'priceDesc' ? 'Price: High to Low' : 'Show All' %> <i class="fi-rs-angle-small-down"></i></span>
-        </div>
-    </div>
-    <div class="sort-by-dropdown">
-        <ul>
-            <li><a class="<%= sortBy === 'showAll' ? 'active' : '' %>" href="/shop?sortBy=showAll&category=<%= category %>">Show All</a></li>
-            <li><a class="<%= sortBy === 'priceAsc' ? 'active' : '' %>" href="/shop?sortBy=priceAsc&category=<%= category %>">Price: Low to High</a></li>
-            <li><a class="<%= sortBy === 'priceDesc' ? 'active' : '' %>" href="/shop?sortBy=priceDesc&category=<%= category %>">Price: High to Low</a></li>
-        </ul>
-    </div>
-</div>
+                        <div class="sort-by-product-wrap">
+                            <div class="sort-by">
+                                <span><i class="fi-rs-apps-sort"></i>Sort by:</span>
+                            </div>
+                            <div class="sort-by-dropdown-wrap">
+                                <span id="selected-sort"><%= sortBy === 'priceAsc' ? 'Price: Low to High' : sortBy === 'priceDesc' ? 'Price: High to Low' : 'Show All' %> <i class="fi-rs-angle-small-down"></i></span>
+                            </div>
+                        </div>
+                        <div class="sort-by-dropdown">
+                            <ul>
+                                <li><a class="<%= sortBy === 'showAll' ? 'active' : '' %>" href="/shop?sortBy=showAll&category=<%= category %>">Show All</a></li>
+                                <li><a class="<%= sortBy === 'priceAsc' ? 'active' : '' %>" href="/shop?sortBy=priceAsc&category=<%= category %>">Price: Low to High</a></li>
+                                <li><a class="<%= sortBy === 'priceDesc' ? 'active' : '' %>" href="/shop?sortBy=priceDesc&category=<%= category %>">Price: High to Low</a></li>
+                            </ul>
+                        </div>
+                    </div>
 
                                 <!-- <div class="sort-by-cover">
                                     <div class="sort-by-product-wrap">
@@ -399,15 +342,11 @@
                                         <div class="product-action-1">
                                             <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal">
                                             <i class="fi-rs-search"></i></a>
-                                            <!-- <a aria-label="Add To Wishlist" class="action-btn hover-up" href="/wishList"><i class="fi-rs-heart"></i></a> -->
-                                            <!-- <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="addToWishList('<%=product._id %>')"><i class="fi-rs-heart"></i></a> -->
+                                        
                                             <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="addToWishList('<%= product._id %>')">
                                                 <i class="fi-rs-heart"></i>
                                               </a>
                                               
-
-                                            
-                                            <!-- <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a> -->
                                         </div>
                                         <div class="product-badges product-badges-position product-badges-mrg">
                                             <!-- <span class="hot">Hot</span> -->
@@ -514,122 +453,110 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-
-
-
-
-      
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>   
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+        <script>
+
+        function addToCart(productId) {
+            console.log('Adding Product ID:', productId);
+
+            fetch('/addToCart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productId }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Added to Cart!',
+                        text: `${data.quantity} ${data.quantity > 1 ? 'items' : 'item'} of ${data.productName} ${data.quantity > 1 ? 'have' : 'has'} been added to your cart.`,
+                        icon: 'success',
+                        confirmButtonText: 'Continue Shopping'
+                    });
+                    // Optional: Update mini cart or cart icon if you have one
+                    // updateMiniCart(data.cartItemCount, data.totalPrice);
+                } else if (data.error === 'User not logged in') {
+                    Swal.fire({
+                        title: 'Not Logged In',
+                        text: 'Please log in to add items to your cart.',
+                        icon: 'warning',
+                        confirmButtonText: 'Log In'
+                    }).then(() => {
+                        window.location.href = '/login'; // Redirect to login page
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.error || 'Failed to add product to cart',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+            .catch((error) => {
+                console.error('Fetch error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+        
+        }
 
 
 
 
-    <script>
 
-function addToCart(productId) {
-    console.log('Adding Product ID:', productId);
 
-    fetch('/addToCart', {
+        function addToWishList(productId) {
+            console.log('Adding Product ID:', productId); // Log to verify the productId
+
+            
+        fetch('/addToWishList', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({ productId }),
-    })
-    .then(response => response.json())
-    .then(data => {
+        body: new URLSearchParams({
+            productId: productId,
+        }),
+        })
+        .then(response => response.json())
+        .then(data => {
+        console.log('Response Data:', data); // Log response to check structure
         if (data.success) {
             Swal.fire({
-                title: 'Added to Cart!',
-                text: `${data.quantity} ${data.quantity > 1 ? 'items' : 'item'} of ${data.productName} ${data.quantity > 1 ? 'have' : 'has'} been added to your cart.`,
-                icon: 'success',
-                confirmButtonText: 'Continue Shopping'
-            });
-            // Optional: Update mini cart or cart icon if you have one
-            // updateMiniCart(data.cartItemCount, data.totalPrice);
-        } else if (data.error === 'User not logged in') {
-            Swal.fire({
-                title: 'Not Logged In',
-                text: 'Please log in to add items to your cart.',
-                icon: 'warning',
-                confirmButtonText: 'Log In'
-            }).then(() => {
-                window.location.href = '/login'; // Redirect to login page
+            icon: 'success',
+            title: 'Success',
+            text: data.message,
+            confirmButtonText: 'OK'
             });
         } else {
             Swal.fire({
-                title: 'Error!',
-                text: data.error || 'Failed to add product to cart',
-                icon: 'error',
-                confirmButtonText: 'OK'
+            icon: 'error',
+            title: 'Error',
+            text: data.message,
+            confirmButtonText: 'OK'
             });
         }
-    })
-    .catch((error) => {
-        console.error('Fetch error:', error);
+        })
+        .catch(error => {
+        console.error('Error:', error);
         Swal.fire({
-            title: 'Error!',
-            text: 'An error occurred. Please try again.',
             icon: 'error',
+            title: 'Error',
+            text: 'An error occurred. Please try again.',
             confirmButtonText: 'OK'
         });
-    });
-   
-}
+        });
 
-
-
-
-
-
-function addToWishList(productId) {
-    console.log('Adding Product ID:', productId); // Log to verify the productId
-
-    
-fetch('/addToWishList', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/x-www-form-urlencoded',
-  },
-  body: new URLSearchParams({
-    productId: productId,
-  }),
-})
-.then(response => response.json())
-.then(data => {
-  console.log('Response Data:', data); // Log response to check structure
-  if (data.success) {
-    Swal.fire({
-      icon: 'success',
-      title: 'Success',
-      text: data.message,
-      confirmButtonText: 'OK'
-    });
-  } else {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: data.message,
-      confirmButtonText: 'OK'
-    });
-  }
-})
-.catch(error => {
-  console.error('Error:', error);
-  Swal.fire({
-    icon: 'error',
-    title: 'Error',
-    text: 'An error occurred. Please try again.',
-    confirmButtonText: 'OK'
-  });
-});
-
-}
-
-
-  
+        }
 
     </script>
 
@@ -748,4 +675,5 @@ fetch('/addToWishList', {
             </div>
         </div>
     </footer>
+</div>
 <%-include("../partials/footer.ejs")%>

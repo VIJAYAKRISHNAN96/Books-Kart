@@ -56,24 +56,20 @@ adminRouter.get("/adminlogin", auth.isLogOut, adminController.loadAdminLogin);
 adminRouter.post("/adminLogin", adminController.processAdminLogin);
 adminRouter.get("/logout", adminController.logout);
 adminRouter.get("/dashboard", auth.isLogin, adminController.loadDashboard);
-// adminRouter.get("/loadGraph", auth.isLogin, adminController.loadGraph);
 
-adminRouter.get("/products", adminController.loadProduct);
+adminRouter.get("/products", auth.isLogin,adminController.loadProduct);
 adminRouter.get("/addProduct", adminController.loadaddProductpage);
-// adminRouter.post('/addProduct', upload.array('images', 3), adminController.addProduct);
 adminRouter.post('/addProduct', upload.array('images', 3), adminController.loadaddProduct);
 
-// adminRouter.post("/addProduct",adminController.addProduct);
 
- // Ensure this is correct
 adminRouter.get('/editProduct/:id', adminController.loadeditProductpage);
 adminRouter.post('/editProduct/:id', upload.array('images', 3), adminController.editProduct);
 adminRouter.get('/deleteProduct/:id', adminController.deleteProduct);
 adminRouter.get('/unlistProduct/:id', adminController.unlistProduct);
-adminRouter.get("/category", adminController.loadCategory);
+adminRouter.get("/category", auth.isLogin,adminController.loadCategory);
 adminRouter.post('/category/edit/:id', adminController.editCategory);
 adminRouter.post('/category/delete/:id', adminController.deleteCategory);
-adminRouter.get("/userlist", adminController.loadUserlist);
+adminRouter.get("/userlist",auth.isLogin, adminController.loadUserlist);
 adminRouter.post('/toggleBlockUser', adminController.toggleBlockUser);
 adminRouter.post('/category/create', adminController.addCategory);
 
@@ -82,7 +78,7 @@ adminRouter.put("/changeOrderStatus", auth.isLogin,orderManagement.changeOrderSt
 adminRouter.get("/orderDetails", auth.isLogin,orderManagement.loadOrderDetails);
 
 
-adminRouter.get('/coupon', couponManagement.loadCouponList);
+adminRouter.get('/coupon',auth.isLogOut, couponManagement.loadCouponList);
 adminRouter.post('/addCoupon', couponManagement.addCoupon);
 adminRouter.put('/couponStatus', couponManagement.changeCouponStatus);
 adminRouter.delete('/deleteCoupon', couponManagement.deleteCoupon);

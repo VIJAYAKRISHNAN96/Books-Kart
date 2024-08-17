@@ -190,7 +190,7 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Users </th>
+                                    <th>User Name </th>
                                     <th>Email</th>
                                     <th>Status</th>
                                     <th>Registered</th>
@@ -202,9 +202,7 @@
                                 <tr>
                                     <td width="40%">
                                         <a href="#" class="itemside">
-                                            <div class="left">
-                                                <img src="/adminAssets/imgs/people/avatar2.jpg" class="img-sm img-avatar" alt="Userpic">
-                                            </div>
+                                            
                                             <div class="info pl-3">
                                                 <h6 class="mb-0 title"><%= user.name %></h6>
                                             </div>
@@ -216,20 +214,14 @@
                                             <%= user.isBlocked ? 'Blocked' : 'Active' %>
                                         </span>
                                     </td>
+                                  <td><%= new Date(user.createdAt).toDateString() %></td>
 
-                                    <td><%= new Date(user.createdAt).toDateString() %></td>
-
-                                    
-                                      
-
-
-                                    
                                     <td class="text-justify">
                                         <button class="btn btn-sm rounded font-sm mt-15 custom-btn <%= user.isBlocked ? 'unblock' : 'block' %>" 
                                             onclick="confirmToggleBlock('<%= user._id %>', '<%= user.isBlocked %>')">
                                             <%= user.isBlocked ? 'Unblock' : 'Block' %>
                                         </button>
-
+                                       
                                     </td>
                                 </tr>
                             <% }); %>
@@ -379,6 +371,24 @@ async function toggleBlockUser(userId) {
             console.error('Error:', error);
           }
         };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         function applyFilters() {
     const searchTerm = document.getElementById('searchInput').value;
     const statusFilter = document.getElementById('statusFilter').value;

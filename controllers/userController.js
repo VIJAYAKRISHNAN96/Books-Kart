@@ -116,6 +116,10 @@ processLogin: async (req, res) => {
           return res.status(401).json({ success: false, message: 'Invalid email or password' });
       }
 
+      if (user.isBlocked) {
+        return res.status(403).json({ success: false, message: 'Your account is blocked. Please contact support.' });
+    }
+
       const isMatch = await bcrypt.compare(password, user.password);
       console.log("Password match status:", isMatch);
 
@@ -459,15 +463,6 @@ loadUser: async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 },
-
-
-
-
-
-
-
-
-
 
 
 
@@ -977,8 +972,6 @@ loadWishList : async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 },
-
-
 
 
 addToWishList : async (req, res) => {

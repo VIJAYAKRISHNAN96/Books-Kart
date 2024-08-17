@@ -383,84 +383,8 @@
 });
 
 </script>
-<!-- <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const imageInput = document.getElementById('imageInput');
-        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
-        const croppedImagesContainer = document.getElementById('croppedImagesContainer');
-        let cropperInstances = [];
 
-        imageInput.addEventListener('change', function () {
-            const files = Array.from(this.files);
 
-            if (files.length > 3) {
-                alert('You can upload a maximum of 3 images per product.');
-                imageInput.value = '';
-                return;
-            }
-
-            imagePreviewContainer.innerHTML = '';
-            croppedImagesContainer.innerHTML = '';
-            cropperInstances = [];
-
-            files.forEach((file, index) => {
-                const reader = new FileReader();
-                reader.onload = function (event) {
-                    const previewDiv = document.createElement('div');
-                    previewDiv.classList.add('image-preview');
-
-                    const img = document.createElement('img');
-                    img.src = event.target.result;
-                    previewDiv.appendChild(img);
-
-                    const removeBtn = document.createElement('button');
-                    removeBtn.classList.add('remove-btn');
-                    removeBtn.innerText = 'X';
-                    removeBtn.addEventListener('click', () => {
-                        previewDiv.remove();
-                        cropperInstances[index].destroy();
-                        cropperInstances[index] = null;
-                        if (cropperInstances.every(cropper => cropper === null)) {
-                            imageInput.value = '';
-                        }
-                    });
-                    previewDiv.appendChild(removeBtn);
-
-                    imagePreviewContainer.appendChild(previewDiv);
-
-                    const cropper = new Cropper(img, {
-                        aspectRatio: 1,
-                        viewMode: 1,
-                        zoomable: false,
-                        ready: function () {
-                            console.log('Cropper.js is ready for image ' + index);
-                        }
-                    });
-
-                    cropperInstances.push(cropper);
-                };
-                reader.readAsDataURL(file);
-            });
-        });
-
-        document.getElementById('addProductForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            cropperInstances.forEach((cropper, index) => {
-                if (cropper) {
-                    const croppedImage = cropper.getCroppedCanvas().toDataURL('image/jpeg');
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = `croppedImages[${index}]`;
-                    input.value = croppedImage;
-                    croppedImagesContainer.appendChild(input);
-                }
-            });
-
-            this.submit();
-        });
-    });
-</script> -->
 </body>
 </html>
 

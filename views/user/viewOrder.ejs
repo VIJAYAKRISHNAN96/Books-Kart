@@ -172,7 +172,7 @@
     <table id="summary-table">
         <tbody>
             <tr>
-                <th>Total Amount</th>
+                <th>Grand Total</th>
                 <td id="grandTotal">$<%= order.billTotal ? order.billTotal.toFixed(2) : '0.00' %></td>
             </tr>
             <tr>
@@ -218,49 +218,6 @@
     
 
     
-
-    // function showCancelConfirmation(orderId, itemId) {
-    // Swal.fire({
-    //     title: 'Cancel Order',
-    //     text: 'Are you sure you want to cancel this order?',
-    //     icon: 'warning',
-    //     showCancelButton: true,
-    //     confirmButtonText: 'Yes, cancel it!',
-    //     cancelButtonText: 'No, keep it'
-    // }).then((result) => {
-    //     if (result.isConfirmed) {
-    //         cancelOrder(orderId, itemId);
-    //     }
-    // });
-// }
-
-// wrking
-//     async function cancelOrder(orderId, itemId, cancellationReason) {
-//     try {
-//         const response = await fetch('/cancelOrder', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json'
-//             },
-//             body: JSON.stringify({ orderId, itemId, cancellationReason })
-//         });
-//         const data = await response.json();
-//         if (response.ok) {
-//             Swal.fire('Order Cancelled', data.message, 'success');
-//             document.querySelector(`[data-input-id="${itemId}"]`).textContent = 'Cancelled';
-//             const cancelButton = document.querySelector(`button[data-input-id="${itemId}"]`);
-//             cancelButton.innerHTML = 'Order Cancelled';
-//             cancelButton.disabled = true;
-//             location.reload();
-//         } else {
-//             Swal.fire('Error', data.message, 'error');
-//         }
-//     } catch (error) {
-//         console.error('Error:', error);
-//         Swal.fire('Error', 'An error occurred while cancelling the order', 'error');
-//     }
-// }
-
 
 
 
@@ -331,67 +288,6 @@ function updateUIAfterCancel(itemId) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // function showReturnConfirmation(orderId, itemId) {
-    //     Swal.fire({
-    //         title: 'Return Order',
-    //         icon: 'warning',
-    //         showCancelButton: true,
-    //         confirmButtonText: 'Yes, return it!',
-    //         cancelButtonText: 'No, keep it'
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             const returnReason = document.getElementById('returnReason').value;
-    //             // Call a function to handle order cancellation
-    //             returnOrder(orderId, itemId, returnReason);
-    //         }
-    //     });
-    // }
-
-    // async function returnOrder(orderId, itemId,) {
-    //     try {
-    //         const response = await fetch('/returnOrder', {
-    //             method: 'PUT',
-    //             headers: {
-    //                 'Content-Type': 'application/json'
-    //             },
-    //             body: JSON.stringify({ orderId, itemId,})
-    //         });
-    //         const data = await response.json();
-    //         if (response.ok) {
-    //             // Handle success
-    //             Swal.fire('Order Returned', data.message, 'success');
-    //             location.reload()
-              
-    //         } else {
-    //             // Handle error
-    //             Swal.fire('Error', data.message, 'error');
-    //         }
-    //     } catch (error) {
-    //         console.error('Error:', error);
-    //         Swal.fire('Error', 'An error occurred while cancelling the order', 'error');
-    //     }
-       
-    // }
-
-
-
     function showReturnConfirmation(orderId, itemId) {
     Swal.fire({
         title: 'Return Item',
@@ -453,28 +349,6 @@ function updateUIAfterReturn(itemId) {
         returnButton.style.backgroundColor = '#808080'; // Grey color
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -632,17 +506,6 @@ async function downloadInvoice(orderId) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
    
-// </script>
+ </script>
 

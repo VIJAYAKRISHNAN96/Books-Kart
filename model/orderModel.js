@@ -1,8 +1,4 @@
 
-
-
-
-
 const { ObjectId } = require('mongodb');
 const { Schema, model } = require('mongoose');
 const objectID = Schema.Types.ObjectId;

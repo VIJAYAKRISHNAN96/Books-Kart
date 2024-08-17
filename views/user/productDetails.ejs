@@ -1,93 +1,6 @@
 <%- include("../partials/header.ejs") %>
 
-<!-- <style>
-    /* Ensure no background or shadows on the image containers */
-.product-image-figure,
-.thumbnail-image-container {
-  background-color: transparent !important; /* Ensure background is transparent */
-  box-shadow: none !important; /* Remove any box shadow */
-  border: none !important; /* Remove any borders */
-  margin: 0 !important; /* Remove any margins */
-  padding: 0 !important; /* Remove any padding */
-  border-radius: 10px; /* Add border-radius for smooth edges */
-  overflow: hidden; /* Ensure contents do not overflow the container */
-}
 
-/* Ensure no background or borders on the images */
-.mainImage,
-.thumbnail-image {
-  display: block;
-  width: 100%;
-  height: auto;
-  background-color: transparent !important; /* Ensure background is transparent */
-  border: none !important; /* Remove any borders */
-  margin: 0 !important; /* Remove any margins */
-  padding: 0 !important; /* Remove any padding */
-  border-radius: 10px; /* Add border-radius for smooth edges */
-  object-fit: cover; /* Ensure aspect ratio is maintained and the image covers the container */
-}
-
-.main-image-container {
-  border-radius: 10px; /* Add border-radius for smooth edges */
-  overflow: hidden; /* Ensure contents do not overflow the container */
-  width: 100%; /* Adjust the width of the main image container */
-  max-width: 400px; /* Set a maximum width for the main image container */
-  height: auto; /* Adjust the height of the main image container */
-  margin: 0 auto; /* Center the main image container */
-}
-
-</style> -->
-
-<!-- <style>
-    /* Ensure no background or shadows on the image containers */
-.product-image-figure,
-.thumbnail-image-container {
-  background-color: transparent !important; /* Ensure background is transparent */
-  box-shadow: none !important; /* Remove any box shadow */
-  border: none !important; /* Remove any borders */
-  margin: 0 !important; /* Remove any margins */
-  padding: 0 !important; /* Remove any padding */
-  border-radius: 10px; /* Add border-radius for smooth edges */
-  overflow: hidden; /* Ensure contents do not overflow the container */
-}
-
-/* Ensure no background or borders on the images */
-.mainImage,
-.thumbnail-image {
-  display: block;
-  width: 100%;
-  height: 100%; /* Ensure the image covers the entire container */
-  background-color: transparent !important; /* Ensure background is transparent */
-  border: none !important; /* Remove any borders */
-  margin: 0 !important; /* Remove any margins */
-  padding: 0 !important; /* Remove any padding */
-  border-radius: 10px; /* Add border-radius for smooth edges */
-  object-fit: cover; /* Ensure aspect ratio is maintained and the image covers the container */
-}
-
-.main-image-container {
-  border-radius: 10px; /* Add border-radius for smooth edges */
-  overflow: hidden; /* Ensure contents do not overflow the container */
-  width: 100%; /* Adjust the width of the main image container */
-  max-width: 400px; /* Set a maximum width for the main image container */
-  height: auto; /* Adjust the height of the main image container */
-  margin: 0 auto; /* Center the main image container */
-}
-
-.thumbnail-image-container {
-  display: flex;
-  justify-content: center;
-  gap: 10px; /* Add some space between thumbnails */
-}
-
-.thumbnail-image {
-  width: 50px;
-  height: 50px;
-  cursor: pointer;
-}
-
-</style> -->
-  
 <style>
     .product-image-figure, .thumbnail-image-container {
   background-color: transparent !important;
@@ -140,9 +53,6 @@
   border-radius: 5px;
 }
 </style>
-
-
-
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -315,25 +225,7 @@
                                                     </div>
                                                 <% }); %>
                                             <% } %>
-                                    <!-- <div class="detail-gallery"> -->
-                                       
-                                        
-                                        <!-- MAIN IMAGE -->
-                                        <!-- <div class="product-image-slider">
-                                            <figure class="border-radius-10 main-image-container">
-                                                <img id="main-product-image" src="/userAssets/imgs/shop/<%= product.images[0] %>" alt="product image">
-                                            </figure>
-                                        </div> -->
-                                        <!-- THUMBNAILS -->
-                                        <!-- <div class="slider-nav-thumbnails">
-                                            <% if (product.images && product.images.length > 0) { %>
-                                                <% product.images.forEach(function(image, index) { %>
-                                                    <div>
-                                                        <img class="thumbnail-image" src="/userAssets/imgs/shop/<%= image %>" alt="product image" data-index="<%= index %>">
-
-                                                    </div>
-                                                <% }); %>
-                                            <% } %> -->
+                                   
                                         </div>
                                     </div>
                                 </div>
@@ -359,11 +251,6 @@
                                                   <span class="save-price font-md color3 ml-15"><%= Math.floor(((product.price - product.discountPrice) / product.price) * 100) %>% Off</span>
                                                 <% } %>
                                               </div>
-                                            <!-- <div class="product-price primary-color float-left">
-                                                <ins><span class="text-brand">$<%= product.discountPrice %></span></ins>
-                                                <ins><span class="old-price font-md ml-15">$<%= product.price %></span></ins>
-                                                <span class="save-price font-md color3 ml-15"><%= (Math.floor(((product.price-product.discountPrice)/product.price)*100)) %>% Off</span>
-                                            </div> -->
                                         </div>
                                         <div class="bt-1 border-color-1 mt-15 mb-15"></div>
                                         <div class="short-desc mb-30">
@@ -397,17 +284,7 @@
                                                         <button class="btn btn-danger" disabled>Out of Stock</button>
                                                     <% } %>
                                                 </div>
-                                                
-
-
-                                                <!-- <div class="product-extra-link2">
-                                                    <button onclick="addToCart('<%= product._id %>', '<%= product.name %>')">Add to Cart</button>
-                                            </div> -->
-
-
-                                            </div>
-                                        
-                                              
+                                            </div>  
                                         </div>
                                         <ul class="product-meta font-xs color-grey mt-50">
                                             <!-- <li class="mb-5">SKU: <a href="#">FWM15VKT</a></li> -->
@@ -431,34 +308,7 @@
                                 </li>
                             </ul>
                             <div class="tab-content shop_info_tab entry-main-content">
-                                <!-- <div class="tab-pane fade show active" id="Description">
-                                    <div class="">
-                                        <p>Uninhibited carnally hired played in whimpered dear gorilla koala depending and much yikes off far quetzal goodness and from for grimaced goodness unaccountably and meadowlark near unblushingly crucial scallop
-                                            tightly neurotic hungrily some and dear furiously this apart.</p>
-                                        <p>Spluttered narrowly yikes left moth in yikes bowed this that grizzly much hello on spoon-fed that alas rethought much decently richly and wow against the frequent fluidly at formidable acceptably flapped
-                                            besides and much circa far over the bucolically hey precarious goldfinch mastodon goodness gnashed a jellyfish and one however because.
-                                        </p>
-                                        <ul class="product-more-infor mt-30">
-                                            <li><span>Type Of Packing</span> Bottle</li>
-                                            <li><span>Color</span> Green, Pink, Powder Blue, Purple</li>
-                                            <li><span>Quantity Per Case</span> 100ml</li>
-                                            <li><span>Ethyl Alcohol</span> 70%</li>
-                                            <li><span>Piece In One</span> Carton</li>
-                                        </ul>
-                                        <hr class="wp-block-separator is-style-dots">
-                                        <p>Laconic overheard dear woodchuck wow this outrageously taut beaver hey hello far meadowlark imitatively egregiously hugged that yikes minimally unanimous pouted flirtatiously as beaver beheld above forward
-                                            energetic across this jeepers beneficently cockily less a the raucously that magic upheld far so the this where crud then below after jeez enchanting drunkenly more much wow callously irrespective limpet.</p>
-                                        <h4 class="mt-30">Packaging & Delivery</h4>
-                                        <hr class="wp-block-separator is-style-wide">
-                                        <p>Less lion goodness that euphemistically robin expeditiously bluebird smugly scratched far while thus cackled sheepishly rigid after due one assenting regarding censorious while occasional or this more crane
-                                            went more as this less much amid overhung anathematic because much held one exuberantly sheep goodness so where rat wry well concomitantly.
-                                        </p>
-                                        <p>Scallop or far crud plain remarkably far by thus far iguana lewd precociously and and less rattlesnake contrary caustic wow this near alas and next and pled the yikes articulate about as less cackled dalmatian
-                                            in much less well jeering for the thanks blindly sentimental whimpered less across objectively fanciful grimaced wildly some wow and rose jeepers outgrew lugubrious luridly irrationally attractively
-                                            dachshund.
-                                        </p>
-                                    </div>
-                                </div> -->
+                                
                                 <div class="tab-pane fade" id="Additional-info">
                                     <table class="font-md">
                                         <tbody>
@@ -780,6 +630,7 @@
       });
     });
   </script>
+
 <!-- new -->
 <script>
     let quantity = 1;
@@ -818,16 +669,7 @@ function addToCart(productId, productName) {
             });
         }
     })
-    // .catch((error) => {
-    //     console.error('Error:', error);
-    //     Swal.fire({
-    //         title: 'Error!',
-    //         text: 'An unexpected error occurred',
-    //         icon: 'error',
-    //         confirmButtonText: 'OK'
-    //     });
-    // });
-
+    
     .catch((error) => {
     console.error('Error:', error);
     Swal.fire({
@@ -849,17 +691,36 @@ function addToCart(productId, productName) {
 
 }
 
-// Optional: Implement this function if you have a mini cart or cart icon to update
-// function updateMiniCart(itemCount, totalPrice) {
-//     const cartCountElement = document.getElementById('cart-count');
-//     const cartTotalElement = document.getElementById('cart-total');
-//     if (cartCountElement) cartCountElement.textContent = itemCount;
-//     if (cartTotalElement) cartTotalElement.textContent = `$${totalPrice.toFixed(2)}`;
-// }
+
 </script>
 
 
+ <!-- Vendor JS-->
+ <script src="userAssets/js/vendor/modernizr-3.6.0.min.js"></script>
+ <script src="userAssets/js/vendor/jquery-3.6.0.min.js"></script>
+ <script src="userAssets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
+ <script src="userAssets/js/vendor/bootstrap.bundle.min.js"></script>
+ <script src="userAssets/js/plugins/slick.js"></script>
+ <script src="userAssets/js/plugins/jquery.syotimer.min.js"></script>    
+ <script src="userAssets/js/plugins/wow.js"></script>
+ <script src="userAssets/js/plugins/jquery-ui.js"></script>
+ <script src="userAssets/js/plugins/perfect-scrollbar.js"></script>
+ <script src="userAssets/js/plugins/magnific-popup.js"></script>
+ <script src="userAssets/js/plugins/select2.min.js"></script>
+ <script src="userAssets/js/plugins/waypoints.js"></script>
+ <script src="userAssets/js/plugins/counterup.js"></script>
+ <script src="userAssets/js/plugins/jquery.countdown.min.js"></script>
+ <script src="userAssets/js/plugins/images-loaded.js"></script>
+ <script src="userAssets/js/plugins/isotope.js"></script>
+ <script src="userAssets/js/plugins/scrollup.js"></script>
+ <script src="userAssets/js/plugins/jquery.vticker-min.js"></script>
+ <script src="userAssets/js/plugins/jquery.theia.sticky.js"></script>
+ <script src="userAssets/js/plugins/jquery.elevatezoom.js"></script>
+ 
 
+ <!-- Template  JS -->
+ <script src="./userAssets/js/main.js?v=3.4"></script>
+ <script src="./userAssets/js/shop.js?v=3.4"></script>
 
     
     
