@@ -78,7 +78,7 @@ adminRouter.put("/changeOrderStatus", auth.isLogin,orderManagement.changeOrderSt
 adminRouter.get("/orderDetails", auth.isLogin,orderManagement.loadOrderDetails);
 
 
-adminRouter.get('/coupon',auth.isLogOut, couponManagement.loadCouponList);
+adminRouter.get('/coupon',auth.isLogin, couponManagement.loadCouponList);
 adminRouter.post('/addCoupon', couponManagement.addCoupon);
 adminRouter.put('/couponStatus', couponManagement.changeCouponStatus);
 adminRouter.delete('/deleteCoupon', couponManagement.deleteCoupon);
