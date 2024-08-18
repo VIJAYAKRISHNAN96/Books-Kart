@@ -24,8 +24,8 @@ const walletModel = require("../model/walletModel");
 // const { verifyPaymentSignature } = require('./razorpayUtils'); // Adjust the path as necessary
 
 const razorpayInstance = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
+  key_id: rzp_test_0bXwsVkpMNQ4Qd,
+  key_secret: DnymdwyD85U6k6ab99ESaHbV
 });
 
 // const razorpayInstance = new Razorpay({
