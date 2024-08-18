@@ -9,12 +9,12 @@ const path = require("path");
 const { v4: uuidv4 } = require('uuid'); // Ensure you have uuid installed
 const Razorpay = require("razorpay");
 // const crypto = require('crypto');
-const crypto = require("crypto");
+// const crypto = require("crypto");
 
 const dotenv = require('dotenv');
 dotenv.config();
 
-const { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } = process.env;
+// const { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } = process.env;
 
 
 
@@ -26,17 +26,17 @@ const walletModel = require("../model/walletModel");
 
 // const { verifyPaymentSignature } = require('./razorpayUtils'); // Adjust the path as necessary
 
-// const razorpayInstance = new Razorpay({
-//   key_id: process.env.RAZORPAY_KEY_ID,
-//   key_secret: process.env.RAZORPAY_KEY_SECRET
-// });
 const razorpayInstance = new Razorpay({
-  key_id: RAZORPAY_KEY_ID,
-  key_secret: RAZORPAY_KEY_SECRET,
+  key_id: rzp_test_0bXwsVkpMNQ4Qd,
+  key_secret: DnymdwyD85U6k6ab99ESaHbV
 });
 
-const orderManagement = {
+// const razorpayInstance = new Razorpay({
+//   key_id: RAZORPAY_KEY_ID,
+//   key_secret: RAZORPAY_KEY_SECRET,
+// });
 
+const orderManagement = {
 
 
 
