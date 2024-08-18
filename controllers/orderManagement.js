@@ -14,6 +14,9 @@ const crypto = require("crypto");
 const dotenv = require('dotenv');
 dotenv.config();
 
+const { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } = process.env;
+
+
 
 const PDFDocument = require("pdfkit-table");
 const { verifyPaymentSignature } = require('./razorpayUtils');
@@ -23,9 +26,13 @@ const walletModel = require("../model/walletModel");
 
 // const { verifyPaymentSignature } = require('./razorpayUtils'); // Adjust the path as necessary
 
+// const razorpayInstance = new Razorpay({
+//   key_id: process.env.RAZORPAY_KEY_ID,
+//   key_secret: process.env.RAZORPAY_KEY_SECRET
+// });
 const razorpayInstance = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
+  key_id: RAZORPAY_KEY_ID,
+  key_secret: RAZORPAY_KEY_SECRET,
 });
 
 const orderManagement = {
