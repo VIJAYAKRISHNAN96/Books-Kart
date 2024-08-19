@@ -2,6 +2,7 @@
 const express = require("express");
 const userRouter = express.Router();
 const passport = require('passport'); 
+require('dotenv').config();
 
 const userController = require("../controllers/userController");
 const orderManagement = require("../controllers/orderManagement");

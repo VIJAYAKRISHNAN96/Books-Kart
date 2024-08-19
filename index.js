@@ -25,6 +25,7 @@ const app= express();
 
  mongoose.connect(process.env.MONGO_URL).then(() => console.log('MongoDB connected successfully'))
  .catch(err => console.error('MongoDB connection error:', err));
+
  
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
@@ -64,7 +65,7 @@ app.use((req, res, next) => {
 // Passport Configuration
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: 'http://localhost:3000/auth/google/callback'
 },
 async (accessToken, refreshToken, profile, done) => {
