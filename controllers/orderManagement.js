@@ -28,14 +28,6 @@ const razorpayInstance = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET
 }); 
 
-// RAZORPAY_KEY_ID="rzp_test_0bXwsVkpMNQ4Qd"
-// RAZORPAY_KEY_SECRET="DnymdwyD85U6k6ab99ESaHbV"
-
-
-// const razorpayInstance = new Razorpay({
-//   key_id: RAZORPAY_KEY_ID,
-//   key_secret: RAZORPAY_KEY_SECRET,
-// });
 
 const orderManagement = {
 
