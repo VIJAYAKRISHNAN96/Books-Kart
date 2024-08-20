@@ -532,7 +532,7 @@
                                                                         <% } %>
                                                                     </td>
                                                                     <td>
-                                                                        $<%= orderItem.billTotal ? orderItem.billTotal.toFixed(2) : 'N/A' %> for <%= orderItem.items.length %> item(s)
+                                                                        $<%= orderItem.billTotal ? orderItem.billTotal.toFixed(2) : '0.00' %> for <%= orderItem.items.length %> item(s)
                                                                     </td>
                                                                     <td>
                                                                         <a href="/viewOrder?id=<%= orderItem._id %>" class="btn btn-outline-primary btn-sm">View</a>

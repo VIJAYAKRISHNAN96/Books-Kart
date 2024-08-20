@@ -1,13 +1,15 @@
 const express = require("express");
 const path = require('path');
 const bodyparser = require('body-parser');
-require("dotenv").config();
+require('dotenv').config();
 const mongoose = require("mongoose");
 const PORT = process.env.PORT || 4000
 const passport=require("passport");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('./model/userModel'); // Make sure to import your User model
 const bcrypt = require('bcrypt');
+// const { MongoClient, ServerApiVersion } = require('mongodb');
+
 
 
 
@@ -23,8 +25,41 @@ const app= express();
 
  app.set("view engine","ejs") 
 
- mongoose.connect(process.env.MONGO_URL).then(() => console.log('MongoDB connected successfully'))
+
+ mongoose.connect(process.env.MONGO_URL)
+ .then(() => console.log('MongoDB connected successfully'))
  .catch(err => console.error('MongoDB connection error:', err));
+
+//  mongoose.connect(process.env.MONGO_URL).then(() => console.log('MongoDB connected successfully'))
+//  .catch(err => console.error('MongoDB connection error:', err));
+
+// const uri = process.env.MONGO_URI;
+
+// const client = new MongoClient(uri, {
+//   serverApi: {
+//     version: ServerApiVersion.v1,
+//     strict: true,
+//     deprecationErrors: true,
+//   }
+// });
+
+// async function run() {
+//   try {
+//     // Connect the client to the server (optional starting in v4.7)
+//     await client.connect();
+//     // Send a ping to confirm a successful connection
+//     await client.db("admin").command({ ping: 1 });
+//     console.log("Pinged your deployment. You successfully connected to MongoDB!");
+//   } finally {
+//     // Ensures that the client will close when you finish/error
+//     await client.close();
+//   }
+// }
+// run().catch(console.dir);
+
+
+
+
 
  
 app.use(express.json());
@@ -63,10 +98,60 @@ app.use((req, res, next) => {
 
  
 // Passport Configuration
+// passport.use(new GoogleStrategy({
+//   clientID: process.env.GOOGLE_CLIENT_ID,
+//   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+//   callbackURL: 'http://localhost:3000/auth/google/callback'
+// },
+// async (accessToken, refreshToken, profile, done) => {
+//   try {
+//     const existingUser = await User.findOne({ googleId: profile.id });
+//     if (existingUser) {
+//       return done(null, existingUser);
+//     }
+//     const newUser = new User({
+//       googleId: profile.id,
+//       name: profile.displayName,
+//       email: profile.emails[0].value,
+//       password: await bcrypt.hash('google_signin_password', 10)       
+      
+//     });
+//     await newUser.save();
+//     done(null, newUser);
+//   } catch (error) {
+//     done(error, null);
+//   }
+// }));
+
+// passport.serializeUser((user, done) => {
+//   done(null, user.id);
+// });
+
+// passport.deserializeUser(async (id, done) => {
+//   try {
+//     const user = await User.findById(id);
+//     done(null, user);
+//   } catch (error) {
+//     done(error, null);
+//   }
+// });
+
+// app.use(passport.initialize());
+// app.use(passport.session());
+
+//  app.use((req, res, next) => {
+//   console.log('Session on every request:', req.session);
+//    res.locals.user = req.session.user || null;
+//    next();
+//  });
+
+
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'http://localhost:3000/auth/google/callback'
+  callbackURL: process.env.NODE_ENV === 'production'
+    ? process.env.GOOGLE_CALLBACK_URL_PROD  // Production URL
+    : process.env.GOOGLE_CALLBACK_URL_DEV   // Development URL
 },
 async (accessToken, refreshToken, profile, done) => {
   try {
@@ -79,7 +164,6 @@ async (accessToken, refreshToken, profile, done) => {
       name: profile.displayName,
       email: profile.emails[0].value,
       password: await bcrypt.hash('google_signin_password', 10)       
-      
     });
     await newUser.save();
     done(null, newUser);
@@ -104,11 +188,20 @@ passport.deserializeUser(async (id, done) => {
 app.use(passport.initialize());
 app.use(passport.session());
 
- app.use((req, res, next) => {
+app.use((req, res, next) => {
   console.log('Session on every request:', req.session);
-   res.locals.user = req.session.user || null;
-   next();
- });
+  res.locals.user = req.session.user || null;
+  next();
+});
+
+
+
+
+
+
+
+
+
 
 app.use("/",userRouter);
 app.use("/admin",adminRouter);

@@ -265,138 +265,73 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
     <script>
-        function showChangeStatus(orderId) {
-          const statusOptions = {
-            Confirmed: 'Confirmed',
-            Shipped: 'Shipped',
-            Delivered: 'Delivered',
-          };
-    
-          Swal.fire({
-            title: 'Change Order Status',
-            html: `<div class="d-flex flex-column align-items-center">
-                     <select id="orderStatusSelect" class="form-select">
-                       ${Object.entries(statusOptions).map(([value, label]) => `<option value="${value}">${label}</option>`).join('')}
-                     </select>
-                   </div>`,
-            showCancelButton: true,
-            confirmButtonText: 'Confirm',
-            cancelButtonText: 'Cancel',
-            preConfirm: () => {
-              const selectedStatus = document.getElementById('orderStatusSelect').value;
-              return { orderId, selectedStatus };
-            }
-          }).then((result) => {
-            if (result.isConfirmed) {
-              const { orderId, selectedStatus } = result.value;
-              changeOrderStatus(orderId, selectedStatus);
-            }
-          });
-        }
-    
-        async function changeOrderStatus(orderId, selectedStatus) {
-          console.log(orderId);
-          console.log(selectedStatus);
-          try {
-            const response = await fetch(`/admin/changeOrderStatus`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ orderId, orderStatus: selectedStatus }),
-            });
-    
-            if (!response.ok) {
-              throw new Error('Failed to update order status');
-            }
-    
-            Swal.fire({
-              title: 'Success',
-              text: 'Order status updated successfully',
-              icon: 'success',
-              confirmButtonText: 'OK',
-              showConfirmButton: true
-            }).then((result) => {
-              if (result.isConfirmed) {
-                location.reload();
-              }
-            });
-    
-          } catch (error) {
-            Swal.fire('Error', 'Failed to update order status', 'error');
+      function showChangeStatus(orderId) {
+        const statusOptions = {
+          Confirmed: 'Confirmed',
+          Shipped: 'Shipped',
+          Delivered: 'Delivered',
+          Cancelled: 'Cancelled',
+          Returned: 'Returned'
+        };
+      
+        Swal.fire({
+          title: 'Change Order Status',
+          html: `<div class="d-flex flex-column align-items-center">
+                   <select id="orderStatusSelect" class="form-select">
+                     ${Object.entries(statusOptions).map(([value, label]) => `<option value="${value}">${label}</option>`).join('')}
+                   </select>
+                 </div>`,
+          showCancelButton: true,
+          confirmButtonText: 'Confirm',
+          cancelButtonText: 'Cancel',
+          preConfirm: () => {
+            const selectedStatus = document.getElementById('orderStatusSelect').value;
+            return { orderId, selectedStatus };
           }
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const { orderId, selectedStatus } = result.value;
+            changeOrderStatus(orderId, selectedStatus);
+          }
+        });
+      }
+      
+      async function changeOrderStatus(orderId, selectedStatus) {
+        console.log('Order ID:', orderId);
+        console.log('Selected Status:', selectedStatus);
+        try {
+          const response = await fetch(`/admin/changeOrderStatus`, { // Use the correct endpoint
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ orderId, orderStatus: selectedStatus }),
+          });
+      
+          if (!response.ok) {
+            throw new Error('Failed to update order status');
+          }
+      
+          const result = await response.json();
+          console.log('Response from server:', result);
+      
+          Swal.fire({
+            title: 'Success',
+            text: 'Order status updated successfully',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            showConfirmButton: true
+          }).then(() => {
+            location.reload();
+          });
+      
+        } catch (error) {
+          console.error('Error:', error);
+          Swal.fire('Error', 'Failed to update order status', 'error');
         }
+      }
       </script>
-
-
-
-function showChangeStatus(orderId) {
-    const statusOptions = {
-      Confirmed: 'Confirmed',
-      Shipped: 'Shipped',
-      Delivered: 'Delivered',
-      Cancelled: 'Cancelled',
-      Returned: 'Returned'
-    };
-  
-    Swal.fire({
-      title: 'Change Order Status',
-      html: `<div class="d-flex flex-column align-items-center">
-               <select id="orderStatusSelect" class="form-select">
-                 ${Object.entries(statusOptions).map(([value, label]) => `<option value="${value}">${label}</option>`).join('')}
-               </select>
-             </div>`,
-      showCancelButton: true,
-      confirmButtonText: 'Confirm',
-      cancelButtonText: 'Cancel',
-      preConfirm: () => {
-        const selectedStatus = document.getElementById('orderStatusSelect').value;
-        return { orderId, selectedStatus };
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const { orderId, selectedStatus } = result.value;
-        changeOrderStatus(orderId, selectedStatus);
-      }
-    });
-  }
-  
-  async function changeOrderStatus(orderId, selectedStatus) {
-    console.log('Order ID:', orderId);
-    console.log('Selected Status:', selectedStatus);
-    try {
-      const response = await fetch(`/changeStatus`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ orderId, orderStatus: selectedStatus }),
-      });
-  
-      if (!response.ok) {
-        throw new Error('Failed to update order status');
-      }
-  
-      const result = await response.json();
-      console.log('Response from server:', result);
-  
-      Swal.fire({
-        title: 'Success',
-        text: 'Order status updated successfully',
-        icon: 'success',
-        confirmButtonText: 'OK',
-        showConfirmButton: true
-      }).then((result) => {
-        if (result.isConfirmed) {
-          location.reload();
-        }
-      });
-  
-    } catch (error) {
-      console.error('Error:', error);
-      Swal.fire('Error', 'Failed to update order status', 'error');
-    }
-  }
-  
-</script> -->
+      

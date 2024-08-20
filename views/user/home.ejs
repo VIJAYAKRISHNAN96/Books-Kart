@@ -397,7 +397,9 @@
                                     </div>
                                     <h2><a href="shop-product-right.html"><%= product.name %></a></h2>
                                     <div class="product-price">
-                                        <span>$<%= product.price %></span>
+                                        <!-- <span>$<%= product.price %></span> -->
+                                        <ins><span class="text-brand">$<%= product.discountPrice.toFixed(2) %></span></ins>
+                                        <ins><span class="old-price">$<%= product.price %></span></ins>
                                     </div>
                                 </div>
                             </div>

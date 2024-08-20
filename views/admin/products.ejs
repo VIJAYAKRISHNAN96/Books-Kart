@@ -15,7 +15,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="/adminAssets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link href="/adminAssets/css/main.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 
     <style>
         .header-row {
@@ -270,6 +270,10 @@
             </div>
         </section> <!-- content-main end// -->
 
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
     <script>
             function confirmDelete(productId) {
   Swal.fire({
@@ -297,7 +301,6 @@ function deleteProduct(productId) {
           data.message,
           'success'
         ).then(() => {
-          // Reload the page or remove the product from the DOM
           location.reload();
         });
       } else {

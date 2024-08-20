@@ -368,53 +368,6 @@ resetPass: async (req, res) => {
 },
 
 
-
-
-
-// loadUser: async (req, res) => {
-//   try {
-//       const userId = req.session.user.id;
-
-//       // Fetch user data, including wallet
-//       const user = await User.findById(userId).populate('wallet.transactions');
-
-      
-
-//       if (!user) {
-//           return res.status(404).send('User not found');
-//       }
-
-//       // Fetch user orders with pagination
-//       const page = parseInt(req.query.page) || 1;
-//       const perPage = 10;
-//       const totalOrderCount = await Order.countDocuments({ user: userId });
-//       const totalPages = Math.ceil(totalOrderCount / perPage);
-//       const skip = (page - 1) * perPage;
-
-//       const order = await Order.find({ user: userId }).skip(skip).limit(perPage).sort({ orderDate: -1 });
-
-//       // Calculate cart count
-//       const cart = await Cart.findOne({ userId });
-//       let cartCount = 0;
-//       if (cart) {
-//           cartCount = cart.product.length;
-//       }
-
-//       // Check if wallet exists and is populated
-//       const wallet = user.wallet ? user.wallet : null;
-      
-
-//       console.log('Wallet:', wallet); // Debugging log
-
-//       // Render user account page with order pagination and wallet data
-//       res.render("userAccount", { user, order, cartCount, wallet, currentPage: page, totalPages });
-//   } catch (error) {
-//       console.error('Error loading user data:', error.message);
-//       res.status(500).send("Internal Server Error");
-//   }
-// },
-
-
 loadUser: async (req, res) => {
   try {
     const userId = req.session.user.id;
@@ -608,7 +561,6 @@ loadUser: async (req, res) => {
   
 
 
-// last working
 loadShop: async (req, res) => {
   try {
       const page = parseInt(req.query.page) || 1;
@@ -1121,30 +1073,31 @@ addToCartFromWishlist: async (req, res) => {
 },
 
 
-searchProduct : async (req, res) => {
+
+searchProduct: async (req, res) => {
   try {
     const query = req.query.q;
-    
+
     if (!query) {
-        return res.status(400).json({ success: false, message: 'Query is required' });
+      return res.status(400).json({ success: false, message: 'Query is required' });
     }
 
-    // Search for products matching the query
     const products = await Product.find({
-        $text: { $search: query }
+      $text: { $search: query },
+      isListed: 'Active' 
     });
 
     res.render('searchResults', {
-        query: query,
-        products: products
+      query: query,
+      products: products
     });
 
-} catch (error) {
+  } catch (error) {
     console.error(error);
     res.status(500).send('Server Error');
+  }
 }
 
-}
 
 }
 
