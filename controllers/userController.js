@@ -1,6 +1,6 @@
 
 mongoose = require("mongoose");
-// const bcrypt = require("bcrypt");
+// const bcrypt = require("bcrypt");  
 const bcrypt = require("bcryptjs");
 
 const nodemailer = require("nodemailer");
@@ -26,6 +26,8 @@ const transport = nodemailer.createTransport({
   }
 });
 
+
+
 // Generate a 6-digit OTP
 const generateOtp = () => {
   return Math.floor(100000 + Math.random() * 900000);
@@ -37,14 +39,12 @@ const securePassword = async (password) => {
   return await bcrypt.hash(password, saltRounds);
 };
 
-// User controller object
 const userController = {
   
 
   homePage: async (req, res) => {
     try {
-      // Fetch products from the database
-      const products = await Product.find({}).limit(8); // Adjust the limit as needed
+      const products = await Product.find({}).limit(8); 
 
       // Render the home page and pass the products
       res.render('home', { products: products });
@@ -58,47 +58,61 @@ const userController = {
   loadSignup: (req, res) => {
     res.render('signup');
   },
+
+
+
   processSignup: async (req, res) => {
     try {
-        
-      const details = {
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password,
-        otp: generateOtp(),
-        otpExpiration: Date.now() + 5 * 60 * 1000 // 5 minutes expiration
-      };
-      console.log('saww',req.body)
+        const { name, email, password } = req.body;
 
-      console.log('sfsfsf',details)
-
-      req.session.details = details;
-      req.session.details = details;
-      req.session.save();
-      res.redirect("/otpVerify");
-      console.log(req.session.details.otp);
-
-      const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: req.body.email,
-        subject: "OTP verification",
-        text: `Your OTP for verification is: ${details?.otp}`,
-      };
-
-      transport.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.log("Error occurred while sending email:", error);
-        } else {
-          console.log("Email sent:", info.response);
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).render('signup', {
+                alertMessage: "User already exists. Please sign in."
+            });
         }
-      });
 
-    //   res.redirect("/otpVerify");
+        const details = {
+            name,
+            email,
+            password,
+            otp: generateOtp(),
+            otpExpiration: Date.now() + 60 * 1000 
+        };
+
+        req.session.details = details;
+        req.session.save();
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "OTP verification",
+            text: `Your OTP for verification is: ${details.otp}`,
+        };
+
+        transport.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log("Error occurred while sending email:", error);
+                return res.status(500).render('signup', {
+                    alertMessage: "Failed to send OTP. Please try again."
+                });
+            } else {
+                console.log("Email sent:", info.response);
+                res.redirect("/otpVerify");
+            }
+        });
+
     } catch (error) {
-      console.log("Error in processSignup:", error.message);
-      res.status(500).json({ message: "Internal server error" });
+        console.log("Error in processSignup:", error.message);
+        res.status(500).render('signup', {
+            alertMessage: "Internal server error"
+        });
     }
-  },
+},
+
+
+
+
   loadLogin: (req, res) => {
     res.render('login');
   },
