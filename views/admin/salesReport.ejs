@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Evara Dashboard</title>
+    <title>Books Kart | Admin</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -148,7 +148,7 @@
                                     <tr>
                                         <td><%= new Date(orders.orderDate).toLocaleDateString() %></td>
                                         <td><%= orders.orderId %></td>
-                                        <td><%= orders.user.name %></td>
+                                        <td><%= orders.user ? orders.user.name : 'N/A' %></td>
                                         <td>
                                             <% orders.items.forEach(item => { %>
                                                 <div class="product-item"><%= item.name %></div>

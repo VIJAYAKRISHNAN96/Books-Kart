@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Admin Dashboard</title>
+    <title>Books Kart | Admin</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -334,14 +334,16 @@
                             <tbody>
                                 <% orders.forEach(order => { %>
                                     <% order.items.forEach(item => { %>
+                                       
+
                                         <tr>
-                                            <td><a href="#" class="fw-bold"><%= order._id %></a></td>
-                                            <td><%= order.user.email %></td>
-                                            <td><%= order.orderDate.toDateString() %></td> 
-                                            <td>$<%= order.billTotal.toFixed(2) %></td>
-                                            <td><%= item.status %></td>
-                                            <td><i class="material-icons md-payment font-xxl text-muted mr-5"></i> <%= order.paymentMethod %></td>
-                                        </tr>
+                                          <td><a href="#" class="fw-bold"><%= order._id %></a></td>
+                                          <td><%= order.user ? order.user.email : 'Unknown Email' %></td>
+                                          <td><%= order.orderDate.toDateString() %></td> 
+                                          <td>$<%= order.billTotal.toFixed(2) %></td>
+                                          <td><%= item.status %></td>
+                                      </tr>
+                                      
                                     <% }); %>
                                 <% }) %>
                             </tbody>

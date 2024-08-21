@@ -162,12 +162,13 @@
                             <tbody>
                                 <% orders.forEach(order => { %>
                                 <tr>
+                                      <td><b><%= order.user ? order.user.name : 'N/A' %></b></td>
+                                      <td><%= order.user ? order.user.email : 'N/A' %></td>
+                                      <td>$<%= order.billTotal.toFixed(2) %></td>
+
                                     
-                                    <!-- <td><%= order.orderId %></td> -->
-                                    <td><b><%= order.user.name %></b></td>
-                                    <td><%= order.user.email %></td>
-                                    <td>$<%= order.billTotal.toFixed(2) %></td>
                                     <td>
+                                    
                                         <% switch (order.orderStatus) {
                                             case 'Pending':
                                                 %><span class="badge rounded-pill alert-warning"><%= order.orderStatus %></span><%

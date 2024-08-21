@@ -102,6 +102,90 @@
 
    </style>
 
+<style>
+.wishlist-icon {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-text {
+    visibility: hidden;
+    width: 80px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Position above the icon */
+    left: 50%;
+    margin-left: -40px; /* Adjust to center the tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+}
+
+.tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%; /* Arrow on the bottom */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+.wishlist-icon:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+</style>
+
+<style>
+    .mini-cart-icon {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-text {
+    visibility: hidden;
+    width: 60px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Position above the icon */
+    left: 50%;
+    margin-left: -30px; /* Adjust to center the tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+}
+
+.tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%; /* Arrow on the bottom */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+.mini-cart-icon:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+</style>
+
 
 </head>
 
@@ -297,15 +381,17 @@
                     <div class="header-action-right">
                         <div class="header-action-2">
                             <div class="header-action-icon-2">
-                                <a href="/wishList">
+                                <a href="/wishList" class="wishlist-icon">
                                     <img class="svgInject" alt="Evara" src="/userAssets/imgs/theme/icons/icon-heart.svg">
-                                    <span class="pro-count blue"></span>
+                                    <span class="tooltip-text">Wishlist</span>
                                 </a>
+                                
+                                
                             </div>
                             <div class="header-action-icon-2">
                                 <a class="mini-cart-icon" href="/cart">
                                     <img alt="Evara" src="/userAssets/imgs/theme/icons/icon-cart.svg">
-                                    <span class="pro-count blue"></span>
+                                    <span class="tooltip-text">Cart</span>
                                 </a>
                                 
                             </div>
